@@ -13,7 +13,7 @@ module Api
       self.id = id.strip
     end
 
-    def initialize
+    def initialize(*arguments)
       if arguments[0].is_a?(Array)
         init_struct(arguments)
       else

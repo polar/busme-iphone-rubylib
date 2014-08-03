@@ -2,8 +2,10 @@ module Api
   class DiscoverAPIVersion1  < DiscoverAPI
     attr_accessor :initialUrl
     attr_accessor :discoverUrl
+    attr_accessor :masterUrl
 
     def initialize(url)
+      super()
       self.initialUrl = url
     end
 
@@ -37,14 +39,14 @@ module Api
     end
 
     def discover(lon, lat, buffer)
-      url = "#{initialUrl}?lon=#{lon}&lat=#{lat}&buf=#{buffer}"
+      url = "#{discoverUrl}?lon=#{lon}&lat=#{lat}&buf=#{buffer}"
       ent = openURL(url)
       tag = xmlParse(ent)
       masters = []
       if "masters" == tag.name.downcase
         for t in tag.childNodes do
           if "master" == t.name.downcase
-            m = parse_maser(t)
+            m = parse_master(t)
             masters << m
           end
         end
@@ -64,25 +66,26 @@ module Api
     private
 
     def parse_master(tag)
-      m = Master.new
-      m.lon = t.attributes["lon"].to_f
-      m.lat = t.attributes["lat"].to_f
-      m.name = t.attributes["name"]
-      m.slug = t.attributes["slug"]
-      m.apiUrl = t.attributes["api"]
-      bounds = t.attributes["api"]
+      master = Master.new
+      master.lon = tag.attributes["lon"].to_f
+      master.lat = tag.attributes["lat"].to_f
+      master.name = tag.attributes["name"]
+      master.slug = tag.attributes["slug"]
+      master.apiUrl = tag.attributes["api"]
+      bounds = tag.attributes["api"]
       box = bounds.split(",")
       if box.length == 4
-        m.bbox = box.map {|x| x.to_f}
+        master.bbox = box.map {|x| x.to_f}
       end
-      for child in t.childNodes do
+      for child in tag.childNodes do
         if "title" == child.name.downcase
-          m.title  = child.text
+          master.title  = child.text
         end
         if "description" == child.name.downcase
-          m.description = child.text
+          master.description = child.text
         end
       end
+      return master
     end
 
   end
