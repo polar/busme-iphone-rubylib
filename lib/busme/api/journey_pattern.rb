@@ -21,9 +21,13 @@ module Api
       @distance ||= Platform::GeoPathUtils.getDistance(path) if path
     end
 
+    def endPoint
+      path && path.last
+    end
+
     def loadParsedXML(tag)
       self.id = tag.attributes["id"]
-      self.distance = tag.attributes["distance"]
+      self.distance = tag.attributes["distance"].to_f
       if tag.childNodes
         for jps in tag.childNodes do
           if "jps" == jps.name.downcase

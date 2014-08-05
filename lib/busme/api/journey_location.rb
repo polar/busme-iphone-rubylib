@@ -10,5 +10,6 @@ module Api
     attr_accessor :onroute
     attr_accessor :reported
     attr_accessor :distance
+    attr_accessor :time
   end
 end

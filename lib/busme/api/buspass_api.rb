@@ -7,6 +7,7 @@ module Api
     attr_accessor :ready
     attr_accessor :syncRate
     attr_accessor :updateRate
+    attr_accessor :activeStartDisplayThreshold
 
     def initialize(initialURL, platform, appVersion)
       super()
@@ -16,6 +17,7 @@ module Api
 
       self.buspass = Buspass.new
       self.ready = false
+      self.activeStartDisplayThreshold = 10 * 60 # minutes
     end
 
     def isReady

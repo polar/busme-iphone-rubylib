@@ -49,7 +49,7 @@ module Integration
 
       t1 = cosa1 * Math.cos(a2) * cosb1 * Math.cos(b2)
       t2 = cosa1 * Math.sin(a2) * cosb1 * Math.sin(b2)
-      t3 = Math.sin(at) * Math.sin(b1)
+      t3 = Math.sin(a1) * Math.sin(b1)
       tt = Math.acos(t1 + t2 + t3)
 
       EARTH_RADIUS_FEET * tt
