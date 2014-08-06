@@ -4,7 +4,7 @@ module Api
     attr_accessor :point
     attr_accessor :version
     attr_accessor :length  # seconds
-    attr_accessor :frequency # miliseconds
+    attr_accessor :frequency # seconds
     attr_accessor :radius # feet?
     attr_accessor :priority
     attr_accessor :expiryTime
@@ -13,10 +13,12 @@ module Api
     attr_accessor :iconUrl
     attr_accessor :seen
     attr_reader   :lastSeen
+    attr_accessor :onDisplayQueue
 
     def initialize
       @seen = false
       @lastSeen = 0
+      @onDisplayQueue = false
     end
 
     def lastSeen=(lastSeen)
@@ -24,10 +26,14 @@ module Api
       @lastSeen = lastSeen
     end
 
-    def shouldBeSeen(time)
-      !@seen || time < expiryTime && @lastSeen + frequency < time
+    def shouldBeSeen?(time)
+      #!@seen || time < expiryTime && @lastSeen + frequency < time
+      time < expiryTime && (!@seen || @lastSeen + length + frequency < time)
     end
 
+    ##
+    # Only a valid call if shouldBeSeen! is true
+    #
     def nextTime(now)
       if !@seen
         now
@@ -40,7 +46,7 @@ module Api
       self.lastSeen = Time.now
     end
 
-    def isDisplayTimeExpired(time)
+    def isDisplayTimeExpired?(time)
       lastSeen + length < time
     end
 

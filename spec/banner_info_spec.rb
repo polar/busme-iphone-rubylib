@@ -23,7 +23,25 @@ describe Api::BannerInfo, "Seen" do
     @banner.expiryTime = Time.now + 10
     @banner.frequency = 10
     @banner.length = 10
-    expect(@banner.isDisplayTimeExpired(Time.now)).to eq(true)
+    expect(@banner.isDisplayTimeExpired?(Time.now)).to eq(true)
+  end
+
+  it 'should not be seen, and should be seen' do
+    @banner = Api::BannerInfo.new
+    @banner.expiryTime = Time.now + 10
+    @banner.frequency = 10
+    @banner.length = 10
+    expect !@banner.seen
+    expect(@banner.shouldBeSeen?(Time.now)).to eq(true)
+  end
+
+  it 'should not be seen if the banner is expired, even if never displayed' do
+    @banner = Api::BannerInfo.new
+    @banner.expiryTime = Time.now - 10
+    @banner.frequency = 10
+    @banner.length = 10
+    expect !@banner.seen
+    expect(@banner.shouldBeSeen?(Time.now)).to eq(false)
   end
 
   it 'should be not seen yet after last seen before frequency' do
@@ -32,7 +50,7 @@ describe Api::BannerInfo, "Seen" do
     @banner.expiryTime = Time.now + 10
     @banner.frequency = 10
     @banner.length = 10
-    expect(@banner.shouldBeSeen(Time.now)).to eq(false)
+    expect(@banner.shouldBeSeen?(Time.now)).to eq(false)
   end
 
   it 'should be seen yet after last seen after frequency' do
@@ -41,6 +59,6 @@ describe Api::BannerInfo, "Seen" do
     @banner.expiryTime = Time.now + 10
     @banner.frequency = 10
     @banner.length = 10
-    expect(@banner.shouldBeSeen(Time.now)).to eq(true)
+    expect(@banner.shouldBeSeen?(Time.now)).to eq(true)
   end
 end

@@ -24,13 +24,13 @@ module Platform
       bannerStore.removeBanner(key)
     end
 
-    def onLocationUpdate(location)
+    def onLocationUpdate(location, now = nil)
       point = GeoCalc.toGeoPoint(location)
-      now = Time.now
+      now = Time.now if now.nil?
       for banner in getBanners do
-        dist = point.distanceTo(banner.point)
+        dist = GeoCalc.getGeoDistance(point, banner.point)
         if dist < banner.radius
-          if banner.shouldBeSeen(now)
+          if banner.shouldBeSeen?(now)
             # display a marker
             bannerController.addBanner(banner)
           end

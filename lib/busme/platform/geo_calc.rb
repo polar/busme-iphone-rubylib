@@ -158,5 +158,9 @@ module Platform
       end
       return dist
     end
+
+    def self.toGeoPoint(location)
+      gp = Integration::GeoPoint.new(location.latitude * 1E6, location.longitude * 1E6)
+    end
   end
 end

@@ -41,8 +41,8 @@ module Integration
     def distanceTo(gp)
       a1 = DEG2RAD * latitude
       a2 = DEG2RAD * longitude
-      b1 = DEG2RAD * latitude
-      b2 = DEG2RAD * longitude
+      b1 = DEG2RAD * gp.latitude
+      b2 = DEG2RAD * gp.longitude
 
       cosa1 = Math.cos(a1)
       cosb1 = Math.cos(b1)

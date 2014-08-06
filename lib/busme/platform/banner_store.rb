@@ -8,7 +8,7 @@ module Platform
       @banners.values
     end
 
-    def addBanner(banner_info)
+    def addBanner(info)
       @banners[info.id] = info if info
     end
 

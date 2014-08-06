@@ -277,7 +277,7 @@ routeid='89abcb460e3a73c5c839e1b99e838996'
     expect(route.getEndTime).to eq(Time.parse("12:45"))
   end
 
-  it "should push locations" do
+  it "journey should push locations" do
     api = Api::BuspassAPI.new("", "Android", "0.0")
     route = Api::Route.new
     tag = Api::Tag.new(REXML::Document.new(@journey_spec).root)
@@ -288,12 +288,12 @@ routeid='89abcb460e3a73c5c839e1b99e838996'
     pattern.loadParsedXML(tag1)
     route.journeyPatterns << pattern
     loc = Api::JourneyLocation.new
-    loc.lat = -76.157838
-    loc.lon = 43.049161
+    loc.lat = pattern.path.last.latitude
+    loc.lon = pattern.path.last.longitude
     loc.timediff = 1 * 60
     loc.dir = 0.0
     loc.distance = pattern.distance
-    loc.reported_time = Time.parse("12:45")
+    loc.reported_time = route.getEndTime
     loc.onroute = true
     loc.reported = true
     route.pushCurrentLocation(loc)
