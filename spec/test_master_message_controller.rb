@@ -3,4 +3,9 @@ class TestMasterMessageController < Platform::MasterMessageController
   def presentMasterMessage(msg)
     @test_displayed_master_message = msg
   end
+
+  def dismissCurrentMasterMessage(remind, time)
+    super
+    @test_displayed_master_message = nil
+  end
 end

@@ -44,4 +44,20 @@ describe Utils::PriorityQueue do
     expect(q.poll).to eq(1)
     expect(q.pop).to eq(nil)
   end
+
+  class TestS < Struct.new(:a,:b)
+  end
+
+  it "should contain things that are pushed" do
+    q = Utils::PriorityQueue.new {|x,y| x.a <=> y.a }
+    a = TestS.new(1, "hi")
+    b = TestS.new(2, "world")
+    q.push(a)
+    q.push(b)
+    expect(q.include?(a)).to eq(true)
+    expect(q.include?(b)).to eq(true)
+    expect(q.poll).to eq(b)
+    expect(q.poll).to eq(a)
+    expect(q.pop).to eq(nil)
+  end
 end

@@ -1,7 +1,6 @@
 module Platform
   class MasterMessageStore
     attr_accessor :masterMessages
-    attr_accessor :seenMessages
     attr_accessor :dirty
 
     def initialize
@@ -20,9 +19,10 @@ module Platform
       self.dirty = true
     end
 
-    def resetMessages
+    def resetMessages(time = nil)
+      time = Time.now if time.nil?
       masterMessages.reject {|x| x.is_a?(Api::MessageSpec) && !x.is_a?(Api::MasterMessage)}
-      masterMessages.each {|x| x.reset}
+      masterMessages.each {|x| x.reset(time)}
       self.dirty = true
     end
 
@@ -36,6 +36,10 @@ module Platform
         end
         self.dirty = true
       end
+    end
+
+    def getMasterMessage(id)
+      masterMessages[id]
     end
 
     def preSerialize(time = nil)

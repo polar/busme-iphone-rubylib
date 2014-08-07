@@ -38,10 +38,10 @@ module Platform
       end
     end
 
-    def dismissCurrentMasterMessage(time = nil)
+    def dismissCurrentMasterMessage(remind, time = nil)
       time = Time.now if time.nil?
       if currentMasterMessage
-        currentMasterMessage.onDismiss(time)
+        currentMasterMessage.onDismiss(remind, time)
       end
       self.currentMasterMessage = nil
     end

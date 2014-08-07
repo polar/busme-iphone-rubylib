@@ -72,7 +72,8 @@ module Api
       end
     end
 
-    def reset
+    def reset(time = nil)
+      time = Time.now if time.nil?
       self.seen = false
       self.lastSeen = nil
       self.displayed = false
