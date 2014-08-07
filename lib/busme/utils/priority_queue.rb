@@ -42,6 +42,10 @@ module Utils
       @queue.slice!(@queue.size-1,1)[0] if @queue.size > 0
     end
 
+    def sort!
+      @queue.sort! {|x,y| @compare.call(x,y)}
+    end
+
     alias_method :pop, :poll
 
     def peek

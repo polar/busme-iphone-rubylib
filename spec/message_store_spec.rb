@@ -26,15 +26,26 @@ describe Platform::MessageStore do
 
   context "one message in store" do
 
-    it "should be seen" do
-      store.isNowSeen(msg1)
-      expect(store.isSeen(msg1.id)).to eq(true)
+    it "should be stored" do
+      now = time_now
+      store.addMasterMessage(msg1)
+      msg1.onDisplay(now)
+      store.clean(now)
+      expect(store.seenMessages).to include(msg1)
     end
 
     it "should not have message 2" do
       store.isNowSeen(msg1)
       expect(store.isSeen(msg2.id)).to eq(false)
     end
+
+    it "should remove message" do
+      store.isNowSeen(msg1)
+      expect(store.isSeen(msg1.id)).to eq(true)
+      store.removeMessage(msg1.id)
+      expect(store.isSeen(msg2.id)).to eq(false)
+    end
+
   end
 
 end
