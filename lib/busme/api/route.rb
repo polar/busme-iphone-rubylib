@@ -30,14 +30,32 @@ module Api
     attr_accessor :lastKnownDistance
     attr_accessor :lastKnownDirection
     attr_accessor :onRoute
-    attr_accessor :journeyPatterns
     attr_accessor :timeZone
     attr_accessor :reported
+
+    attr_accessor :journeyStore
+
+    def preSerialize
+      @journeyStore = nil
+      @paths = nil
+      @projectedPaths = nil
+    end
+
+    def postSerialize(api)
+      self.journeyStore = api.journeyStore
+    end
+
+    def getJourneyPattern(id)
+      journeyStore.getPattern(id)
+    end
+
+    def journeyPatterns
+      patternids.map {|x| journeyStore.getPattern(id) }.compact
+    end
 
     def initialize
       self.version = -1
       self.locationRefreshRate = 10 # seconds
-      self.journeyPatterns = []
     end
 
     def postSerialize(api)

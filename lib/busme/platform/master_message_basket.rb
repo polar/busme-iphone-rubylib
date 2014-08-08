@@ -27,7 +27,7 @@ module Platform
       for msg in masterMessageStore.masterMessages.values do
         if msg.is_a? Api::MasterMessage
           if time <= msg.expiryTime && (!msg.seen || msg.remindTime && msg.remindTime <= time)
-            if msg.point && msg.radius
+            if msg.point && msg.radius && msg.radius > 0
               dist = GeoCalc.getGeoDistance(point, msg.point)
               if dist < msg.radius
                 masterMessageController.addMasterMessage(msg)
