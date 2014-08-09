@@ -13,6 +13,8 @@ module Api
     def initialize(status, reason = "")
       self.status = status
       self.reason = reason
+      self.roles = []
+      self.rolesLiteral = ""
     end
 
     def hasRole?(name)
