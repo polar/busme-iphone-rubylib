@@ -20,27 +20,24 @@ module Platform
 
     def roll(removeCurrent, now = nil)
       now = Time.now  if now.nil?
-      remove = false
       if currentBanner
         if !removeCurrent && !currentBanner.isDisplayTimeExpired?(now)
           return
         else
-          remove = true
+          abandonBanner(currentBanner)
+          currentBanner.onDismiss(now)
+          self.currentBanner = nil
         end
       end
       banner = @bannerQ.poll
       while banner do
         if banner.shouldBeSeen?(now)
           presentBanner(banner)
-          banner.lastSeen = now
+          banner.onDisplay(now)
           self.currentBanner = banner
           return
         end
         banner = @bannerQ.poll
-      end
-      if remove
-        abandonBanner(currentBanner)
-        self.currentBanner = nil
       end
     end
 

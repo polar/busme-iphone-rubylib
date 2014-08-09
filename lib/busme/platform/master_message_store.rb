@@ -8,13 +8,17 @@ module Platform
       self.dirty = true
     end
 
+    def getMasterMessages
+      masterMessages.values
+    end
+
     def addMasterMessage(msg)
       masterMessages[msg.id] = msg
       self.dirty = true
     end
 
     def removeMasterMessage(msg_or_id)
-      masterMessages.delete(msg_or_id.id) if msg.is_a? Api::MessageSpec
+      masterMessages.delete(msg_or_id.id) if msg_or_id.is_a? Api::MessageSpec
       masterMessages.delete(msg_or_id)
       self.dirty = true
     end

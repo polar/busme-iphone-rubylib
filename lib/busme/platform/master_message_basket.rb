@@ -10,6 +10,14 @@ module Platform
       self.masterMessageController = controller
     end
 
+    def getMasterMessages
+      masterMessageStore.getMasterMessages
+    end
+
+    def removeMasterMessage(id)
+      masterMessageStore.removeMasterMessage(id)
+    end
+
     def addMasterMessage(msg)
       stored_message = masterMessageStore.getMasterMessage(msg.id)
       if stored_message

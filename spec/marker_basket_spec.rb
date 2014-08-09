@@ -66,6 +66,13 @@ describe Platform::MarkerBasket do
       expect(store.markers.values).to include(msg1)
     end
 
+    it "should remove markers" do
+      basket.addMarker(msg1)
+      expect(store.markers.values).to include(msg1)
+      basket.removeMarker(msg1.id)
+      expect(store.markers.values).to_not include(msg1)
+    end
+
     it "should display marker on location" do
       now = time_now
       basket.addMarker(msg1)

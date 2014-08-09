@@ -1,0 +1,30 @@
+
+<Route curloc='http://busme-apis.herokuapp.com/masters/50fcc339223520000c000088/apis/1/968f501b3e02890cffa2a1e1b80bc3ca'
+       id='968f501b3e02890cffa2a1e1b80bc3ca'
+       type='journey'
+       dir='Warehouse'
+       sort='436.0'
+       routeCode='643'
+       version='1399940356'
+       name='Warehouse'
+       timeless='false'
+       startOffset='745'
+       duration='20.0'
+       distance='15415.938937646108'
+       time_zone='America/New_York'
+       locationRefreshRate='10'
+       nw_lon='-76.15842'
+       nw_lat='43.049618'
+       se_lon='-76.131349'
+       se_lat='43.035447'
+       patternid='b2d03c4880f6d57b3b4edfa5aa9c9211'
+       routeid='9864eb9e615f740526e93f6297e29435'
+        >
+  <Links>
+    <Link distance='1191.568971761244' average_speed='19.8594828626874' duration='1.0'/>
+    <Link distance='2628.7647354610676' average_speed='14.604248530339264' duration='3.0'/>
+    <Link distance='4009.5913295447585' average_speed='13.365304431815861' duration='5.0'/>
+    <Link distance='2128.859239098445' average_speed='17.740493659153707' duration='2.0'/>
+    <Link distance='5457.154661780593' average_speed='10.105841966260359' duration='9.0'/>
+  </Links>
+</Route>

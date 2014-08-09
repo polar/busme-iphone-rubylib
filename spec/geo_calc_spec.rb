@@ -94,11 +94,11 @@ describe Platform::GeoCalc, "getGeoDistance" do
     expect(Platform::GeoCalc.getGeoAngle(@c1, @c2)).to eq(0)
   end
 
-  it "should have a GeoAngle of 90" do
+  it "should have a GeoAngle of 0" do
     @c1.longitude = 0.00
     @c1.latitude = 1.00
     @c2.longitude = 0.0
-    @c2.latitude  = -1.0
+    @c2.latitude  = 1.0
     expect(Platform::GeoCalc.getGeoAngle(@c1, @c2)).to eq(0)
   end
 

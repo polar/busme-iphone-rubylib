@@ -277,6 +277,11 @@ routeid='89abcb460e3a73c5c839e1b99e838996'
     expect(route.getEndTime).to eq(Time.parse("12:45"))
   end
 
+  class TestJourneyStore
+    attr_accessor :journeys
+    def initialize; self.journeys = {}; end
+    def getPattern(id); journeys[id]; end
+  end
   it "journey should push locations" do
     api = Api::BuspassAPI.new("", "Android", "0.0")
     route = Api::Route.new
@@ -286,7 +291,9 @@ routeid='89abcb460e3a73c5c839e1b99e838996'
     pattern = Api::JourneyPattern.new
     tag1 = Api::Tag.new(REXML::Document.new(@pattern_spec).root)
     pattern.loadParsedXML(tag1)
-    route.journeyPatterns << pattern
+    # Mock Journey Store for the patterns
+    route.journeyStore = TestJourneyStore.new
+    route.journeyStore.journeys[pattern.id] = pattern
     loc = Api::JourneyLocation.new
     loc.lat = pattern.path.last.latitude
     loc.lon = pattern.path.last.longitude

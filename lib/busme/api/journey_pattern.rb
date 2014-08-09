@@ -27,7 +27,8 @@ module Api
 
     def loadParsedXML(tag)
       self.id = tag.attributes["id"]
-      self.distance = tag.attributes["distance"].to_f
+      @distance = tag.attributes["distance"]
+      @distance = @distance.to_f if @distance
       if tag.childNodes
         for jps in tag.childNodes do
           if "jps" == jps.name.downcase

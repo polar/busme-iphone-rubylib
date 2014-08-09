@@ -34,6 +34,31 @@ describe Platform::MasterMessageStore do
       expect(store.masterMessages.keys).to include(msg1.id)
     end
 
+    it "should be retrieved" do
+      store.addMasterMessage(msg1)
+      expect(store.getMasterMessages).to include(msg1)
+    end
+
+    it "should remove a message by object" do
+      now = time_now
+      store.addMasterMessage(msg1)
+      msg1.onDisplay(now)
+      store.clean(now)
+      store.addMasterMessage(msg1)
+      store.removeMasterMessage(msg1)
+      expect(store.masterMessages.keys).to_not include(msg1.id)
+    end
+
+    it "should remove a message by id" do
+      now = time_now
+      store.addMasterMessage(msg1)
+      msg1.onDisplay(now)
+      store.clean(now)
+      store.addMasterMessage(msg1)
+      store.removeMasterMessage(msg1.id)
+      expect(store.masterMessages.keys).to_not include(msg1.id)
+    end
+
     it "should be expired" do
       now = time_now
       store.addMasterMessage(msg1)

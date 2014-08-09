@@ -13,22 +13,37 @@ module Api
     attr_accessor :iconUrl
     attr_accessor :seen
     attr_reader   :lastSeen
+    attr_reader   :beginSeen
     attr_accessor :onDisplayQueue
 
     def initialize
       @seen = false
-      @lastSeen = 0
       @onDisplayQueue = false
     end
 
     def lastSeen=(lastSeen)
-      @seen = true
       @lastSeen = lastSeen
+    end
+
+    def beginSeen=(time)
+      @seen = true
+      @beginSeen = time
     end
 
     def shouldBeSeen?(time)
       #!@seen || time < expiryTime && @lastSeen + frequency < time
-      time < expiryTime && (!@seen || @lastSeen + length + frequency < time)
+      time < expiryTime && (!@seen || !@beginSeen && @lastSeen && @lastSeen + frequency < time)
+    end
+
+    def onDisplay(time = nil)
+      time = Time.now if time.nil?
+      self.beginSeen = time
+    end
+
+    def onDismiss(time = nil)
+      time = Time.now if time.nil?
+      self.lastSeen = time
+      self.beginSeen = nil
     end
 
     ##
@@ -47,7 +62,7 @@ module Api
     end
 
     def isDisplayTimeExpired?(time)
-      lastSeen + length < time
+      !!beginSeen && beginSeen + length < time
     end
 
   end

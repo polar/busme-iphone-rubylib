@@ -38,6 +38,32 @@ describe Platform::MarkerStore do
       expect(store.markers.keys).to include(msg1.id)
     end
 
+    it "should be retrieved" do
+      now = time_now
+      store.addMarker(msg1)
+      expect(store.getMarkers).to include(msg1)
+    end
+
+    it "should remove a marker by marker" do
+      now = time_now
+      store.addMarker(msg1)
+      msg1.onDisplay(now)
+      store.clean(now)
+      expect(store.markers.keys).to include(msg1.id)
+      store.removeMarker(msg1)
+      expect(store.markers.keys).to_not include(msg1.id)
+    end
+
+    it "should remove a marker by id" do
+      now = time_now
+      store.addMarker(msg1)
+      msg1.onDisplay(now)
+      store.clean(now)
+      expect(store.markers.keys).to include(msg1.id)
+      store.removeMarker(msg1.id)
+      expect(store.markers.keys).to_not include(msg1.id)
+    end
+
     it "should be expired" do
       now = time_now
       store.addMarker(msg1)

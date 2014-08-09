@@ -12,6 +12,14 @@ module Platform
       patterns[id]
     end
 
+    def containsPattern?(id)
+      patterns.keys.include?(id)
+    end
+
+    def containsJourney?(id)
+      journeys.keys.include?(id)
+    end
+
     def storePattern(pattern)
       patterns[pattern.id] = pattern
     end
@@ -23,6 +31,14 @@ module Platform
 
     def getJourney(id)
       journeys[id]
+    end
+
+    def removeJourney(id)
+      journeys.delete id
+    end
+
+    def removePattern(id)
+      patterns.delete id
     end
 
     def preSerialize

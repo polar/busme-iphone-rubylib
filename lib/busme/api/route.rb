@@ -144,8 +144,8 @@ module Api
     def isFinished?
       loc = lastKnownLocation
       distance = lastKnownDistance
-      path_distance = journeyPatterns[0].distance
-      dist_from_last = journeyPatterns[0].endPoint.distanceTo(loc)
+      path_distance = getJourneyPattern(patternid).distance
+      dist_from_last = getJourneyPattern(patternid).endPoint.distanceTo(loc)
       path_distance - distance < 10 && dist_from_last < 3 # feet
     end
 

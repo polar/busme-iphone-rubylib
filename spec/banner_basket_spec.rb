@@ -85,10 +85,13 @@ describe Platform::BannerBasket do
       basket.onLocationUpdate(location1, now)
       controller.roll(false, now)
       expect(controller.test_displayed_banner).to eq(banner1)
-      expect(banner1.lastSeen).to eq(now)
+      expect(banner1.beginSeen).to eq(now)
 
       # Will get picked up by the basket and may be placed on the display multiple times
-      now += banner1.length + banner1.frequency + 1
+      now += banner1.length +  1
+      controller.roll(false, now)
+      expect(controller.test_displayed_banner).to eq(nil)
+      now += banner1.frequency + 1
       basket.onLocationUpdate(location1, now)
       now += 1
       basket.onLocationUpdate(location1, now)

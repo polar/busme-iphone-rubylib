@@ -63,6 +63,18 @@ describe Platform::MasterMessageBasket do
       expect(store.masterMessages.values).to include(msg1)
     end
 
+    it "should retrieve messages" do
+      basket.addMasterMessage(msg1)
+      expect(basket.getMasterMessages).to include(msg1)
+    end
+
+    it "should remove messages" do
+      basket.addMasterMessage(msg1)
+      expect(store.masterMessages.values).to include(msg1)
+      basket.removeMasterMessage(msg1.id)
+      expect(store.masterMessages.values).to_not include(msg1)
+    end
+
     it "should display message on location" do
       now = time_now
       basket.addMasterMessage(msg1)

@@ -10,6 +10,10 @@ module Platform
       self.markerController = controller
     end
 
+    def getMarkers
+      markerStore.markers.values
+    end
+
     def addMarker(marker_info)
       markerStore.addMarker(marker_info)
     end

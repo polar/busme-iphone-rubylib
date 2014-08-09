@@ -40,7 +40,7 @@ describe Platform::MasterMessageController do
       expect(msg1.displayed).to eq(true)
       expect(msg1.lastSeen).to be_within(1).of(now)
       now += 5
-      controller.dismissCurrentMasterMessage(now)
+      controller.dismissCurrentMasterMessage(true, now)
       expect(msg1.seen).to eq(true)
       expect(msg1.displayed).to eq(false)
       expect(msg1.lastSeen).to be_within(1).of(now)
@@ -64,7 +64,7 @@ describe Platform::MasterMessageController do
       expect(msg2.displayed).to eq(true)
       expect(msg2.lastSeen).to be_within(1).of(now)
       now += 5
-      controller.dismissCurrentMasterMessage(now)
+      controller.dismissCurrentMasterMessage(false, now)
       expect(msg2.seen).to eq(true)
       expect(msg2.displayed).to eq(false)
       expect(msg2.lastSeen).to be_within(1).of(now)
@@ -80,7 +80,7 @@ describe Platform::MasterMessageController do
       controller.roll(now)
       expect(controller.test_displayed_master_message).to eq(msg2)
       now += 5
-      controller.dismissCurrentMasterMessage(now)
+      controller.dismissCurrentMasterMessage(false, now)
       expect(controller.currentMasterMessage).to eq(nil)
       now += 1
       controller.roll(now)

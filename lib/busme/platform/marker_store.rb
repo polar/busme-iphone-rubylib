@@ -8,13 +8,17 @@ module Platform
       self.dirty = true
     end
 
+    def getMarkers
+      markers.values
+    end
+
     def addMarker(msg)
       markers[msg.id] = msg
       self.dirty = true
     end
 
-    def removeMaker(msg_or_id)
-      markers.delete(msg_or_id.id) if msg.is_a? Api::MarkerInfo
+    def removeMarker(msg_or_id)
+      markers.delete(msg_or_id.id) if msg_or_id.is_a? Api::MarkerInfo
       markers.delete(msg_or_id)
       self.dirty = true
     end
