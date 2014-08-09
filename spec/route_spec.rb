@@ -282,6 +282,7 @@ routeid='89abcb460e3a73c5c839e1b99e838996'
     def initialize; self.journeys = {}; end
     def getPattern(id); journeys[id]; end
   end
+
   it "journey should push locations" do
     api = Api::BuspassAPI.new("", "Android", "0.0")
     route = Api::Route.new

@@ -44,7 +44,6 @@ module Platform
 
     def onLocationUpdate(route, locations)
       jd = journeyDisplayMap[route.id]
-      jd.onLocationUpdate(route, locations)
     end
 
     def presentJourneyDisplay(journey_display)
