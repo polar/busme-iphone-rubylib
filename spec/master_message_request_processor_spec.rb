@@ -17,7 +17,7 @@ describe Platform::MasterMessageRequestProcessor do
     message
   }
   let(:msg2) {
-    lit = "<Message id='2' version='1'><Content>Hello</Content></Message>"
+    lit = "<Message id='2' version='9'><Content>Hello</Content></Message>"
     doc = REXML::Document.new(lit)
     tag = Api::Tag.new(doc.root)
     message = Api::MasterMessage.new
@@ -27,7 +27,7 @@ describe Platform::MasterMessageRequestProcessor do
   let(:response) {
     lit = "<Response><Messages>
             <Message id='1' destroy='1'/>
-            <Message id='2' version='2'><Content>Goodbye</Content></Message>
+            <Message id='2' version='10'><Content>Goodbye</Content></Message>
             <Message id='3' version='1'><Content>Voila</Content></Message>
           </Messages></Response>"
     doc = REXML::Document.new(lit)
@@ -38,9 +38,11 @@ describe Platform::MasterMessageRequestProcessor do
     basket.addMasterMessage(msg1)
     basket.addMasterMessage(msg2)
     args = processor.getArguments
+    # size is guaranteed, but order (other than (id,version) pairs coincide) is not
     expect(args.size).to eq(4)
     args1 = args.take(2)
     if !args1.include? ["message_ids[]", msg1.id]
+      # flip them so we can easily test
       args2 = args1
       args1 = args.drop(2)
     else
@@ -56,8 +58,11 @@ describe Platform::MasterMessageRequestProcessor do
     basket.addMasterMessage(msg1)
     basket.addMasterMessage(msg2)
     processor.onResponse(response)
+    # should destroy message 1
     expect(store.masterMessages[msg1.id]).to eq(nil)
-    expect(store.masterMessages[msg2.id].version).to eq(2)
+    # should upgrade message 2
+    expect(store.masterMessages[msg2.id].version).to eq(10)
+    # should now have message 3
     expect(store.masterMessages["3"]).to_not eq(nil)
   end
 

@@ -1,5 +1,6 @@
 module Platform
   class BannerStore
+    attr_accessor :banners
     def initialize
       @banners = {}
     end
