@@ -10,7 +10,6 @@ module Api
     def initialize(api)
       self.api = api
       api.bgEvents.registerForEvent("LoginEvent", self)
-      api.uiEvents.registerForEvent("LoginEvent", self)
     end
 
     def onBuspassEvent(event)
@@ -31,10 +30,8 @@ module Api
           registerLogin
         when Login::LS_LOGGED_IN
         when Login::LS_LOGGED_OUT
-
-        # Check UI Events
         else
-          confirmLogin
+          raise "Bad Option"
       end
     end
 

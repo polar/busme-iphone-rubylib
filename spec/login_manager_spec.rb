@@ -4,12 +4,23 @@ require "test_api"
 
 class TestListener
   include Api::BuspassEventListener
-
+  attr_accessor :api
+  def initialize(api)
+    self.api = api
+  end
   attr_accessor :event
   def onBuspassEvent(event)
     self.event = event
   end
 end
+
+class TestListener2 < TestListener
+  def onBuspassEvent(event)
+    super(event)
+    api.loginManager.confirmLogin
+  end
+end
+
 
 describe Api::LoginManager do
   let (:suGet) { fileName = File.join("spec", "test_data", "SUGet.xml"); TestHttpMessage.new(200, "OK", File.read(fileName))}
@@ -29,7 +40,7 @@ describe Api::LoginManager do
     api.forceGet
     api
   }
-  let (:listener) { TestListener.new }
+  let (:listener) { TestListener.new(api) }
   let (:login) { Api::Login.new }
 
   before do
@@ -162,6 +173,7 @@ describe Api::LoginManager do
   end
 
   it "should roll to logged out on invalid token when quiet" do
+    api.uiEvents.registerForEvent("LoginEvent", TestListener2.new(api))
     login.quiet = true
     test_response(Api::Login::LS_AUTHTOKEN, invalidToken)
     api.uiEvents.roll()
