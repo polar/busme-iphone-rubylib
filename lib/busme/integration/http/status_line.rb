@@ -3,11 +3,10 @@ module Integration
     class StatusLine
       attr_accessor :reasonPhrase
       attr_accessor :statusCode
-    end
-
-      def initialize(code, phrase)
-        self.reasonPhrase = phrase
+      def initialize(code, reason)
         self.statusCode = code
+        self.reasonPhrase = reason
+      end
     end
 end
 end

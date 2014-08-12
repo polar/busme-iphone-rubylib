@@ -6,7 +6,7 @@ module Integration
         self.httpResponse = httpResponse
       end
       def getAllHeaders()
-        @headers ||= httpResponse.header.header.item.map {|k,v| Header.new(k,v)}
+        @headers ||= httpResponse.header.items.map {|k,v| Header.new(k,v)}
       end
       def getEntity()
         @entity ||= HttpEntity.new(httpResponse)

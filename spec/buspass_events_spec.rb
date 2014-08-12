@@ -1,7 +1,7 @@
 require "spec_helper"
 
 class TestListener
-  include Platform::BuspassEventListener
+  include Api::BuspassEventListener
   attr_accessor :testEventName
   attr_accessor :testEventData
   attr_accessor :testEventTime
@@ -13,11 +13,11 @@ class TestListener
   end
 end
 
-describe Platform::BuspassEventNotifier do
-  let(:event1) { Platform::BuspassEvent.new("A", [1,2])}
+describe Api::BuspassEventNotifier do
+  let(:event1) { Api::BuspassEvent.new("A", [1,2])}
   let(:listener1) { TestListener.new() }
   let(:listener2) { TestListener.new() }
-  let(:notifier) { Platform::BuspassEventNotifier.new("A") }
+  let(:notifier) { Api::BuspassEventNotifier.new("A") }
 
   it "should accept an event listener" do
     notifier.register(listener1)
@@ -39,11 +39,11 @@ describe Platform::BuspassEventNotifier do
   end
 end
 
-describe Platform::BuspassEventDistributor do
-  let(:event1) { Platform::BuspassEvent.new("A", [1,2])}
+describe Api::BuspassEventDistributor do
+  let(:event1) { Api::BuspassEvent.new("A", [1,2])}
   let(:listener1) { TestListener.new() }
   let(:listener2) { TestListener.new() }
-  let(:distributor) { Platform::BuspassEventDistributor.new }
+  let(:distributor) { Api::BuspassEventDistributor.new }
 
   it "should register a buspass event and distribute it" do
     distributor.registerForEvent("A", listener1)
@@ -76,6 +76,40 @@ describe Platform::BuspassEventDistributor do
     expect(listener2.testEventData).to eq(nil)
 
     distributor.triggerEvent("B", [1,2])
+
+    expect(listener1.testEventName).to eq("A")
+    expect(listener1.testEventData).to eq([3,4])
+    expect(listener2.testEventName).to eq("B")
+    expect(listener2.testEventData).to eq([1,2])
+    expect(listener2.testEventTime > listener1.testEventTime)
+  end
+
+  it "should register event, post with with data and distribute it" do
+    distributor.registerForEvent("A", listener1)
+    distributor.registerForEvent("A", listener2)
+
+    event = Api::BuspassEvent.new("A", [3,4])
+    distributor.postEvent(event)
+
+    e1 = distributor.roll
+
+    expect(e1).to eq(event)
+
+    expect(listener1.testEventName).to eq("A")
+    expect(listener1.testEventData).to eq([3,4])
+    expect(listener2.testEventName).to eq("A")
+    expect(listener2.testEventData).to eq([3,4])
+    expect(listener2.testEventTime > listener1.testEventTime)
+  end
+
+  it "should register 2 events post events with data and distribute it" do
+    distributor.registerForEvent("A", listener1)
+    distributor.registerForEvent("B", listener2)
+    distributor.postEvent("A", [3,4])
+
+    distributor.postEvent("B", [1,2])
+
+    distributor.rollAll
 
     expect(listener1.testEventName).to eq("A")
     expect(listener1.testEventData).to eq([3,4])

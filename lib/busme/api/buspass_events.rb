@@ -1,4 +1,4 @@
-module Platform
+module Api
   class BuspassEvent
     attr_accessor :eventName
     attr_accessor :eventData
@@ -36,9 +36,35 @@ module Platform
 
   class BuspassEventDistributor
     attr_accessor :eventNotifiers
+    attr_accessor :eventQ
 
     def initialize
       self.eventNotifiers = {}
+      self.eventQ = Utils::PriorityQueue.new
+    end
+
+    def postEvent(event, data = nil)
+      event = event.is_a?(BuspassEvent) ? event : BuspassEvent.new(event, data)
+      postBuspassEvent(event)
+    end
+
+    def postBuspassEvent(event)
+      eventQ.push(event)
+    end
+
+    def roll
+      event = eventQ.pop
+      if event
+        triggerBuspassEvent(event)
+      end
+      event
+    end
+
+    def rollAll
+      event = roll
+      while event do
+        event = roll
+      end
     end
 
     def triggerEvent(event, data = nil)

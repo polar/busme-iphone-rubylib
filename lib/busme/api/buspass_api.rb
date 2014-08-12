@@ -8,6 +8,10 @@ module Api
     attr_accessor :syncRate
     attr_accessor :updateRate
     attr_accessor :activeStartDisplayThreshold
+    attr_accessor :busmeAppVersionString
+    attr_accessor :loginManager
+    attr_accessor :uiEvents
+    attr_accessor :bgEvents
 
     def initialize(initialURL, platform, appVersion)
       super()
@@ -18,6 +22,10 @@ module Api
       self.buspass = Buspass.new
       self.ready = false
       self.activeStartDisplayThreshold = 10 * 60 # minutes
+      self.busmeAppVersionString = "#{self.platformName} #{self.appVersion}"
+      self.uiEvents = BuspassEventDistributor.new()
+      self.bgEvents = BuspassEventDistributor.new()
+      self.loginManager = LoginManager.new(self)
     end
 
     def isReady
@@ -102,5 +110,146 @@ module Api
       end
     end
 
+    def passwordRegistration(login)
+      login.url = buspass.registerUrl
+      params = []
+      params << ["email", login.email]
+      params << ["password", login.password]
+      params << ["password_confirmation", login.password]
+      params << ["role_intent", login.roleIntent]
+      params << ["auth_code", login.driverAuthCode]
+      params << ["app_version", busmeAppVersionString()]
+      resp = postURLResponse(buspass.registerUrl, params)
+      status = resp.getStatusLine().statusCode
+      entity = resp.getEntity()
+
+      if status == 200
+        tag = xmlParse(entity)
+        if "login" == tag.name.downcase
+          login.status = tag.attributes["status"]
+          if "OK" == login.status
+            login.name = tag.attributes["name"]
+            email = tag.attributes['email']
+            if email
+              login.email = email
+            end
+            roleIntent = tag.attributes["roleIntent"]
+            if roleIntent
+              login.roleIntent = roleIntent
+            end
+            rolesLiteral = tag.attributes["roles"]
+            if rolesLiteral
+              login.roles = rolesLiteral.split(",")
+              login.rolesLiteral = rolesLiteral
+            end
+            login.authToken = tag.attributes["authToken"]
+            login.loginState = Login::LS_REGISTER_SUCCESS
+          else
+            login.loginState = Login::LS_REGISTER_FAILURE
+          end
+        else
+          login.status = "NotProperResponse"
+          login.loginState = Login::LS_REGISTER_FAILURE
+        end
+      else
+        login.status = "NetworkProblem"
+        login.loginState = Login::LS_REGISTER_FAILURE
+      end
+      login
+    end
+
+    def passwordLogin(login)
+      login.url = buspass.loginUrl
+      params = []
+      params << ["email", login.email]
+      params << ["password", login.password]
+      params << ["role_intent", login.roleIntent]
+      params << ["auth_code", login.driverAuthCode]
+      params << ["app_version", busmeAppVersionString]
+      resp = postURLResponse(buspass.loginUrl, params)
+      status = resp.getStatusLine().statusCode
+      entity = resp.getEntity()
+
+      if status == 200
+        tag = xmlParse(entity)
+        if "login" == tag.name.downcase
+          login.status = tag.attributes["status"]
+          if "OK" == login.status
+            login.name = tag.attributes["name"]
+            email = tag.attributes['email']
+            if email
+              login.email = email
+            end
+            roleIntent = tag.attributes["roleIntent"]
+            if roleIntent
+              login.roleIntent = roleIntent
+            end
+            rolesLiteral = tag.attributes["roles"]
+            if rolesLiteral
+              login.roles = rolesLiteral.split(",")
+              login.rolesLiteral = rolesLiteral
+            end
+            login.authToken = tag.attributes["authToken"]
+            login.loginState = Login::LS_LOGIN_SUCCESS
+          else
+            login.loginState = Login::LS_LOGIN_FAILURE
+          end
+        else
+          login.status = "NotProperResponse"
+          login.loginState = Login::LS_LOGIN_FAILURE
+        end
+      else
+        login.status = "NetworkProblem"
+        login.loginState = Login::LS_LOGIN_FAILURE
+      end
+      login
+    end
+
+    def authTokenLogin(login)
+      login.url = buspass.authUrl
+      params = []
+      params << ["access_token", login.authToken]
+      params << ["role_intent", login.roleIntent]
+      params << ["app_version", busmeAppVersionString()]
+      resp = postURLResponse(buspass.authUrl, params)
+      status = resp.getStatusLine().statusCode
+      entity = resp.getEntity()
+
+      if status == 200
+        tag = xmlParse(entity)
+        if "login" == tag.name.downcase
+          login.status = tag.attributes["status"]
+          if "OK" == login.status
+            login.name = tag.attributes["name"]
+            email = tag.attributes['email']
+            if email
+              login.email = email
+            end
+            roleIntent = tag.attributes["roleIntent"]
+            if roleIntent
+              login.roleIntent = roleIntent
+            end
+            rolesLiteral = tag.attributes["roles"]
+            if rolesLiteral
+              login.roles = rolesLiteral.split(",")
+              login.rolesLiteral = rolesLiteral
+            end
+            login.authToken = tag.attributes["authToken"]
+            login.name = tag.attributes["name"]
+            login.loginState = Login::LS_AUTHTOKEN_SUCCESS
+          else
+            login.loginState = Login::LS_AUTHTOKEN_FAILURE
+          end
+
+        else
+          login.status = "NotProperResponse"
+          login.loginState = Login::LS_AUTHTOKEN_FAILURE
+        end
+      else
+        login.status = "NetworkProblem"
+        login.loginState = Login::LS_AUTHTOKEN_FAILURE
+      end
+      login
+    end
   end
 end
