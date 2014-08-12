@@ -2,26 +2,6 @@ require "spec_helper"
 require "test_http_client"
 require "test_api"
 
-class TestListener
-  include Api::BuspassEventListener
-  attr_accessor :api
-  def initialize(api)
-    self.api = api
-  end
-  attr_accessor :event
-  def onBuspassEvent(event)
-    self.event = event
-  end
-end
-
-class TestListener2 < TestListener
-  def onBuspassEvent(event)
-    super(event)
-    api.loginManager.confirmLogin
-  end
-end
-
-
 describe Api::LoginManager do
   let (:suGet) { fileName = File.join("spec", "test_data", "SUGet.xml"); TestHttpMessage.new(200, "OK", File.read(fileName))}
   let (:badResponse) { TestHttpMessage.new(500, "Internal Error", "")}
@@ -40,11 +20,11 @@ describe Api::LoginManager do
     api.forceGet
     api
   }
-  let (:listener) { TestListener.new(api) }
   let (:login) { Api::Login.new }
 
+  # always instantiate the api first.
   before do
-    api.uiEvents.registerForEvent("LoginEvent", listener)
+    api
   end
 
   it "should handle get" do
@@ -56,30 +36,20 @@ describe Api::LoginManager do
 
   it "should handle the logins with the correct Urls" do
     login.loginState = Api::Login::LS_LOGIN
-    api.bgEvents.triggerEvent("LoginEvent", login)
+    api.loginManager.enterProtocol(login)
 
     # make sure we got the right URL
     expect(login.url).to eq(api.buspass.loginUrl)
     login.loginState = Api::Login::LS_AUTHTOKEN
-    api.bgEvents.triggerEvent("LoginEvent", login)
+    api.loginManager.enterProtocol(login)
 
     # make sure we got the right URL
     expect(login.url).to eq(api.buspass.authUrl)
     login.loginState = Api::Login::LS_REGISTER
-    api.bgEvents.triggerEvent("LoginEvent", login)
+    api.loginManager.enterProtocol(login)
 
     # make sure we got the right URL
     expect(login.url).to eq(api.buspass.registerUrl)
-  end
-
-  it "should hit the uiEvents" do
-
-    login.loginState = Api::Login::LS_LOGIN
-    api.bgEvents.triggerEvent("LoginEvent", login)
-    api.uiEvents.roll
-
-    expect(listener.event).to_not eq(nil)
-    expect(listener.event.eventData).to eq(login)
   end
 
   def test_response(startState, response)
@@ -88,9 +58,7 @@ describe Api::LoginManager do
 
     httpClient.mock_answer = response
 
-    api.bgEvents.triggerEvent("LoginEvent", login)
-    api.uiEvents.roll
-    login
+    api.loginManager.enterProtocol(login)
   end
 
   it "should handle bad response from login, auth, and register" do
@@ -147,36 +115,39 @@ describe Api::LoginManager do
     expect(login.authToken).to eq("testToken")
   end
 
+  def test_response_and_exit(startState, response)
+    login.email = "polar@syr.edu"
+    login.loginState = startState
+
+    httpClient.mock_answer = response
+
+    api.loginManager.enterProtocol(login)
+    api.loginManager.exitProtocol
+  end
+
   it "should roll to logged in" do
-    test_response(Api::Login::LS_LOGIN, loginOK)
-    api.uiEvents.roll()
+    test_response_and_exit(Api::Login::LS_LOGIN, loginOK)
     expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
-    test_response(Api::Login::LS_AUTHTOKEN, loginOK)
-    api.uiEvents.roll()
+    test_response_and_exit(Api::Login::LS_AUTHTOKEN, loginOK)
     expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
-    test_response(Api::Login::LS_REGISTER, loginOK)
-    api.uiEvents.roll()
+    test_response_and_exit(Api::Login::LS_REGISTER, loginOK)
     expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
   end
 
   it "should roll to register from login and being not registered" do
-    test_response(Api::Login::LS_LOGIN, notRegistered)
-    api.uiEvents.roll()
+    test_response_and_exit(Api::Login::LS_LOGIN, notRegistered)
     expect(login.loginState).to eq(Api::Login::LS_REGISTER)
   end
 
   it "should roll to password login on invalid token when not quiet" do
     login.quiet = false
-    test_response(Api::Login::LS_AUTHTOKEN, invalidToken)
-    api.uiEvents.roll()
+    test_response_and_exit(Api::Login::LS_AUTHTOKEN, invalidToken)
     expect(login.loginState).to eq(Api::Login::LS_LOGIN)
   end
 
   it "should roll to logged out on invalid token when quiet" do
-    api.uiEvents.registerForEvent("LoginEvent", TestListener2.new(api))
     login.quiet = true
-    test_response(Api::Login::LS_AUTHTOKEN, invalidToken)
-    api.uiEvents.roll()
+    test_response_and_exit(Api::Login::LS_AUTHTOKEN, invalidToken)
     expect(login.loginState).to eq(Api::Login::LS_LOGGED_OUT)
   end
 

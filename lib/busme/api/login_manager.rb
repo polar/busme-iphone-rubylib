@@ -9,17 +9,11 @@ module Api
 
     def initialize(api)
       self.api = api
-      api.bgEvents.registerForEvent("LoginEvent", self)
     end
 
-    def onBuspassEvent(event)
-      if login != event.eventData
-        self.login = event.eventData
-      end
-      process
-    end
 
-    def process
+    def enterProtocol(login)
+      self.login = login
       case login.loginState
         # BG Events
         when Login::LS_AUTHTOKEN
@@ -43,8 +37,6 @@ module Api
     rescue Exception => boom
       login.status = "BadResponse"
       login.loginState = Login::LS_AUTHTOKEN_FAILURE
-    ensure
-      api.uiEvents.postEvent("LoginEvent", login)
     end
 
     def registerLogin
@@ -55,8 +47,6 @@ module Api
     rescue Exception => boom
       login.status = "BadResponse"
       login.loginState = Login::LS_REGISTER_FAILURE
-    ensure
-      api.uiEvents.postEvent("LoginEvent", login)
     end
 
     def passwordLogin
@@ -67,11 +57,9 @@ module Api
     rescue Exception => boom
       login.status = "BadResponse"
       login.loginState = Login::LS_LOGIN_FAILURE
-    ensure
-      api.uiEvents.postEvent("LoginEvent", login)
     end
 
-    def confirmLogin
+    def exitProtocol
       case login.loginState
         when Login::LS_LOGIN_SUCCESS,Login::LS_LOGIN_FAILURE
           confirmPasswordLogin
@@ -100,7 +88,6 @@ module Api
               login.loginState = Login::LS_LOGIN
           end
       end
-      api.bgEvents.postEvent("LoginEvent", login)
     end
 
     def confirmRegisterLogin
@@ -119,7 +106,6 @@ module Api
               login.loginState = Login::LS_LOGIN
           end
       end
-      api.bgEvents.postEvent("LoginEvent", login)
     end
 
     def confirmAuthTokenLogin
@@ -133,7 +119,6 @@ module Api
             login.loginState = Login::LS_LOGIN
           end
       end
-      api.bgEvents.postEvent("LoginEvent", login)
     end
 
     def performLogout
@@ -141,7 +126,6 @@ module Api
     rescue Exception => boom
     ensure
       login.loginState = Login::LS_LOGGED_OUT
-      api.uiEvents.postEvent("LoginEvent", login)
     end
   end
 end
