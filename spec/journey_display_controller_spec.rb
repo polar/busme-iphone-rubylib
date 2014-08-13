@@ -18,14 +18,16 @@ describe Platform::JourneyDisplayController do
   let(:journey_id2) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3ca", "V", "643", 1399940356])}
   let(:pattern_id) { "b2d03c4880f6d57b3b4edfa5aa9c9211"}
 
+  before do
+    controller
+  end
+
   it "should initialize" do
-    controller.onCreate
     expect(basket.onJourneyAddedListener).to eq(controller)
     expect(basket.onJourneyRemovedListener).to eq(controller)
   end
 
   it "should create journey displays and present them" do
-    controller.onCreate
     journeyids = [route_id, journey_id]
     basket.sync(journeyids, nil, nil)
     expect(controller.journeyDisplayMap.keys).to include(route_id.id)
@@ -39,7 +41,6 @@ describe Platform::JourneyDisplayController do
   end
 
   it "should make the display of route to have its related journey as an active" do
-    controller.onCreate
     journeyids = [route_id, journey_id]
     basket.sync(journeyids, nil, nil)
     jd_route = controller.journeyDisplayMap[route_id.id]

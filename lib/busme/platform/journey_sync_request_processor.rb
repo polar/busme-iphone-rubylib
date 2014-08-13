@@ -1,9 +1,12 @@
 module Platform
   class JourneySyncRequestProcessor
-    attr_accessor :journeyBasket
+    include Api::ArgumentPreparer
+    include Api::ResponseProcessor
 
-    def initialize(basket)
-      self.journeyBasket = basket
+    attr_accessor :journeyController
+
+    def initialize(controller)
+      self.journeyController = controller
     end
 
     def getArguments
@@ -21,7 +24,7 @@ module Platform
           end
         end
       end
-      journeyBasket.sync(nameids, nil, nil )
+      journeyController.sync(nameids)
     end
   end
 end

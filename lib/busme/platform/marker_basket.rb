@@ -4,8 +4,7 @@ module Platform
     attr_accessor :markerController
     attr_accessor :activityAPI
 
-    def initialize(api, store, controller)
-      self.activityAPI = api
+    def initialize(store, controller)
       self.markerStore = store
       self.markerController = controller
     end

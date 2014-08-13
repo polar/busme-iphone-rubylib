@@ -1,5 +1,8 @@
 module Platform
   class MarkerRequestProcessor
+    include Api::ArgumentPreparer
+    include Api::ResponseProcessor
+
     attr_accessor :markerBasket
 
     def initialize(basket)

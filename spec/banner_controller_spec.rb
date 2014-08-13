@@ -4,7 +4,7 @@ require "test_banner_controller"
 describe Platform::BannerController do
 
   let(:time_now)  { Time.now }
-  let(:controller) { TestBannerController.new }
+  let(:controller) { TestBannerController.new(nil) }
   let(:banner1) do
     now = time_now
     b = Api::BannerInfo.new

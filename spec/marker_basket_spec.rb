@@ -6,7 +6,7 @@ describe Platform::MarkerBasket do
   let(:time_now) { Time.now }
   let(:controller) { TestMarkerController.new }
   let(:store) { Platform::MarkerStore.new }
-  let(:basket) { Platform::MarkerBasket.new(nil, store, controller) }
+  let(:basket) { Platform::MarkerBasket.new(store, controller) }
   let(:msg1) do
     b = Api::MarkerInfo.new
     b.id = "1"

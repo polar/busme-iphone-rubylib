@@ -1,5 +1,6 @@
 require "spec_helper"
 require "test_api"
+require "test_http_client"
 require "test_basket_listener"
 
 
@@ -9,12 +10,17 @@ describe Platform::JourneySyncRequestProcessor do
   let(:listener) { TestBasketListener.new }
   let(:basket) {
     basket = Platform::JourneyBasket.new(api, store)
-    basket.onJourneyAddedListener = listener
-    basket.onJourneyRemovedListener = listener
-    basket.onBasketUpdateListener = listener
     basket
   }
-  let(:processor) { Platform::JourneySyncRequestProcessor.new(basket) }
+  let(:controller) { Platform::JourneyDisplayController.new(basket) }
+  let(:processor) {
+    Platform::JourneySyncRequestProcessor.new(controller).tap do
+      # The contoller sets the onJourneyAddedListener and onJourneyRemovedListener
+      basket.onJourneyAddedListener = listener
+      basket.onJourneyRemovedListener = listener
+      basket.onBasketUpdateListener = listener
+    end
+  }
   let(:route_id) {Api::NameId.new(["643", "9864eb9e615f740526e93f6297e29435", "R", 1399939597])}
   let(:journey_id) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3ca", "V", "643", 1399940355])}
   let(:route_id2) {Api::NameId.new(["643", "9864eb9e615f740526e93f6297e29435", "R", 1399939598])}

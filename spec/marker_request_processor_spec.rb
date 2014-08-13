@@ -6,7 +6,7 @@ describe Platform::MarkerRequestProcessor do
   let(:time_now) { Time.now }
   let(:controller) { TestMarkerController.new }
   let(:store) { Platform::MarkerStore.new }
-  let(:basket) { Platform::MarkerBasket.new(nil, store, controller) }
+  let(:basket) { Platform::MarkerBasket.new(store, controller) }
   let(:processor) { Platform::MarkerRequestProcessor.new(basket) }
   let(:marker1) {
     lit = "<Marker id='1' version='1'><Content>Hello</Content></Marker>"

@@ -1,5 +1,8 @@
 module Platform
   class JourneyCurrentLocationsRequestProcessor
+    include Api::ArgumentPreparer
+    include Api::ResponseProcessor
+
     attr_accessor :journeyBasketController
 
     def initialize(controller)

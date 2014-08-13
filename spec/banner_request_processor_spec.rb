@@ -6,7 +6,7 @@ describe Platform::BannerRequestProcessor do
   let(:time_now) { Time.now }
   let(:controller) { TestBannerController.new }
   let(:store) { Platform::BannerStore.new }
-  let(:basket) { Platform::BannerBasket.new(nil, store, controller) }
+  let(:basket) { Platform::BannerBasket.new(store, controller) }
   let(:processor) { Platform::BannerRequestProcessor.new(basket) }
   let(:msg1) {
     lit = "<Banner id='1' version='1'><Content>Hello</Content></Banner>"

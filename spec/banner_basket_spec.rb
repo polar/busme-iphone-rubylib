@@ -5,7 +5,7 @@ describe Platform::BannerBasket do
   let(:time_now) { Time.now }
   let(:store) { Platform::BannerStore.new }
   let(:controller) { TestBannerController.new }
-  let(:basket) { Platform::BannerBasket.new(nil, store, controller)}
+  let(:basket) { Platform::BannerBasket.new(store, controller)}
   let(:banner1) do
     b = Api::BannerInfo.new
     b.id = "1"

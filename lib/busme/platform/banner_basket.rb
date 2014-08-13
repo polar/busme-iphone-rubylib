@@ -2,11 +2,9 @@ module Platform
   class BannerBasket
     attr_accessor :bannerStore
     attr_accessor :bannerController
-    attr_accessor :activityAPI
     attr_accessor :banners
 
-    def initialize(api, store, controller)
-      self.activityAPI = api
+    def initialize(store, controller)
       self.bannerStore = store
       self.bannerController = controller
       self.banners = []

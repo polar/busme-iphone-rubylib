@@ -6,7 +6,7 @@ describe Platform::MasterMessageRequestProcessor do
   let(:time_now) { Time.now }
   let(:controller) { TestMasterMessageController.new }
   let(:store) { Platform::MasterMessageStore.new }
-  let(:basket) { Platform::MasterMessageBasket.new(nil, store, controller) }
+  let(:basket) { Platform::MasterMessageBasket.new( store, controller) }
   let(:processor) { Platform::MasterMessageRequestProcessor.new(basket) }
   let(:msg1) {
     lit = "<Message id='1' version='1'><Content>Hello</Content></Message>"

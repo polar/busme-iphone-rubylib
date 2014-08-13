@@ -1,5 +1,8 @@
 module Platform
   class BannerRequestProcessor
+    include Api::ArgumentPreparer
+    include Api::ResponseProcessor
+
     attr_accessor :bannerBasket
 
     def initialize(basket)

@@ -12,8 +12,8 @@ module Api
     end
 
 
-    def enterProtocol(login)
-      self.login = login
+    def enterProtocol(login = nil)
+      self.login = login  if login
       case login.loginState
         # BG Events
         when Login::LS_AUTHTOKEN

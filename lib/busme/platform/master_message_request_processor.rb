@@ -1,5 +1,8 @@
 module Platform
   class MasterMessageRequestProcessor
+    include Api::ResponseProcessor
+    include Api::ArgumentPreparer
+
     attr_accessor :masterMessageBasket
 
     def initialize(basket)

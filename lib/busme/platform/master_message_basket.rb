@@ -1,11 +1,9 @@
 module Platform
   class MasterMessageBasket
-    attr_accessor :api
     attr_accessor :masterMessageStore
     attr_accessor :masterMessageController
 
-    def initialize(api, store, controller)
-      self.api = api
+    def initialize(store, controller)
       self.masterMessageStore = store
       self.masterMessageController = controller
     end

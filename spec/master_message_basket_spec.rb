@@ -6,7 +6,7 @@ describe Platform::MasterMessageBasket do
   let(:time_now) { Time.now }
   let(:controller) { TestMasterMessageController.new }
   let(:store) { Platform::MasterMessageStore.new }
-  let(:basket) { Platform::MasterMessageBasket.new(nil, store, controller) }
+  let(:basket) { Platform::MasterMessageBasket.new(store, controller) }
   let(:msg1) do
     b = Api::MasterMessage.new("1")
     b.point = Integration::GeoPoint.new(53.0 * 1E6, -74.0 * 1E6)

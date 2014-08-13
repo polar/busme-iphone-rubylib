@@ -30,11 +30,16 @@ end
 class TestHttpClient
   # Should be a TestHttpMessage
   attr_accessor :mock_answer
+  attr_accessor :url
+  attr_accessor :params
 
   def get(url)
+    self.url = url
     mock_answer
   end
   def post(url, params)
+    self.url = url
+    self.params = params
     mock_answer
   end
 

@@ -1,9 +1,9 @@
 module Platform
   class JourneyDisplayController
+    attr_accessor :journeyBasket
 
     attr_accessor :journeyDisplays
     attr_accessor :journeyDisplayMap
-    attr_accessor :journeyBasket
     attr_accessor :onJourneyDisplayAddedListener
     attr_accessor :onJourneyDisplayRemovedListener
 
@@ -11,6 +11,8 @@ module Platform
       self.journeyBasket = basket
       self.journeyDisplays = []
       self.journeyDisplayMap = {}
+      journeyBasket.onJourneyAddedListener = self
+      journeyBasket.onJourneyRemovedListener = self
     end
 
     def getJourneyDisplays
@@ -38,8 +40,17 @@ module Platform
     def onCreate()
       self.journeyDisplays = []
       self.journeyDisplayMap = {}
-      journeyBasket.onJourneyAddedListener = self
-      journeyBasket.onJourneyRemovedListener = self
+    end
+
+    #
+    # This is called from the JourneySyncRequestProcessor and is run on
+    # the background thread. The ProgressListener should be posting events
+    # to the UI Thread.
+    #
+    def sync(nameids)  # TODO: Extend
+      progressListener = nil
+      ioListener = nil
+      journeyBasket.sync(nameids, progressListener, ioListener)
     end
 
     def onLocationUpdate(route, locations)

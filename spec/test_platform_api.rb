@@ -1,6 +1,6 @@
 require "test_http_client"
 
-class TestApi   < Api::BuspassAPI
+class TestPlatformApi < Platform::PlatformApi
 
   def initialize
     super("http://nothing", "android", "3.2.1")

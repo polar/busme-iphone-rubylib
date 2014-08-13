@@ -1,8 +1,10 @@
 module Platform
   class BannerController
+    attr_accessor :api
     attr_accessor :currentBanner
 
-    def initialize
+    def initialize(api)
+      self.api = api
       @bannerQ = Utils::PriorityQueue.new {|b1,b2| compare(b1,b2)}
     end
 
@@ -53,11 +55,12 @@ module Platform
       end
     end
 
-    def presentBanner(currentBanner)
-      raise "NotImplemented"
+    def presentBanner(banner)
+      eventData = BannerEventData.new(banner)
+      api.uiEvents.postEvent("BannerEvent", eventData)
     end
 
-    def abandonBanner(currentBanner)
+    def abandonBanner(banner)
       raise "NotImplemented"
     end
   end

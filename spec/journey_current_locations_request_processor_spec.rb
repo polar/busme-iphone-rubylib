@@ -35,8 +35,12 @@ describe Platform::JourneyCurrentLocationsRequestProcessor do
     tag = Api::Tag.new(doc.root)
   }
 
+  before do
+    # Need to instantiate controller for each spec
+    controller
+  end
+
   it "should replace journeys" do
-    controller.onCreate
     journeyids = [route_id, journey_id]
     basket.sync(journeyids, nil, nil)
 

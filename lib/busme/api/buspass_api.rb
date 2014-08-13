@@ -28,12 +28,16 @@ module Api
       self.loginManager = LoginManager.new(self)
     end
 
-    def isReady
+    def isReady?
       ready
     end
 
     def getPlatformArgs()
       "platform=#{platformName}&app_version=#{appVersion}"
+    end
+
+    def getTrackingArgs()
+      nil
     end
 
     def get()
@@ -251,5 +255,30 @@ module Api
       end
       login
     end
+
+    def getBannerClickThru(id)
+      if isReady?
+        url = buspass.bannerClickThru
+        if url
+          url += getPlatformArgs
+          args = getTrackingArgs
+          url = args ? url : "#{url}&#{args}"
+          params = []
+          params << ["banner_id", id]
+          params << ["master_slug", buspass.slug]
+
+          entity = postURL(url, params)
+          if entity
+            tag = xmlParse(entity)
+            if tag
+              if "a" == tag.name.downcase
+                tag.attributes["href"]
+              end
+            end
+          end
+        end
+      end
+    end
+
   end
 end
