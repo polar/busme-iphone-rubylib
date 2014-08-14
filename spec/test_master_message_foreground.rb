@@ -1,4 +1,4 @@
-class TestBannerForeground < Platform::BannerForeground
+class TestMasterMessageForeground < Platform::MasterMessageForeground
   attr_accessor :test_url
   attr_accessor :test_previous_state
 

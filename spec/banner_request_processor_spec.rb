@@ -4,7 +4,7 @@ require "test_banner_controller"
 describe Platform::BannerRequestProcessor do
 
   let(:time_now) { Time.now }
-  let(:controller) { TestBannerController.new }
+  let(:controller) { TestBannerController.new(nil) }
   let(:store) { Platform::BannerStore.new }
   let(:basket) { Platform::BannerBasket.new(store, controller) }
   let(:processor) { Platform::BannerRequestProcessor.new(basket) }

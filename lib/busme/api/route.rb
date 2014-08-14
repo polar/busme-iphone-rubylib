@@ -50,7 +50,9 @@ module Api
     end
 
     def journeyPatterns
-      patternids.map {|x| journeyStore.getPattern(id) }.compact
+      pids = (patternids ||[]) + (patternid ? [patternid] : [])
+      pats = pids.map {|id| journeyStore.getPattern(id) }.compact
+      pats
     end
 
     def initialize

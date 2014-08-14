@@ -87,7 +87,7 @@ module Api
       self.version = tag.attributes["version"].to_i
       lon = tag.attributes["lon"].to_f
       lat = tag.attributes["lat"].to_f
-      point = Integration::GeoPoint.new(lat * 1E6, lon * 1E6)
+      self.point = Integration::GeoPoint.new(lat * 1E6, lon * 1E6)
       self.radius = tag.attributes["radius"].to_i
       self.loaded = true
     end

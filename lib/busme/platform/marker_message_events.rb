@@ -1,6 +1,6 @@
 module Platform
-  
-  module BannerEventConstants
+
+  module MarkerMessageEventConstants
     S_PRESENT  = 0
     S_INQUIRED = 1
     S_RESOLVED = 2
@@ -12,37 +12,39 @@ module Platform
     R_REMOVE = 3
     R_CANCEL = 4
   end
-  
 
-  class BannerEventData
-    include BannerEventConstants
-    attr_accessor :banner_info
+
+  class MarkerMessageEventData
+    include MarkerMessageEventConstants
+    attr_accessor :marker_info
     attr_accessor :thruUrl
     attr_accessor :resolve
     attr_accessor :resolveData
     attr_accessor :state
-    attr_accessor :bannerForeground
-    attr_accessor :bannerBackground
+    attr_accessor :markerMessageForeground
+    attr_accessor :markerMessageBackground
 
     def initialize(info)
-      self.banner_info = info
+      self.marker_info = info
       self.state       = S_PRESENT
     end
   end
 
-  class BannerForeground
-    include BannerEventConstants
+  class MarkerMessageForeground
+    include MarkerMessageEventConstants
     include Api::BuspassEventListener
     attr_accessor :api
+    attr_accessor :markerController
 
-    def initialize(api)
+    def initialize(api, controller)
       self.api = api
-      api.uiEvents.registerForEvent("BannerEvent", self)
+      self.markerController = controller
+      api.uiEvents.registerForEvent("MarkerMessageEvent", self)
     end
 
     # Called from the UI Thread.
     def onBuspassEvent(event)
-      event.eventData.bannerForeground = self
+      event.eventData.markerMessageForeground = self
       case event.eventData.state
         when S_PRESENT
           onPresent(event.eventData)
@@ -59,17 +61,17 @@ module Platform
     # Called from UI Thread
     # Should Overridden to display message
     def onPresent(eventData)
-      eventData.banner_info.onDisplay(Time.now)
+      # This should popup a message about the marker. The marker stays visible.
     end
 
     # Called on Foreground Thread by way of UI invoking
-    #      eventData.banner_foreground.onInquired(eventData, resolution)
+    #      eventData.marker_foreground.onInquired(eventData, resolution)
     # Should be called to resolve message with a resolution
     # Override to maybe get rid of message from display, or wait until onResolved
     def onInquired(eventData, resolve = nil)
       eventData.resolve = resolve if resolve
       eventData.state = S_INQUIRED
-      api.bgEvents.postEvent("BannerEvent", eventData)
+      api.bgEvents.postEvent("MarkerMessageEvent", eventData)
     end
 
     # Should Overridden to handle dismissal of message if needed.
@@ -77,17 +79,19 @@ module Platform
       case eventData.resolve
         when R_GO
         when R_REMIND
+          markerController.dismissMarker(eventData.marker_info, true, Time.now)
         when R_REMOVE
+          markerController.dismissMarker(eventData.marker_info, false, Time.now)
         when R_CANCEL
       end
       eventData.state = S_DONE
-      api.bgEvents.postEvent("BannerEvent", eventData)
+      api.bgEvents.postEvent("MarkerMessageEvent", eventData)
     end
 
     # Should Overridden
     def onError(eventData)
       eventData.state = S_DONE
-      api.bgEvents.postEvent("BannerEvent", eventData)
+      api.bgEvents.postEvent("MarkerMessageEvent", eventData)
     end
 
     # Should Overridden
@@ -95,19 +99,19 @@ module Platform
     end
   end
 
-  class BannerBackground
-    include BannerEventConstants
+  class MarkerMessageBackground
+    include MarkerMessageEventConstants
     include Api::BuspassEventListener
     attr_accessor :api
 
     def initialize(api)
       self.api = api
-      api.bgEvents.registerForEvent("BannerEvent", self)
+      api.bgEvents.registerForEvent("MarkerMessageEvent", self)
     end
 
     # Called from Background Thread
     def onBuspassEvent(event)
-      event.eventData.bannerBackground = self
+      event.eventData.markerMessageBackground = self
 
       case event.eventData.state
         when S_INQUIRED
@@ -122,39 +126,34 @@ module Platform
 
     # Called from Background Thread
     def onInquired(eventData)
-      banner_info = eventData.banner_info
+      marker_info = eventData.marker_info
       case eventData.resolve
         when R_GO
           begin
-            url = api.getBannerClickThru(banner_info.id)
-            eventData.thruUrl = url || banner_info.goUrl
+            url = api.getMarkerClickThru(marker_info.id)
+            eventData.thruUrl = url || eventData.marker_info.goUrl
           rescue Exception => boom
-            eventData.thruUrl = banner_info.goUrl
+            eventData.thruUrl = eventData.marker_info.goUrl
           end
-          eventData.banner_info.onDismiss(Time.now)
         when R_REMIND
-          # We really do not have a remind or remove for banners. Same as cancel
-          eventData.banner_info.onDismiss(Time.now)
         when R_REMOVE
-          eventData.banner_info.onDismiss(Time.now)
         when R_CANCEL
-          eventData.banner_info.onDismiss(Time.now)
       end
       eventData.state = S_RESOLVED
     rescue Exception => boom
       eventData.state = S_ERROR
     ensure
-      api.uiEvents.postEvent("BannerEvent", eventData)
+      api.uiEvents.postEvent("MarkerMessageEvent", eventData)
     end
 
     # May be Overridden
     def onError(eventData)
-      api.uiEvents.postEvent("BannerEvent", eventData)
+      api.uiEvents.postEvent("MarkerMessageEvent", eventData)
     end
 
     # May be  Overridden
     def onDone(eventData)
-      api.uiEvents.postEvent("BannerEvent", eventData)
+      api.uiEvents.postEvent("MarkerMessageEvent", eventData)
     end
   end
 end

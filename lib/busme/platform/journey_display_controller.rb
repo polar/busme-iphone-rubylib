@@ -22,18 +22,20 @@ module Platform
     # JourneyBasket.OnJourneyAddedListener
     def onJourneyAdded(basket, route)
       newRoute = JourneyDisplay.new(self, route)
-      presentJourneyDisplay(newRoute)
       journeyDisplays << newRoute
       journeyDisplayMap[newRoute.route.id] = newRoute
+      onJourneyDisplayAddedListener.onJourneyDisplayAdded(newRoute) if onJourneyDisplayAddedListener
+      presentJourneyDisplay(newRoute)
     end
 
     # JourneyBasket.OnJourneyRemovedListener
     def onJourneyRemoved(basket, route)
       jd = journeyDisplayMap[route.id]
       if jd
-        abandonJourneyDisplay(jd)
         journeyDisplayMap.delete(route.id)
-        journeys.delete(jd)
+        journeyDisplays.delete(jd)
+        onJourneyDisplayRemovedListener.onJourneyDisplayRemoved(jd) if onJourneyDisplayRemovedListener
+        abandonJourneyDisplay(jd)
       end
     end
 
@@ -58,11 +60,11 @@ module Platform
     end
 
     def presentJourneyDisplay(journey_display)
-      raise "NotImplemented"
+      #raise "NotImplemented"
     end
 
     def abandonJourneyDisplay(journey_display)
-      raise "NotImplemented"
+      #raise "NotImplemented"
     end
 
   end

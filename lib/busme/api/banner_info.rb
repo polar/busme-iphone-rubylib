@@ -16,6 +16,7 @@ module Api
     attr_reader   :lastSeen
     attr_reader   :beginSeen
     attr_accessor :onDisplayQueue
+    attr_accessor :displayed
 
     attr_accessor :loaded
 
@@ -42,12 +43,14 @@ module Api
     def onDisplay(time = nil)
       time = Time.now if time.nil?
       self.beginSeen = time
+      self.displayed = true
     end
 
     def onDismiss(time = nil)
       time = Time.now if time.nil?
       self.lastSeen = time
       self.beginSeen = nil
+      self.displayed = false
     end
 
     ##

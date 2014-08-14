@@ -13,11 +13,11 @@ module Platform
     attr_accessor :pathHighlighted
     attr_accessor :tracking
     attr_accessor :hiddenListener
-    attr_accessor :journeyBasketController
+    attr_accessor :journeyDisplayController
 
     def initialize(controller, route)
       self.route = route
-      self.journeyBasketController = controller
+      self.journeyDisplayController = controller
       self.nameVisible = true
       self.nameHighlighted = false
       self.pathVisible = true
@@ -88,9 +88,25 @@ module Platform
       end
     end
 
+    def getRouteDefinition
+      if journeyDisplayController.getJourneyDisplays.include?(@routeDefinition)
+        return @routeDefinition
+      end
+      if route.isJourney?
+        for jd in journeyDisplayController.getJourneyDisplays
+          if jd.route.isRouteDefinition?
+            if jd.route.code == route.code
+              @routeDefinition = jd
+            end
+          end
+        end
+      end
+      @routeDefinition
+    end
+
     def hasActiveJourneys?
       if route.isRouteDefinition?
-        for jd in journeyBasketController.getJourneyDisplays
+        for jd in journeyDisplayController.getJourneyDisplays
           if jd.isActive?
             if jd.route.code == route.code
               return true
@@ -104,7 +120,7 @@ module Platform
     def activeJourneys
       jds = []
       if route.isRouteDefinition?
-        for jd in journeyBasketController.getJourneyDisplays
+        for jd in journeyDisplayController.getJourneyDisplays
           if jd.isActive?
             if jd.route.code == route.code
               jds << jd

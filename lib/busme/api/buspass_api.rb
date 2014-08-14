@@ -41,7 +41,7 @@ module Api
     end
 
     def get()
-      if isReady
+      if isReady?
         buspass
       end
       forceGet()
@@ -265,6 +265,54 @@ module Api
           url = args ? url : "#{url}&#{args}"
           params = []
           params << ["banner_id", id]
+          params << ["master_slug", buspass.slug]
+
+          entity = postURL(url, params)
+          if entity
+            tag = xmlParse(entity)
+            if tag
+              if "a" == tag.name.downcase
+                tag.attributes["href"]
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def getMasterMessageClickThru(id)
+      if isReady?
+        url = buspass.messageClickThru
+        if url
+          url += getPlatformArgs
+          args = getTrackingArgs
+          url = args ? url : "#{url}&#{args}"
+          params = []
+          params << ["message_id", id]
+          params << ["master_slug", buspass.slug]
+
+          entity = postURL(url, params)
+          if entity
+            tag = xmlParse(entity)
+            if tag
+              if "a" == tag.name.downcase
+                tag.attributes["href"]
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def getMarkerClickThru(id)
+      if isReady?
+        url = buspass.markerClickThru
+        if url
+          url += getPlatformArgs
+          args = getTrackingArgs
+          url = args ? url : "#{url}&#{args}"
+          params = []
+          params << ["message_id", id]
           params << ["master_slug", buspass.slug]
 
           entity = postURL(url, params)

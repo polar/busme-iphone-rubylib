@@ -9,6 +9,8 @@ describe Api::MarkerInfo do
               id='1'
               remindPeriod='86400'
               remindable='true'
+              lat='53.0'
+              lon='-74.0'
               goUrl='http://google.com'
               iconUrl='http://imgur.com/2343'
               version='1394035274'>
@@ -31,6 +33,9 @@ describe Api::MarkerInfo do
     expect(m.remindPeriod).to eq(86400)
     expect(m.version).to eq(1394035274)
     expect(m.remindable).to eq(true)
+    expect(m.point).to_not eq(nil)
+    expect(m.point.latitude).to eq(53.0)
+    expect(m.point.longitude).to eq(-74.0)
   end
 
   it "should be seen after displayed" do

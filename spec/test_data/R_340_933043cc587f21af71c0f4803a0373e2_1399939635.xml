@@ -1,0 +1,14 @@
+
+<Route id='933043cc587f21af71c0f4803a0373e2'
+       type='route'
+       name='Drumlins'
+       routeCode='340'
+       sort='403.0'
+       version='1399939635'
+       nw_lon='-76.176869'
+       nw_lat='43.076736'
+       se_lon='-76.105302'
+       se_lat='43.020475'
+       patternids='6e47b8d3b8919b8100131cd50c7c15ba,0ddfde9afb5ab263da56d37268b62c10,e13a9a32a03f51624de0d0a9016cf09a,3f64ac8c5083bead341cb2d09d20b22b,5278697fcfdccc4db312ac7e9de76201,5b922487a30d624c49e96b4c14b743ac,9ab64279cce76833f512f4923cf755fc,0d8bbdb31b4db2de1bd42d1b5dce5c76,bcf272636be0cadf3415d061c2012019,1b72be9b7282d74820279c143183a308,b2483b220e89d2b80d9eee0c02dc1a5d'
+        >
+</Route>

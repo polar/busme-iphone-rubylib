@@ -1,8 +1,10 @@
 module Platform
   class MasterMessageController
+    attr_accessor :api
     attr_accessor :currentMasterMessage
 
-    def initialize
+    def initialize(api)
+      self.api = api
       @messageQ = Utils::PriorityQueue.new {|lhs,rhs| compare(lhs,rhs)}
     end
 
@@ -59,7 +61,8 @@ module Platform
     end
 
     def presentMasterMessage(msg)
-      raise "NotImplemented"
+      eventData = MasterMessageEventData.new(msg)
+      api.uiEvents.postEvent("MasterMessageEvent", eventData)
     end
   end
 end

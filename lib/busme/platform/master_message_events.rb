@@ -1,6 +1,6 @@
 module Platform
   
-  module BannerEventConstants
+  module MasterMessageEventConstants
     S_PRESENT  = 0
     S_INQUIRED = 1
     S_RESOLVED = 2
@@ -14,35 +14,35 @@ module Platform
   end
   
 
-  class BannerEventData
-    include BannerEventConstants
-    attr_accessor :banner_info
+  class MasterMessageEventData
+    include MasterMessageEventConstants
+    attr_accessor :masterMessage
     attr_accessor :thruUrl
     attr_accessor :resolve
     attr_accessor :resolveData
     attr_accessor :state
-    attr_accessor :bannerForeground
-    attr_accessor :bannerBackground
+    attr_accessor :masterMessageForeground
+    attr_accessor :masterMessageBackground
 
-    def initialize(info)
-      self.banner_info = info
+    def initialize(message)
+      self.masterMessage = message
       self.state       = S_PRESENT
     end
   end
 
-  class BannerForeground
-    include BannerEventConstants
+  class MasterMessageForeground
+    include MasterMessageEventConstants
     include Api::BuspassEventListener
     attr_accessor :api
 
     def initialize(api)
       self.api = api
-      api.uiEvents.registerForEvent("BannerEvent", self)
+      api.uiEvents.registerForEvent("MasterMessageEvent", self)
     end
 
     # Called from the UI Thread.
     def onBuspassEvent(event)
-      event.eventData.bannerForeground = self
+      event.eventData.masterMessageForeground = self
       case event.eventData.state
         when S_PRESENT
           onPresent(event.eventData)
@@ -59,7 +59,7 @@ module Platform
     # Called from UI Thread
     # Should Overridden to display message
     def onPresent(eventData)
-      eventData.banner_info.onDisplay(Time.now)
+      eventData.masterMessage.onDisplay(Time.now)
     end
 
     # Called on Foreground Thread by way of UI invoking
@@ -69,7 +69,7 @@ module Platform
     def onInquired(eventData, resolve = nil)
       eventData.resolve = resolve if resolve
       eventData.state = S_INQUIRED
-      api.bgEvents.postEvent("BannerEvent", eventData)
+      api.bgEvents.postEvent("MasterMessageEvent", eventData)
     end
 
     # Should Overridden to handle dismissal of message if needed.
@@ -81,13 +81,13 @@ module Platform
         when R_CANCEL
       end
       eventData.state = S_DONE
-      api.bgEvents.postEvent("BannerEvent", eventData)
+      api.bgEvents.postEvent("MasterMessageEvent", eventData)
     end
 
     # Should Overridden
     def onError(eventData)
       eventData.state = S_DONE
-      api.bgEvents.postEvent("BannerEvent", eventData)
+      api.bgEvents.postEvent("MasterMessageEvent", eventData)
     end
 
     # Should Overridden
@@ -95,19 +95,19 @@ module Platform
     end
   end
 
-  class BannerBackground
-    include BannerEventConstants
+  class MasterMessageBackground
+    include MasterMessageEventConstants
     include Api::BuspassEventListener
     attr_accessor :api
 
     def initialize(api)
       self.api = api
-      api.bgEvents.registerForEvent("BannerEvent", self)
+      api.bgEvents.registerForEvent("MasterMessageEvent", self)
     end
 
     # Called from Background Thread
     def onBuspassEvent(event)
-      event.eventData.bannerBackground = self
+      event.eventData.masterMessageBackground = self
 
       case event.eventData.state
         when S_INQUIRED
@@ -122,39 +122,39 @@ module Platform
 
     # Called from Background Thread
     def onInquired(eventData)
-      banner_info = eventData.banner_info
+      masterMessage = eventData.masterMessage
       case eventData.resolve
         when R_GO
           begin
-            url = api.getBannerClickThru(banner_info.id)
-            eventData.thruUrl = url || banner_info.goUrl
+            url = api.getMasterMessageClickThru(masterMessage.id)
+            eventData.thruUrl = url ||  masterMessage.goUrl
           rescue Exception => boom
-            eventData.thruUrl = banner_info.goUrl
+            eventData.thruUrl = masterMessage.goUrl
           end
-          eventData.banner_info.onDismiss(Time.now)
+          eventData.masterMessage.onDismiss(true, Time.now)
         when R_REMIND
-          # We really do not have a remind or remove for banners. Same as cancel
-          eventData.banner_info.onDismiss(Time.now)
+          # We really do not have a remind. Same as cancel
+          eventData.masterMessage.onDismiss(true, Time.now)
         when R_REMOVE
-          eventData.banner_info.onDismiss(Time.now)
+          eventData.masterMessage.onDismiss(false, Time.now)
         when R_CANCEL
-          eventData.banner_info.onDismiss(Time.now)
+          eventData.masterMessage.onDismiss(true, Time.now)
       end
       eventData.state = S_RESOLVED
     rescue Exception => boom
       eventData.state = S_ERROR
     ensure
-      api.uiEvents.postEvent("BannerEvent", eventData)
+      api.uiEvents.postEvent("MasterMessageEvent", eventData)
     end
 
     # May be Overridden
     def onError(eventData)
-      api.uiEvents.postEvent("BannerEvent", eventData)
+      api.uiEvents.postEvent("MasterMessageEvent", eventData)
     end
 
     # May be  Overridden
     def onDone(eventData)
-      api.uiEvents.postEvent("BannerEvent", eventData)
+      api.uiEvents.postEvent("MasterMessageEvent", eventData)
     end
   end
 end

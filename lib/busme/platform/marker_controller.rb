@@ -19,8 +19,6 @@ module Platform
       @markerQ.delete(marker)
     end
 
-    # UI Thread
-
     def roll(now = nil)
       now = Time.now  if now.nil?
       # We sort because we have present time calculations.

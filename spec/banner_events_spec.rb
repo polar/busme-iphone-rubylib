@@ -47,17 +47,94 @@ describe Platform::BannerForeground do
     bannerForeground
   end
 
-  it "a background click should call for a foreground clicked." do
+  it "should with good message obey the protocol all the way through" do
+    # Banner Event has been set up with a banner's message to be displayed.
     api.uiEvents.postEvent("BannerEvent", eventData)
+
+    # Foreground Thread
     api.uiEvents.roll()
-    expect(bannerForeground.test_state).to eq(Platform::BannerEventData::S_PRESENT)
-    expect(eventData.state).to eq(Platform::BannerEventData::S_CLICK)
+    expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_PRESENT)
+    expect(eventData.state).to eq(Platform::BannerEventData::S_PRESENT)
+    expect(eventData.bannerForeground).to eq(bannerForeground)
+
+    expect(banner.displayed).to eq(true)
+
+    # Call from Foreground Thread with resolve info
+    eventData.resolve = Platform::BannerEventData::R_GO
+    eventData.bannerForeground.onInquired(eventData)
+
+    # Should have added a Background Event to GO to the URL
+    expect(eventData.resolve).to eq(Platform::BannerEventData::R_GO)
+    expect(eventData.state).to eq(Platform::BannerEventData::S_INQUIRED)
+
+    # Background Thread
     httpClient.mock_answer = bannerURLMessage
     api.bgEvents.roll()
     expect(eventData.thruUrl).to eq("http://google.com")
+    expect(eventData.state).to eq(Platform::BannerEventData::S_RESOLVED)
+
+    # Foreground Thread
+    bannerForeground.test_previous_state = nil
     api.uiEvents.roll()
-    expect(bannerForeground.test_state).to eq(Platform::BannerEventData::S_CLICKED)
+    expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_RESOLVED)
     expect(bannerForeground.test_url).to eq("http://google.com")
+    expect(eventData.state).to eq(Platform::BannerEventData::S_DONE)
+
+    # Background Thread
+    api.bgEvents.roll()
+
+    # Foreground Thread
+    bannerForeground.test_previous_state = nil
+    api.uiEvents.roll()
+    expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_DONE)
+
+    # The dismiss might happen before, but it should definitely be dismissed by now.
+    expect(banner.displayed).to eq(false)
+  end
+
+  it "should with bad repsonse, it should still obey the protocol all the way through, but should pick up the goURL" do
+    # Banner Event has been set up with a banner's message to be displayed.
+    api.uiEvents.postEvent("BannerEvent", eventData)
+
+    # Foreground Thread
+    api.uiEvents.roll()
+    expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_PRESENT)
+    expect(eventData.state).to eq(Platform::BannerEventData::S_PRESENT)
+    expect(eventData.bannerForeground).to eq(bannerForeground)
+
+    expect(banner.displayed).to eq(true)
+
+    # Call from Foreground Thread with resolve info
+    eventData.resolve = Platform::BannerEventData::R_GO
+    eventData.bannerForeground.onInquired(eventData)
+
+    # Should have added a Background Event to GO to the URL
+    expect(eventData.resolve).to eq(Platform::BannerEventData::R_GO)
+    expect(eventData.state).to eq(Platform::BannerEventData::S_INQUIRED)
+
+    # Background Thread
+    httpClient.mock_answer = badResponse
+    api.bgEvents.roll()
+    expect(eventData.thruUrl).to eq("http://busme.us")
+    expect(eventData.state).to eq(Platform::BannerEventData::S_RESOLVED)
+
+    # Foreground Thread
+    bannerForeground.test_previous_state = nil
+    api.uiEvents.roll()
+    expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_RESOLVED)
+    expect(bannerForeground.test_url).to eq("http://busme.us")
+    expect(eventData.state).to eq(Platform::BannerEventData::S_DONE)
+
+    # Background Thread
+    api.bgEvents.roll()
+
+    # Foreground Thread
+    bannerForeground.test_previous_state = nil
+    api.uiEvents.roll()
+    expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_DONE)
+
+    # The dismiss might happen before, but it should definitely be dismissed by now.
+    expect(banner.displayed).to eq(false)
   end
 
 end

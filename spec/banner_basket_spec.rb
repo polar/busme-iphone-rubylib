@@ -4,7 +4,7 @@ require "test_banner_controller"
 describe Platform::BannerBasket do
   let(:time_now) { Time.now }
   let(:store) { Platform::BannerStore.new }
-  let(:controller) { TestBannerController.new }
+  let(:controller) { TestBannerController.new(nil) }
   let(:basket) { Platform::BannerBasket.new(store, controller)}
   let(:banner1) do
     b = Api::BannerInfo.new
