@@ -14,7 +14,7 @@ class TestListener
   end
 end
 
-describe Platform::JourneyDisplayController do
+describe Platform::JourneyVisibilityController do
   let(:api) { TestApi.new }
   let(:store) { Platform::JourneyStore.new }
   let(:basket) {
@@ -28,6 +28,8 @@ describe Platform::JourneyDisplayController do
   let(:journey_id2) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3cb", "V", "643", 1399940355])}
   let(:route340_id) {Api::NameId.new(["340", "933043cc587f21af71c0f4803a0373e2", "R", 1399939635])}
   let(:journey340_id1) {Api::NameId.new(["340", "2d0236dbd2a072bbe7f44d8c93a6d32f", "V", "340", 1399939634])}
+  let(:journey340_id2) {Api::NameId.new(["340", "451d7074f1580e1224eeef8dbab8ac36", "V", "340", 1399939634])}
+  let(:journey340_id3) {Api::NameId.new(["340", "556e3d48986d2cefbfce3b80abda2695", "V", "340", 1399939628])}
   let(:pattern_id) { "b2d03c4880f6d57b3b4edfa5aa9c9211"}
 
   before do
@@ -56,7 +58,7 @@ describe Platform::JourneyDisplayController do
     expect(jd_journey.nameVisible).to eq(false)
   end
 
-  it "should go to a showing only route based system"  do
+  it "should when going to S_ROUTE should show the names of the journeys"  do
     journeyids = [route_id, journey_id]
     basket.sync(journeyids, nil, nil)
     jd_route = journeyDisplayController.journeyDisplayMap[route_id.id]
@@ -74,7 +76,7 @@ describe Platform::JourneyDisplayController do
     expect(jd_journey.nameVisible).to eq(true)
   end
 
-  it "should in S_ROUTE mode add the new journey" do
+  it "should in S_ROUTE add the new journey of the same route and be visible in path and name" do
     journeyids = [route_id, journey_id]
     basket.sync(journeyids, nil, nil)
     jd_route = journeyDisplayController.journeyDisplayMap[route_id.id]
@@ -251,8 +253,30 @@ describe Platform::JourneyDisplayController do
 
   end
 
+  it "should in S_VEHICLE roll back to S_ALL when going back"  do
+    journeyids = [route_id, journey_id]
+    basket.sync(journeyids, nil, nil)
+    jd_route = journeyDisplayController.journeyDisplayMap[route_id.id]
+    jd_journey = journeyDisplayController.journeyDisplayMap[journey_id.id]
+
+    # It should change the jd_journey to name visible.
+    expect(controller.onTrackingSelected(jd_journey)).to eq(true)
+
+    expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_VEHICLE)
+
+    controller.goBack
+
+    expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_ALL)
+
+    expect(jd_route.pathVisible).to eq(true)
+    expect(jd_route.nameVisible).to eq(true)
+    expect(jd_journey.pathVisible).to eq(true)
+    expect(jd_journey.nameVisible).to eq(false)
+
+  end
+
   context "Using Location selection" do
-    it "should eliminate irrelevant routes"do
+    it "should eliminate irrelevant routes when location selected"do
       journeyids = [route_id, journey_id, route340_id, journey340_id1]
       basket.sync(journeyids, nil, nil)
       jd_route = journeyDisplayController.journeyDisplayMap[route_id.id]
@@ -276,8 +300,8 @@ describe Platform::JourneyDisplayController do
       expect(jd_journey340.nameVisible).to eq(false)
     end
 
-    it "should eliminate routes and add them back in" do
-      journeyids = [route340_id, journey340_id1]
+    it "should eliminate visibility of routes, and then add them back in based on the selected route codes" do
+      journeyids = [route_id, journey_id, route340_id, journey340_id1]
       basket.sync(journeyids, nil, nil)
       expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_ALL)
       jd_route340 = journeyDisplayController.journeyDisplayMap[route340_id.id]
@@ -298,70 +322,24 @@ describe Platform::JourneyDisplayController do
       expect(jd_journey340.pathVisible).to eq(false)
       expect(jd_journey340.nameVisible).to eq(false)
 
-      journeyids = [route340_id, journey340_id1]
+      journeyids = [route340_id, journey340_id1, journey340_id2]
       basket.sync(journeyids, nil, nil)
       jd_journey340 = journeyDisplayController.journeyDisplayMap[journey340_id1.id]
+      jd_journey3402 = journeyDisplayController.journeyDisplayMap[journey340_id2.id]
 
       # It gets redisplayed merely because it's a 340, regardless of location.
       expect(jd_journey340.pathVisible).to eq(true)
       expect(jd_journey340.nameVisible).to eq(false)
+      expect(jd_journey3402.pathVisible).to eq(true)
+      expect(jd_journey3402.nameVisible).to eq(false)
 
+      # Just to make sure the journey names become visible.
+      expect(controller.onRouteCodeSelected("340")).to eq(true)
+      expect(jd_journey340.pathVisible).to eq(true)
+      expect(jd_journey340.nameVisible).to eq(true)
+      expect(jd_journey3402.pathVisible).to eq(true)
+      expect(jd_journey3402.nameVisible).to eq(true)
     end
-  end
-
-  it "should create journey displays and abandon them" do
-    journeyids = [route_id, journey_id]
-    basket.sync(journeyids, nil, nil)
-    expect(controller.journeyDisplayMap.keys).to include(route_id.id)
-    expect(controller.journeyDisplayMap.keys).to include(journey_id.id)
-    jd_route = controller.journeyDisplayMap[route_id.id]
-    jd_journey = controller.journeyDisplayMap[journey_id.id]
-    expect jd_route
-    expect jd_journey
-    expect(controller.test_presented_journey_displays).to include(jd_route)
-    expect(controller.test_presented_journey_displays).to include(jd_journey)
-    basket.sync([], nil, nil)
-    expect(controller.test_presented_journey_displays).to_not include(jd_route)
-    expect(controller.test_presented_journey_displays).to_not include(jd_journey)
-  end
-
-  it "should create journey displays and hit added listeners" do
-    journeyids = [route_id, journey_id]
-    basket.sync(journeyids, nil, nil)
-    expect(controller.journeyDisplayMap.keys).to include(route_id.id)
-    expect(controller.journeyDisplayMap.keys).to include(journey_id.id)
-    jd_route = controller.journeyDisplayMap[route_id.id]
-    jd_journey = controller.journeyDisplayMap[journey_id.id]
-    expect jd_route
-    expect jd_journey
-    expect(listener.journeys_added).to include(jd_route)
-    expect(listener.journeys_added).to include(jd_journey)
-  end
-
-  it "should create journey displays and hit removed listeners for the journey not included" do
-    journeyids = [route_id, journey_id]
-    basket.sync(journeyids, nil, nil)
-    expect(controller.journeyDisplayMap.keys).to include(route_id.id)
-    expect(controller.journeyDisplayMap.keys).to include(journey_id.id)
-    jd_route = controller.journeyDisplayMap[route_id.id]
-    jd_journey = controller.journeyDisplayMap[journey_id.id]
-    expect jd_route
-    expect jd_journey
-    expect(listener.journeys_added).to include(jd_route)
-    expect(listener.journeys_added).to include(jd_journey)
-    # Should remove journey_id
-    basket.sync([route_id], nil, nil)
-    expect(listener.journeys_removed).to_not include(jd_route)
-    expect(listener.journeys_removed).to include(jd_journey)
-  end
-
-  it "should make the display of route to have its related journey as an active" do
-    journeyids = [route_id, journey_id]
-    basket.sync(journeyids, nil, nil)
-    jd_route = controller.journeyDisplayMap[route_id.id]
-    jd_journey = controller.journeyDisplayMap[journey_id.id]
-    expect(jd_route.hasActiveJourneys?)
-    expect(jd_route.activeJourneys).to include(jd_journey)
   end
 
 end

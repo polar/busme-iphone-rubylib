@@ -57,13 +57,13 @@ module Platform
     end
 
     # Called from UI Thread
-    # Should Overridden to display message
+    # Should override to display message
     def onPresent(eventData)
       eventData.masterMessage.onDisplay(Time.now)
     end
 
     # Called on Foreground Thread by way of UI invoking
-    #      eventData.banner_foreground.onInquired(eventData, resolution)
+    #      eventData.masterMessageForeground.onInquired(eventData, resolution)
     # Should be called to resolve message with a resolution
     # Override to maybe get rid of message from display, or wait until onResolved
     def onInquired(eventData, resolve = nil)

@@ -23,19 +23,15 @@ module Platform
       # For S_ROUTE
       self.selectedRouteCode = nil
 
-      self.selectedRouteCodes = Set.new
       # For S_ALL, S_ROUTE
       self.selectedRoutes = Set.new
       self.selectedLocations = Set.new
 
       # For S_ALL
       self.onlySelected = false
+      # When a location selects routes, we set the selected route codes.
+      self.selectedRouteCodes = Set.new
     end
-  end
-
-  def onJourneyDisplayAdded(display)
-    state = stateStack.peek
-    setVisibilityJourneyDisplay(state, display)
   end
 
   class JourneyVisibilityController
@@ -55,7 +51,45 @@ module Platform
       controller.onJourneyDisplayRemovedListener = self
     end
 
+    def journeyDisplays
+      journeyDisplayController.getJourneyDisplays
+    end
+
+    #
+    # Called from JourneyDisplayController
+    #
+    def onJourneyDisplayAdded(display)
+      # all ready added to the journeyDisplayController.getJourneyDisplays
+      state = stateStack.peek
+      if addJourneyToState(state, display)
+        setVisibilityJourneyDisplay(state, display)
+      else
+        display.pathVisible = display.nameVisible = false
+      end
+    end
+
+    #
+    # Called from JourneyDisplayController
+    #
+    def onJourneyDisplayRemoved(display)
+      # all ready removed from the journeyDisplayController.getJourneyDisplays
+      state = stateStack.peek
+      display.pathVisible = display.nameVisible = false
+      while stateStack.size > 0 && removeJourneyDisplayFromState(state, display)
+        state = stateStack.pop
+      end
+      if stateStack.empty?
+        stateStack.push(VisualState.new)
+      end
+      setVisibility(state)
+    end
+
+    #
+    # Should be called when the current location is updated from the
+    # device. This handles "nearby" visibilities.
+    #
     # Returns true if some displays are to disappear, or come back.
+    #
     def onCurrentLocationChanged(point)
       changed = false
       self.currentLocation = point
@@ -83,16 +117,110 @@ module Platform
       changed
     end
 
-    def onJourneyDisplayAdded(display)
-      # all ready added to the journeyDisplayController.getJourneyDisplays
-      state = stateStack.peek
-      if addJourneyToState(state, display)
-        setVisibilityJourneyDisplay(state, display)
-      else
-        display.pathVisible = display.nameVisible = false
+    #
+    # A Command issued by User
+    #
+    def goBack
+      if stateStack.size > 1
+        stateStack.pop
       end
+      setVisibility(stateStack.peek)
     end
 
+    #
+    # Called by User selecting a particular location for filtering.
+    #
+    # Returns true if it changed the selection and added a new Visual State
+    #
+    def onLocationSelected(point, buffer)
+      atLeastOneSelected = false
+      selected = []
+      unselected = []
+      for display in journeyDisplayController.getJourneyDisplays do
+        if display.pathVisible
+          isSelected = false
+          for path in display.route.paths do
+            if GeoPathUtils.isOnPath(path, point, buffer)
+              isSelected = true
+            end
+
+          end
+          if isSelected
+            atLeastOneSelected = true
+            selected << display
+          else
+            unselected << display
+          end
+        end
+      end
+      if atLeastOneSelected
+        newState = VisualState.new
+        newState.state = stateStack.peek.state
+        newState.nearBy = stateStack.peek.nearBy
+        newState.onlyActive = stateStack.peek.onlyActive
+        newState.onlySelected = true
+        newState.selectedLocations = stateStack.peek.selectedLocations.dup
+        newState.selectedLocations << point
+        newState.selectedRoutes =  stateStack.peek.selectedRoutes.dup
+        newState.selectedRoutes.merge(selected)
+        newState.selectedRoutes.subtract(unselected)
+        newState.selectedRouteCodes.merge(newState.selectedRoutes.map{|x| x.route.code})
+        stateStack.push(newState)
+        setVisibility(newState)
+        return true
+      end
+      return false
+    end
+
+    #
+    # Called when User selects a vehicle to track
+    # Moves to the S_VEHICLE state
+    #
+    def onTrackingSelected(display)
+      state = stateStack.peek
+      if state.state == VisualState::S_VEHICLE
+        if state.selectedRoute == display
+          return false
+        else
+          stateStack.pop
+        end
+      end
+      newState = VisualState.new
+      newState.state = VisualState::S_VEHICLE
+      newState.nearBy = state.nearBy
+      newState.onlyActive = state.onlyActive
+      newState.selectedRoute = display
+      stateStack.push(newState)
+      setVisibility(newState)
+      return true
+    end
+
+    #
+    # Called when User selects a route for filtering
+    # Moves to the S_ROUTE state
+    #
+    def onRouteCodeSelected(code)
+      state = stateStack.peek
+      if state.state == VisualState::S_ROUTE
+        if state.selectedRouteCode == code
+          return false
+        else
+          stateStack.pop
+        end
+      end
+      newState = VisualState.new
+      newState.state = VisualState::S_ROUTE
+      newState.nearBy = state.nearBy
+      newState.onlyActive = state.onlyActive
+      newState.selectedRouteCode = code
+      stateStack.push(newState)
+      setVisibility(newState)
+      return true
+    end
+
+    protected
+
+    # Returns true if nothing would be visible from the state.
     def addJourneyToState(state, display)
       case state.state
         when VisualState::S_VEHICLE
@@ -178,102 +306,6 @@ module Platform
           raise "Bad VisualState"
       end
       return false
-    end
-
-    def onJourneyDisplayRemoved(display)
-      # all ready removed from the journeyDisplayController.getJourneyDisplays
-      state = stateStack.peek
-      display.pathVisible = display.nameVisible = false
-      while stateStack.size > 0 && removeJourneyDisplayFromState(state, display)
-        state = stateStack.pop
-      end
-      if stateStack.empty?
-        stateStack.push(VisualState.new)
-      end
-      setVisibility(state)
-    end
-
-    # Returns true if it changed the selection and added a new Visual State
-    def onLocationSelected(point, buffer)
-      atLeastOneSelected = false
-      selected = []
-      unselected = []
-      for display in journeyDisplayController.getJourneyDisplays do
-        if display.pathVisible
-          isSelected = false
-          for path in display.route.paths do
-            if GeoPathUtils.isOnPath(path, point, buffer)
-              isSelected = true
-            end
-
-          end
-          if isSelected
-            atLeastOneSelected = true
-            selected << display
-          else
-            unselected << display
-          end
-        end
-      end
-      if atLeastOneSelected
-        newState = VisualState.new
-        newState.state = stateStack.peek.state
-        newState.nearBy = stateStack.peek.nearBy
-        newState.onlyActive = stateStack.peek.onlyActive
-        newState.onlySelected = true
-        newState.selectedLocations = stateStack.peek.selectedLocations.dup
-        newState.selectedLocations << point
-        newState.selectedRoutes =  stateStack.peek.selectedRoutes.dup
-        newState.selectedRoutes.merge(selected)
-        newState.selectedRoutes.subtract(unselected)
-        newState.selectedRouteCodes.merge(newState.selectedRoutes.map{|x| x.route.code})
-        stateStack.push(newState)
-        setVisibility(newState)
-        return true
-      end
-      return false
-    end
-
-    def onTrackingSelected(display)
-      state = stateStack.peek
-      if state.state == VisualState::S_VEHICLE
-        if state.selectedRoute == display
-          return false
-        else
-          stateStack.pop
-        end
-      end
-      newState = VisualState.new
-      newState.state = VisualState::S_VEHICLE
-      newState.nearBy = state.nearBy
-      newState.onlyActive = state.onlyActive
-      newState.selectedRoute = display
-      stateStack.push(newState)
-      setVisibility(newState)
-      return true
-    end
-
-    def onRouteCodeSelected(code)
-      state = stateStack.peek
-      if state.state == VisualState::S_ROUTE
-        if state.selectedRouteCode == code
-          return false
-        else
-          stateStack.pop
-        end
-      end
-      newState = VisualState.new
-      newState.state = VisualState::S_ROUTE
-      newState.nearBy = state.nearBy
-      newState.onlyActive = state.onlyActive
-      newState.selectedRouteCode = code
-      stateStack.push(newState)
-      setVisibility(newState)
-      return true
-    end
-
-    def journeyDisplays
-      journeyDisplayController.getJourneyDisplays
     end
 
     def setVisibility(state)

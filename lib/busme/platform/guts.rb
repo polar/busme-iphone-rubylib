@@ -24,14 +24,17 @@ module Platform
     attr_accessor :masterMessageForeground
     attr_accessor :masterMessageBackground
 
+    attr_accessor :loginForeground
+    attr_accessor :loginBackground
+
     def initialize(api)
       api = api
 
       self.bannerController = BannerController.new(api) # TODO: Extend with UI
       self.bannerStore = BannerStore.new
       self.bannerBasket = BannerBasket.new(bannerStore, bannerController)
-      self.bannerClick = BannerForeground.new(api)
-      self.bannerClicked = BannerBackground.new(api)
+      self.bannerForeground = BannerForeground.new(api)
+      self.bannerBackground = BannerBackground.new(api)
 
       self.journeyStore = JourneyStore.new # TODO: Serialization
       self.journeyBasket = JourneyBasket.new(api, journeyStore)
@@ -44,11 +47,13 @@ module Platform
       self.markerMessageBackground =  MarkerMessageBackground.new(api)
 
       self.masterMessageStore = MasterMessageStore.new # TODO: Serialization
-      self.masterMessageController = MasterMessageController.new(api) # TODO: Extend with UI
+      self.masterMessageController = MasterMessageController.new(api)
       self.masterMessageBasket = MasterMessageBasket.new(masterMessageStore, masterMessageController)
-      self.masterMessageForeground = MasterMessageForeground.new(api)
+      self.masterMessageForeground = MasterMessageForeground.new(api) # TODO: Extend with UI
       self.masterMessageBackground =  MasterMessageBackground.new(api)
 
+      self.loginForeground = LoginForeground.new(api) # TODO: Extend with UI
+      self.loginBackground = LoginBackground.new(api)
     end
   end
 end

@@ -40,7 +40,7 @@ module Api
 
     def initialize
       self.eventNotifiers = {}
-      self.eventQ = Utils::PriorityQueue.new
+      self.eventQ = Utils::Queue.new
     end
 
     def postEvent(event, data = nil)

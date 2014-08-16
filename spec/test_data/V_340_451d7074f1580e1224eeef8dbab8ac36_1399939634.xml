@@ -1,0 +1,32 @@
+
+<Route curloc='http://apis.busme.us/masters/50fcc339223520000c000088/apis/1/451d7074f1580e1224eeef8dbab8ac36'
+       id='451d7074f1580e1224eeef8dbab8ac36'
+       type='journey'
+       dir='To Drumlins'
+       sort='403.0'
+       routeCode='340'
+       version='1399939634'
+       name='SU Drumlins'
+       timeless='false'
+       startOffset='644'
+       duration='54.0'
+       distance='53204.26872514122'
+       time_zone='America/New_York'
+       locationRefreshRate='10'
+       nw_lon='-76.176869'
+       nw_lat='43.076736'
+       se_lon='-76.105763'
+       se_lat='43.020517'
+       patternid='1b72be9b7282d74820279c143183a308'
+       routeid='933043cc587f21af71c0f4803a0373e2'
+        >
+  <Links>
+    <Link distance='2951.8637189762003' average_speed='12.299432162400835' duration='4.0'/>
+    <Link distance='17757.120761567006' average_speed='42.27885895611192' duration='7.0'/>
+    <Link distance='5642.092805638226' average_speed='6.268992006264696' duration='15.0'/>
+    <Link distance='2862.4323262487155' average_speed='15.902401812492863' duration='3.0'/>
+    <Link distance='4246.342542142163' average_speed='11.795395950394898' duration='6.0'/>
+    <Link distance='7230.723090779686' average_speed='17.216007358999253' duration='7.0'/>
+    <Link distance='12513.693479789223' average_speed='17.380129833040588' duration='12.0'/>
+  </Links>
+</Route>

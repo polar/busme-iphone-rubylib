@@ -69,9 +69,10 @@ module Platform
       removedJourneys = []
       keepJourneys = []
       newJourneys = []
+      index = 0
       for nameid in journeyids
         if progressListener
-          progressListener.onRouteStart(journeyids.index(nameid))
+          progressListener.onRouteStart(index)
         end
         if nameid
           addJourney = true
@@ -99,8 +100,9 @@ module Platform
         end
 
         if progressListener
-          progressListener.onRouteEnd(journeyids.index(nameid))
+          progressListener.onRouteEnd(index)
         end
+        index += 1
       end
       for route in copy_journeys
         removeJourney = true

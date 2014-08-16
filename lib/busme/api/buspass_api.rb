@@ -156,7 +156,7 @@ module Api
           login.loginState = Login::LS_REGISTER_FAILURE
         end
       else
-        login.status = "NetworkProblem"
+        login.status = resp.getStatusLine().reason
         login.loginState = Login::LS_REGISTER_FAILURE
       end
       login
@@ -203,7 +203,7 @@ module Api
           login.loginState = Login::LS_LOGIN_FAILURE
         end
       else
-        login.status = "NetworkProblem"
+        login.status = resp.getStatusLine().reason
         login.loginState = Login::LS_LOGIN_FAILURE
       end
       login
@@ -250,7 +250,7 @@ module Api
           login.loginState = Login::LS_AUTHTOKEN_FAILURE
         end
       else
-        login.status = "NetworkProblem"
+        login.status = resp.getStatusLine().reason
         login.loginState = Login::LS_AUTHTOKEN_FAILURE
       end
       login

@@ -35,12 +35,20 @@ class TestHttpClient
 
   def get(url)
     self.url = url
-    mock_answer
+    if mock_answer.is_a? Exception
+      raise mock_answer
+    else
+      mock_answer
+    end
   end
   def post(url, params)
     self.url = url
     self.params = params
-    mock_answer
+    if mock_answer.is_a? Exception
+      raise mock_answer
+    else
+      mock_answer
+    end
   end
 
 end

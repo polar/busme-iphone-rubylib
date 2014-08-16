@@ -49,7 +49,7 @@ module Platform
     # the background thread. The ProgressListener should be posting events
     # to the UI Thread.
     #
-    def sync(nameids)  # TODO: Extend
+    def sync(nameids)
       progressListener = nil
       ioListener = nil
       journeyBasket.sync(nameids, progressListener, ioListener)
