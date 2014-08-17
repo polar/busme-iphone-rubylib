@@ -1,5 +1,14 @@
 module Platform
+  class JourneyAddedData
+    attr_accessor :journeyDisplay
+  end
+
+  class JourneyRemovedData
+    attr_accessor :id
+  end
+
   class JourneyDisplayController
+    attr_accessor :api
     attr_accessor :journeyBasket
 
     attr_accessor :journeyDisplays
@@ -7,7 +16,8 @@ module Platform
     attr_accessor :onJourneyDisplayAddedListener
     attr_accessor :onJourneyDisplayRemovedListener
 
-    def initialize(basket)
+    def initialize(api, basket)
+      self.api = api
       self.journeyBasket = basket
       self.journeyDisplays = []
       self.journeyDisplayMap = {}
@@ -60,11 +70,15 @@ module Platform
     end
 
     def presentJourneyDisplay(journey_display)
-      #raise "NotImplemented"
+      eventData = JourneyAddedData.new
+      eventData.journeyDisplay = journey_display
+      api.uiEvents.postEvent("JourneyAdded", eventData)
     end
 
     def abandonJourneyDisplay(journey_display)
-      #raise "NotImplemented"
+      eventData = JourneyRemovedData.new
+      eventData.id = journey_display.id
+      api.uiEvents.postEvent("JourneyRemoved", eventData)
     end
 
   end

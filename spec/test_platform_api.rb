@@ -11,6 +11,10 @@ class TestPlatformApi < Platform::PlatformApi
     10
   end
 
+  def offRouteDistanceThreshold
+    100
+  end
+
   def getRouteDefinition(nameid)
     filename = File.join("spec", "test_data", "#{nameid.type}_#{nameid.name}_#{nameid.id}_#{nameid.version}.xml")
     file = File.new(filename)

@@ -24,7 +24,7 @@ describe Platform::JourneyDisplayController do
   }
   let(:listener) { TestListener.new }
   let(:controller) {
-    TestJourneyDisplayController.new(basket).tap do |cont|
+    TestJourneyDisplayController.new(api, basket).tap do |cont|
       cont.onJourneyDisplayAddedListener = listener
       cont.onJourneyDisplayRemovedListener = listener
     end

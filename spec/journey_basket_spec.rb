@@ -8,11 +8,11 @@ describe Platform::JourneyBasket do
   let(:store) { Platform::JourneyStore.new }
   let(:listener) { TestBasketListener.new }
   let(:basket) {
-    basket = Platform::JourneyBasket.new(api, store)
-    basket.onJourneyAddedListener = listener
-    basket.onJourneyRemovedListener = listener
-    basket.onBasketUpdateListener = listener
-    basket
+    Platform::JourneyBasket.new(api, store).tap do |basket|
+      basket.onJourneyAddedListener = listener
+      basket.onJourneyRemovedListener = listener
+      basket.onBasketUpdateListener = listener
+    end
   }
   let(:route_id) {Api::NameId.new(["643", "9864eb9e615f740526e93f6297e29435", "R", 1399939597])}
   let(:journey_id) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3ca", "V", "643", 1399940355])}

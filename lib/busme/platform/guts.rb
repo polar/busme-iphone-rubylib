@@ -27,6 +27,10 @@ module Platform
     attr_accessor :loginForeground
     attr_accessor :loginBackground
 
+    attr_accessor :journeyLocationPoster
+    attr_accessor :journeyEventController
+    attr_accessor :journeyPostingController
+
     def initialize(api)
       api = api
 
@@ -38,7 +42,7 @@ module Platform
 
       self.journeyStore = JourneyStore.new # TODO: Serialization
       self.journeyBasket = JourneyBasket.new(api, journeyStore)
-      self.journeyDisplayController = JourneyDisplayController.new(journeyBasket) # TODO: Extend with UI
+      self.journeyDisplayController = JourneyDisplayController.new(api, journeyBasket) # TODO: Extend with UI
 
       self.markerController = MarkerController.new # TODO: Extend with UI
       self.markerStore = MarkerStore.new # TODO: Serialization
@@ -54,6 +58,10 @@ module Platform
 
       self.loginForeground = LoginForeground.new(api) # TODO: Extend with UI
       self.loginBackground = LoginBackground.new(api)
+
+      self.journeyLocationPoster = JourneyLocationPoster.new(api)
+      self.journeyEventController = JourneyEventController.new(api)
+      self.journeyPostingController = JourneyPostingCotnroller.new(api)
     end
   end
 end

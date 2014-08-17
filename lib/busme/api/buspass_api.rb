@@ -328,5 +328,37 @@ module Api
       end
     end
 
+    # Returns nil, ok, notavailable, notloggedin
+    def postJourneyLocation(route, location, role)
+      if isReady?
+        url = buspass.postJourneyLocationUrl
+        if url
+          params = []
+          params << ["id", route.id]
+          params << ["lat", location.latitude]
+          params << ["lon", location.longitude]
+          params << ["dir", location.bearing]
+          params << ["reported_time", location.time]
+          params << ["speed", location.speed]
+          if "driver" == role
+            params << ["driver", "1"]
+          end
+
+          entity = postURL(url, params)
+          if entity
+            tag = xmlParse(entity)
+            if tag
+              case tag.name.downcase
+                when "ok"
+                when "notavailable"
+                when "notloggedin"
+              end
+              return tag.name.downcase
+            end
+          end
+        end
+      end
+    end
+
   end
 end

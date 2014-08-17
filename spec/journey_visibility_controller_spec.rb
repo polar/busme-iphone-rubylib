@@ -21,7 +21,7 @@ describe Platform::JourneyVisibilityController do
     basket = Platform::JourneyBasket.new(api, store)
     basket
   }
-  let(:journeyDisplayController) { Platform::JourneyDisplayController.new(basket) }
+  let(:journeyDisplayController) { Platform::JourneyDisplayController.new(api, basket) }
   let(:controller) { Platform::JourneyVisibilityController.new(api,journeyDisplayController )}
   let(:route_id) {Api::NameId.new(["643", "9864eb9e615f740526e93f6297e29435", "R", 1399939597])}
   let(:journey_id) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3ca", "V", "643", 1399940355])}

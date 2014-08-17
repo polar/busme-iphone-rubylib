@@ -12,7 +12,7 @@ describe Platform::JourneySyncRequestProcessor do
     basket = Platform::JourneyBasket.new(api, store)
     basket
   }
-  let(:controller) { Platform::JourneyDisplayController.new(basket) }
+  let(:controller) { Platform::JourneyDisplayController.new(api, basket) }
   let(:processor) {
     Platform::JourneySyncRequestProcessor.new(controller).tap do
       # The contoller sets the onJourneyAddedListener and onJourneyRemovedListener
