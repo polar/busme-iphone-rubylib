@@ -2,6 +2,7 @@ module Api
   class JourneyPattern
     attr_accessor :id
     attr_accessor :path
+    attr_writer   :projectedPath
     attr_writer   :distance
 
     def getPatternNameId()
@@ -12,13 +13,12 @@ module Api
       path != nil
     end
 
-    def projectedPath
-      # Needs to be implemented for the specific UI
-      raise "NotImplemented"
-    end
-
     def distance
       @distance ||= Platform::GeoPathUtils.getDistance(path) if path
+    end
+
+    def projectedPath
+      @projectedPath = Utils::ScreenPathUtils.toProjectedPath(path) if @projectedPath.nil?
     end
 
     def endPoint
