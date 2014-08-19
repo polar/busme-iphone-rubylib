@@ -108,11 +108,11 @@ describe Platform::MarkerStore do
       now = time_now
       store.addMarker(msg1)
       store.addMarker(msg2)
-      store.preSerialize(now)
+      store.preSerialize(nil)
       s = YAML::dump(store)
       store1 = YAML::load(s)
       now += 10
-      store1.postSerialize(now)
+      store1.postSerialize(nil)
       expect(store1.markers.keys).to include(msg1.id)
       expect(store1.markers.keys).to include(msg2.id)
     end
@@ -121,11 +121,11 @@ describe Platform::MarkerStore do
       now = time_now
       store.addMarker(msg1)
       store.addMarker(msg2)
-      store.preSerialize(now)
+      store.preSerialize(nil, now)
       s = YAML::dump(store)
       store1 = YAML::load(s)
       now = msg1.expiryTime + 1
-      store1.postSerialize(now)
+      store1.postSerialize(nil, now)
       expect(store1.markers.keys).to_not include(msg1.id)
       expect(store1.markers.keys).to include(msg2.id)
     end

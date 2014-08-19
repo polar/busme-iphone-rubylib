@@ -66,7 +66,7 @@ describe Platform::JourneyStore do
       store.storeJourney(route)
       store.storeJourney(journey)
 
-      store.preSerialize
+      store.preSerialize(nil)
       s = YAML::dump(store)
       store.postSerialize(nil)
 
@@ -82,7 +82,7 @@ describe Platform::JourneyStore do
       store.storeJourney(route)
       store.storeJourney(journey)
 
-      store.preSerialize
+      store.preSerialize(nil)
       s = YAML::dump(store)
       store.postSerialize(nil)
 

@@ -4,6 +4,7 @@ module Platform
     include Api::ResponseProcessor
 
     attr_accessor :journeyController
+    attr_accessor :progressListener
 
     def initialize(controller)
       self.journeyController = controller
@@ -24,7 +25,8 @@ module Platform
           end
         end
       end
-      journeyController.sync(nameids)
+      progressListener.onSyncEnd(nameids.length) if progressListener
+      journeyController.sync(nameids, progressListener, progressListener)
     end
   end
 end

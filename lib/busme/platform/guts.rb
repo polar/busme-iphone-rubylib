@@ -31,8 +31,15 @@ module Platform
     attr_accessor :journeyEventController
     attr_accessor :journeyPostingController
 
+    attr_accessor :updateRemoteInvocation
+
+    attr_accessor :externalStorageController
+    attr_accessor :storageSerializerController
+
+    attr_accessor :journeySyncController
+
     def initialize(api)
-      api = api
+      self.api = api
 
       self.bannerController = BannerController.new(api) # TODO: Extend with UI
       self.bannerStore = BannerStore.new
@@ -61,7 +68,15 @@ module Platform
 
       self.journeyLocationPoster = JourneyLocationPoster.new(api)
       self.journeyEventController = JourneyEventController.new(api)
-      self.journeyPostingController = JourneyPostingCotnroller.new(api)
+      self.journeyPostingController = JourneyPostingController.new(api)
+
+      self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
+
+      self.externalStorageController = ExternalStorageController.new(api) # TODO: Extend for platform
+      self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
+
+      self.journeySyncController = JourneySyncController.new(api, journeyDisplayController)
+
     end
   end
 end

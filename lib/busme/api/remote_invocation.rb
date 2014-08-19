@@ -29,7 +29,7 @@ module Api
     end
 
     def invoke(progress = nil, isForced = false)
-      progress.onUpdateStart(Time.now, isforced) if progress
+      progress.onUpdateStart(Time.now, isForced) if progress
       makeRequest = false
       if requestUrl
         progress.onArgumentsStart if progress
@@ -53,14 +53,22 @@ module Api
           progress.onRequestFinish(Time.now) if progress
           progress.onResponseStart if progress
           if response
-            for rp in responseProcessors do
-              rp.onResponse(response)
+            if handleResponse(response)
+              for rp in responseProcessors do
+                rp.onResponse(response)
+              end
             end
           end
           progress.onResponseFinish if progress
         end
       end
       progress.onUpdateFinish(makeRequest, Time.now) if progress
+    end
+
+    # Place to handle any response attributes, or make sure you've got the right
+    # tag.
+    def handleResponse(response)
+      true
     end
 
     protected

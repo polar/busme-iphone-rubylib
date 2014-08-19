@@ -103,11 +103,11 @@ describe Platform::MasterMessageStore do
       now = time_now
       store.addMasterMessage(msg1)
       store.addMasterMessage(msg2)
-      store.preSerialize(now)
+      store.preSerialize(nil, now)
       s = YAML::dump(store)
       store1 = YAML::load(s)
       now += 10
-      store1.postSerialize(now)
+      store1.postSerialize(nil, now)
       expect(store1.masterMessages.keys).to include(msg1.id)
       expect(store1.masterMessages.keys).to include(msg2.id)
     end
@@ -116,11 +116,11 @@ describe Platform::MasterMessageStore do
       now = time_now
       store.addMasterMessage(msg1)
       store.addMasterMessage(msg2)
-      store.preSerialize(now)
+      store.preSerialize(nil, now)
       s = YAML::dump(store)
       store1 = YAML::load(s)
       now = msg1.expiryTime + 1
-      store1.postSerialize(now)
+      store1.postSerialize(nil, now)
       expect(store1.masterMessages.keys).to_not include(msg1.id)
       expect(store1.masterMessages.keys).to include(msg2.id)
     end

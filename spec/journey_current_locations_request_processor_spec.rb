@@ -9,7 +9,7 @@ describe Platform::JourneyCurrentLocationsRequestProcessor do
   let(:basket) {
     basket = Platform::JourneyBasket.new(api, store)
   }
-  let(:controller) { TestJourneyDisplayController.new(basket)}
+  let(:controller) { TestJourneyDisplayController.new(api, basket)}
   let(:processor) { Platform::JourneyCurrentLocationsRequestProcessor.new(controller) }
   let(:route_id) {Api::NameId.new(["643", "9864eb9e615f740526e93f6297e29435", "R", 1399939597])}
   let(:journey_id) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3ca", "V", "643", 1399940355])}

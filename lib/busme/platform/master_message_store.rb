@@ -46,11 +46,11 @@ module Platform
       masterMessages[id]
     end
 
-    def preSerialize(time = nil)
+    def preSerialize(api, time = nil)
       clean(time)
     end
 
-    def postSerialize(time = nil)
+    def postSerialize(api, time = nil)
       clean(time)
     end
 

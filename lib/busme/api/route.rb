@@ -35,14 +35,15 @@ module Api
 
     attr_accessor :journeyStore
 
-    def preSerialize
-      @journeyStore = nil
+    def preSerialize(api)
+      self.busAPI = nil
+      self.journeyStore = nil
       @paths = nil
       @projectedPaths = nil
     end
 
     def postSerialize(api)
-      self.journeyStore = api.journeyStore
+      self.busAPI = api
     end
 
     def getJourneyPattern(id)

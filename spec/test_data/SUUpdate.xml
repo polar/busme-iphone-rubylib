@@ -1,0 +1,37 @@
+
+<Response
+        updateRate='30000'
+        syncRate='100000'
+        >
+  <Banners>
+    <Banner id='1' version='121' lat='53.0' lon='-73.0' length='10'
+                   frequency='10' priority='1' expiryTime='7715568553'
+                   radius='200'
+                   goUrl='http://busme.us'
+                   iconUrl='http://something.org/pic.png'
+          ><Title>Title1</Title><Description>Hello</Description>
+    </Banner>
+  </Banners>
+  <JPS>
+    <JP id='2d0236dbd2a072bbe7f44d8c93a6d32f' reported='false' distance='27551.257620664182' lon='-76.170796' lat='43.074535' reported_time='1408368214' recorded_time='1408368214' timediff='-50' direction='-3.0675100593222306' onroute='true'/>
+  </JPS>
+  <Messages>
+    <Message id='1' version='121' lat='53.0' lon='-73.0' length='10'
+                   frequency='10' priority='1' expiryTime='7715568553'
+                   radius='200'
+                   goUrl='http://busme.us'
+                   iconUrl='http://something.org/pic.png'
+            ><Title>Title1</Title><Description>Hello</Description>
+    </Message>
+  </Messages>
+  <Markers>
+    <Marker id='1' version='121' lat='53.0' lon='-74.0' length='10'
+            frequency='10' priority='1' expiryTime='7715568553'
+            radius='200'
+            goUrl='http://busme.us'
+            iconUrl='http://something.org/pic.png'
+            ><Title>Title1</Title><Description>Hello</Description>
+    </Marker>
+  </Markers>
+
+</Response>

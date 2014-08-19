@@ -11,6 +11,12 @@ module Utils
       end
     end
 
+    def size
+      @queue.size
+    end
+
+    alias_method :length, :size
+
     def include?(v)
       @queue.include?(v)
     end

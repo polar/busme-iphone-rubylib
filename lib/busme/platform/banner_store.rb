@@ -1,5 +1,7 @@
 module Platform
   class BannerStore
+    include Api::Storage
+
     attr_accessor :banners
     def initialize
       @banners = {}
@@ -15,6 +17,14 @@ module Platform
 
     def removeBanner(key)
       @banners.delete(key)
+    end
+
+    def preSerialize(api)
+
+    end
+
+    def postSerialize(api)
+
     end
   end
 end

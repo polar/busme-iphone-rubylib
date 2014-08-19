@@ -107,8 +107,8 @@ module Api
               end
             end
           end
-          self.syncRate = -1
-          self.updateRate = -1
+          self.syncRate =  bp.syncRate ? bp.syncRate.to_i : 10000
+          self.updateRate = bp.updateRate ? bp.updateRate.to_i : 40000
           self.ready = true
         end
       end

@@ -28,6 +28,17 @@ module Platform
       self.banner_info = info
       self.state       = S_PRESENT
     end
+
+    def dup(evd)
+      evd = BannerEventData.new(banner_info)
+      evd.thruUrl = evd.thruUrl
+      evd.resolve = evd.resolve
+      evd.resolveData = evd.resolveData
+      evd.state = evd.state
+      evd.bannerForeground = evd.bannerForeground
+      evd.bannerBackground = evd.bannerBackground
+      evd
+    end
   end
 
   class BannerForeground
@@ -63,11 +74,12 @@ module Platform
     end
 
     # Called on Foreground Thread by way of UI invoking
-    #      eventData.banner_foreground.onInquired(eventData, resolution)
+    #      eventData.bannerForeground.onInquired(eventData, resolution)
     # Should be called to resolve message with a resolution
     # Override to maybe get rid of message from display, or wait until onResolved
-    def onInquired(eventData, resolve = nil)
-      eventData.resolve = resolve if resolve
+    def onInquired(eventData, resolve)
+      eventData = eventData.dup
+      eventData.resolve = resolve
       eventData.state = S_INQUIRED
       api.bgEvents.postEvent("BannerEvent", eventData)
     end
@@ -80,18 +92,21 @@ module Platform
         when R_REMOVE
         when R_CANCEL
       end
+      eventData = eventData.dup
       eventData.state = S_DONE
       api.bgEvents.postEvent("BannerEvent", eventData)
     end
 
     # Should Overridden
     def onError(eventData)
+      eventData = eventData.dup
       eventData.state = S_DONE
       api.bgEvents.postEvent("BannerEvent", eventData)
     end
 
     # Should Overridden
     def onDone(eventData)
+      eventData.banner_info.onDismiss(Time.now)
     end
   end
 
@@ -122,6 +137,7 @@ module Platform
 
     # Called from Background Thread
     def onInquired(eventData)
+      eventData = eventData.dup
       banner_info = eventData.banner_info
       case eventData.resolve
         when R_GO
@@ -131,14 +147,10 @@ module Platform
           rescue Exception => boom
             eventData.thruUrl = banner_info.goUrl
           end
-          eventData.banner_info.onDismiss(Time.now)
         when R_REMIND
           # We really do not have a remind or remove for banners. Same as cancel
-          eventData.banner_info.onDismiss(Time.now)
         when R_REMOVE
-          eventData.banner_info.onDismiss(Time.now)
         when R_CANCEL
-          eventData.banner_info.onDismiss(Time.now)
       end
       eventData.state = S_RESOLVED
     rescue Exception => boom
@@ -149,11 +161,13 @@ module Platform
 
     # May be Overridden
     def onError(eventData)
+      eventData = eventData.dup
       api.uiEvents.postEvent("BannerEvent", eventData)
     end
 
     # May be  Overridden
     def onDone(eventData)
+      eventData = eventData.dup
       api.uiEvents.postEvent("BannerEvent", eventData)
     end
   end

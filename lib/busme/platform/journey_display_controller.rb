@@ -59,9 +59,7 @@ module Platform
     # the background thread. The ProgressListener should be posting events
     # to the UI Thread.
     #
-    def sync(nameids)
-      progressListener = nil
-      ioListener = nil
+    def sync(nameids, progressListener, ioListener)
       journeyBasket.sync(nameids, progressListener, ioListener)
     end
 
@@ -77,7 +75,7 @@ module Platform
 
     def abandonJourneyDisplay(journey_display)
       eventData = JourneyRemovedData.new
-      eventData.id = journey_display.id
+      eventData.id = journey_display.route.id
       api.uiEvents.postEvent("JourneyRemoved", eventData)
     end
 

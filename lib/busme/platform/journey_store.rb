@@ -1,5 +1,5 @@
 module Platform
-  class JourneyStore
+  class JourneyStore < Api::JourneyStore
     attr_accessor :journeys
     attr_accessor :patterns
 
@@ -41,8 +41,8 @@ module Platform
       patterns.delete id
     end
 
-    def preSerialize
-      journeys.values.each {|x| x.preSerialize}
+    def preSerialize(api)
+      journeys.values.each {|x| x.preSerialize(api)}
     end
 
     def postSerialize(api)

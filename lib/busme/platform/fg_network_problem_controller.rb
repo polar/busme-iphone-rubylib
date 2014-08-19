@@ -22,23 +22,26 @@ module Platform
     end
 
     def present(eventData)
-
+      # Make a Network Problem Dialog appear
     end
 
     def dismiss(eventData)
+      # Dismiss Network Problem Dialog appear
 
     end
 
-    def onOK(eventData)
+    # The usual three buttons of an alert dialog
 
+    def onOK(eventData)
+      dismiss(eventData)
     end
 
     def onCancel(eventData)
-
+      dismiss(eventData)
     end
 
     def onDismiss(eventData)
-
+      dismiss(eventData)
     end
   end
 end

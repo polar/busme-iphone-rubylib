@@ -1,5 +1,6 @@
 module Platform
   class MarkerStore
+    include Api::Storage
     attr_accessor :markers
     attr_accessor :dirty
 
@@ -46,11 +47,11 @@ module Platform
       markers[id]
     end
 
-    def preSerialize(time = nil)
+    def preSerialize(api, time = nil)
       clean(time)
     end
 
-    def postSerialize(time = nil)
+    def postSerialize(api, time = nil)
       clean(time)
     end
 

@@ -1,16 +1,10 @@
 module Api
-  class Storage
-    attr_accessor :dirty
-
-    def initialize
-      @dirty = false
-    end
-
-    def preSerialize(api)
+  module Storage
+    def preSerialize(api, time = nil)
       raise "NotImplemented"
     end
 
-    def postSerialize(api)
+    def postSerialize(api, time = nil)
       raise "NotImplemented"
     end
   end
