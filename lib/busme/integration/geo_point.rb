@@ -9,7 +9,7 @@ module Integration
     attr_reader :longitudeE6
     attr_reader :latitudeE6
 
-    def initialize(latE6, lonE6)
+    def initialize(latE6 = 0, lonE6 = 0)
       self.latitudeE6 = latE6
       self.longitudeE6 = lonE6
     end

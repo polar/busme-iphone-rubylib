@@ -68,6 +68,10 @@ module Integration
       Point.new(centerX, centerY)
     end
 
+    def area
+      height * width
+    end
+
     def offset(dx, dy)
       self.left += dx
       self.right += dx

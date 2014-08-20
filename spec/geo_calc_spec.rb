@@ -40,6 +40,17 @@ describe Platform::GeoCalc, "getGeoDistance" do
     expect(Platform::GeoCalc.pathDistance([@c1,@c2,@c3])).to be_within(0.001 * target).of(target)
   end
 
+  it "midpoint should not be offLine by 60 feet" do
+    @c1.longitude = 0
+    @c1.latitude = 0
+    @c2.longitude = 1.0
+    @c2.latitude  = 0.0
+    @c3 = Platform::Location.new("")
+    @c3.longitude = 0.5
+    @c3.latitude  = Platform::GeoCalc::LAT_PER_FOOT * 60
+    expect(Platform::GeoCalc.offLine(@c1, @c2, @c3)).to be_within(60).of(0)
+  end
+
   it "midpoint should be on line" do
     @c1.longitude = 74.00
     @c1.latitude = 53.00
@@ -47,8 +58,8 @@ describe Platform::GeoCalc, "getGeoDistance" do
     @c2.latitude  = 53.0
     @c3 = Platform::Location.new("")
     @c3.longitude = 94.0
-    @c3.latitude  = 0.00
-    expect(Platform::GeoCalc.isOnLine(@c1, @c2, 60, @c2)).to be(true)
+    @c3.latitude  = 53.0 + Platform::GeoCalc::LAT_PER_FOOT * 60
+    expect(Platform::GeoCalc.isOnLine(@c1, @c2, 60, @c3)).to be(true)
   end
 
   it "should be on path" do

@@ -99,6 +99,28 @@ module Platform
       return bearing_normalized
     end
 
+    def self.rotate(point, pivot, theta, reuse = nil)
+      out = reuse.nil? ? Integration::GeoPoint.new : reuse
+      out.latitude = Math.cos(theta) * (point.latitude - pivot.latitude) - Math.sin(theta) * (point.longitude - pivot.longitude) + pivot.latitude
+      out.longitude = Math.sin(theta) * (point.latitude - pivot.latitude) + Math.cos(theta) * (point.longitude - pivot.longitude) + pivot.longitude
+      out
+    end
+
+    ##
+    # The method defines a measure of the point c3 being off the line made by c1 to c2 in feet.
+    # Point c3 is said to be within the bounds of c1 and c2 if its perpendicular height
+    # line intersects with line in between c1 and c2.
+    # If the point c3 is within the bounds of c1 and c2 then the offLine measurement is
+    # the perpendicular distance from the line.
+    # If point c3 is outside the bounds of c1 and c2, then the offLine measurement
+    # is the height of an isosceles triangle (a=b,c) with c1 to c2 being the base (c), and keeping
+    # the same perimeter distance, i.e. d(a) = d(b) = (d(c1,c3) + d(c3,c2))
+    # This makes the measure more than its perpendicular distance from the line which would
+    # intersect outside the bounds. For instance, if all coordinates had the same y, and
+    # we had points c1(0,0) c2(1,0) c3(2,0), then the perpendicular distance from c1-c2 is 0, but
+    # we are not between c1 and c2, so this function returns 1.4142135623730951 to signify the
+    # off lineness
+    #
     def self.offLine(c1, c2, c3)
 
       if equalCoordinates(c1,c2)
@@ -107,6 +129,28 @@ module Platform
 
       if equalCoordinates(c1, c3)
         return 0
+      end
+
+      theta1 = getGeoAngle(c1,c2)
+
+      # Rotate points around c1 to the horizontal line
+      # We don't care about lats and lons outside of (-90,90), and (-180,180) respectively, at this point.
+      # They are just numbers used for calculation of angles.
+      c2_1 = rotate(c2, c1, -theta1)
+      c3_1 = rotate(c3, c1, -theta1)
+
+      #   buf                          buf
+      # (---  c1 ----------------- c2 ---)
+      #          *      |
+      #   H(c1-c3) *    | H*Sin(theta3)
+      #              *  |
+      #                c3
+      if c1.longitude <= c3_1.longitude && c3_1.longitude <= c2_1.longitude
+        a3 = (c3_1.latitude - c1.latitude)
+        b3 = (c3_1.longitude - c1.longitude)
+        theta3 =  Math.atan2(a3, b3)
+        hc1c3 = getGeoDistance(c1, c3)
+        return (hc1c3 * Math.sin(theta3)).abs
       end
 
       hc1c3 = getGeoDistance(c1,c3)
