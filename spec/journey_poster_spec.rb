@@ -99,7 +99,7 @@ describe Platform::JourneyLocationPoster do
 
     # enable it
     locationPoster.enabled = true
-    locationPoster.startPosting(journey)
+    locationPoster.startPosting(journey, "driver")
 
     path = journey.paths[0]
     iPoint = 0
@@ -109,7 +109,7 @@ describe Platform::JourneyLocationPoster do
     for point in path do
       location = Platform::Location.new("", point.longitude, point.latitude)
       location.speed = 10 * 5120 # feet per hour
-      locationPoster.onLocationChanged(location)
+      locationPoster.processLocation(location)
       while api.uiEvents.roll do
         case eventController.action
           when Platform::JourneyEventData::A_ON_ROUTE_POSTING
@@ -138,7 +138,7 @@ describe Platform::JourneyLocationPoster do
 
     # enable it
     locationPoster.enabled = true
-    locationPoster.startPosting(journey)
+    locationPoster.startPosting(journey, "driver")
 
     httpClient.mock_answer = TestHttpMessage.new(200, "OK","<OK/>")
 
@@ -150,7 +150,7 @@ describe Platform::JourneyLocationPoster do
     for point in path do
       location = Platform::Location.new("", point.longitude, point.latitude)
       location.speed = 10 * 5120 # feet per hour
-      locationPoster.onLocationChanged(location)
+      locationPoster.processLocation(location)
       postingController.test_posted_location = nil
       postingController.test_posted_answer = nil
       api.bgEvents.roll

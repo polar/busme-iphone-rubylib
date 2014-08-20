@@ -2,11 +2,14 @@ module Platform
   class JourneyDisplaySelectionController
     attr_accessor :api
     attr_accessor :journeyDisplayController
+    attr_accessor :journeyDisplayUtility
+    attr_accessor :journeyDisplayVisibilityController
     attr_accessor :trackingJourneyDisplay
 
-    def initialize(api, journeyDisplayController)
+    def initialize(api, journeyDisplayController, journeyDisplayVisibilityController)
       self.api = api
       self.journeyDisplayController = journeyDisplayController
+      self.journeyDisplayVisibilityController = journeyDisplayVisibilityController
       api.uiEvents.registerForEvent("Map:SelectionChanged", self)
     end
 
@@ -17,6 +20,18 @@ module Platform
       else
         self.trackingJourneyDisplay = journeyDisplay
       end
+    end
+
+    def onSelectForPosting(screenPoint, screenRect, touchRect, zoomLevel)
+      projection = Utils::ScreenPathUtils::Projection.new(zoomLevel, screenRect)
+      jds = journeyDisplayController.journeyDisplays
+      jd = journeyDisplayUtility.hitsLocator(jds, screenPoint, touchRect, projection)
+      if jd
+        if jd.isActive?
+          selectTrackingJourney(jd)
+        end
+      end
+      journeyDisplayVisbilityController
     end
   end
 end

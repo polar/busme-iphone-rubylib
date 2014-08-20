@@ -39,7 +39,13 @@ module Platform
     def initialize(api)
       self.api = api
       self.enabled = false
+
       api.uiEvents.registerForEvent("LocationChanged", self)
+      api.uiEvents.registerForEvent("LocationProviderDisabled", self)
+      api.uiEvents.registerForEvent("LocationProviderEnabled", self)
+
+      api.bgEvents.registerForEvent("JourneyStartPosting", self)
+      api.bgEvents.registerForEvent("JourneyStopPosting", self)
       api.bgEvents.registerForEvent("JourneyRemoved", self)
     end
 
@@ -54,18 +60,39 @@ module Platform
     def onBuspassEvent(event)
       eventData = event.eventData
       case event.eventName
+        when "LocationProviderEnabled"
+          onProviderEnabled(eventData)
+        when "LocationProviderDisabled"
+          onProviderDisabled(eventdata)
+        when "JourneyStartPosting"
+          onJourneyStartPosting(eventData)
+        when "JourneyStopPosting"
+          onJourneyStopPosting(eventData)
         when "JourneyRemoved"
-          if eventData.id == postingRoute
-            endPosting(JourneyEventData::R_NORMAL)
-            reset(nil, nil)
-          end
+          onJourneyRemoved(eventData)
         when "LocationChanged"
           onLocationChanged(eventData.location)
       end
     end
 
+    def startPosting(route, role)
+      self.postingRoute = route
+      self.postingRole = role
+      self.postingPathPoints = route.paths.first
+      self.startPoint = postingPathPoints.first
+      self.endPoint = postingPathPoints.last
+    end
+
+    def endPosting(reason = JourneyEventData::FORCED)
+      if postingRoute
+        postingRoute.reporting = false
+        notifiyOnRouteDone(reason)
+        reset(nil, nil)
+      end
+    end
+
     # TODO: Determine Off Route stuff.
-    def onLocationChanged(location)
+    def processLocation(location)
       if !enabled
         return
       end
@@ -103,31 +130,40 @@ module Platform
     end
 
     def postLocation(location)
-      api.bgEvents.postEvent("JourneyLocationPost", JourneyLocationEventData.new(postingRoute, location, postingRole))
+      api.bgEvents.postEvent("JourneyLocationPost",
+                             JourneyLocationEventData.new(postingRoute, location, postingRole))
     end
 
-    def startPosting(route)
-      self.postingRoute = route
-      self.postingPathPoints = route.paths.first
-      self.startPoint = postingPathPoints.first
-      self.endPoint = postingPathPoints.last
-    end
-
-    def endPosting(reason = JourneyEventData::FORCED)
+    def onJourneyStartPosting(eventData)
       if postingRoute
-        postingRoute.reporting = false
+        endPosting(JourneyEventData::R_FORCED)
       end
-      notifiyOnRouteDone(reason)
-      self.postingRole = nil
+      startPosting(eventData.route, eventData.role)
     end
 
-    def onProviderEnabled(provider)
+    def onJourneyStopPosting(eventData)
+      if postingRoute
+        endPosting(JourneyEventData::R_FORCED)
+      end
+    end
+
+    def onJourneyRemoved(eventData)
+      if eventData.id == postingRoute
+        endPosting(JourneyEventData::R_NORMAL)
+      end
+    end
+
+    def onLocationChanged(eventData)
+      processLocation(eventData.location)
+    end
+
+    def onProviderEnabled(eventData)
       self.enabled = true
     end
 
-    def onProviderDisabled(provider)
+    def onProviderDisabled(eventData)
       self.enabled = false
-      endPostingNotify(DISABLED)
+      endPosting(JourneyEventData::R_DISABLED)
     end
 
     def notifyOnRoutePosting(location)
@@ -191,6 +227,7 @@ module Platform
       eventData.reason = reason
       eventData.action = JourneyEventData::A_ON_ROUTE_DONE
       api.uiEvents.postEvent("JourneyEvent", eventData)
+      self.postingRoute = self.postingRole = nil
     end
 
   end
