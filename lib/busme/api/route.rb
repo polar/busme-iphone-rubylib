@@ -79,7 +79,7 @@ module Api
     end
 
     def projectedPaths
-      @projectedPaths ||= journeyPatterns.map {|x| x.projectedPaths}
+      @projectedPaths ||= journeyPatterns.map {|x| x.projectedPath}
     end
 
     def getPathCount
@@ -146,10 +146,12 @@ module Api
 
     def isFinished?
       loc = lastKnownLocation
-      distance = lastKnownDistance
-      path_distance = getJourneyPattern(patternid).distance
-      dist_from_last = getJourneyPattern(patternid).endPoint.distanceTo(loc)
-      path_distance - distance < 10 && dist_from_last < 3 # feet
+      if loc
+        distance = lastKnownDistance
+        path_distance = getJourneyPattern(patternid).distance
+        dist_from_last = getJourneyPattern(patternid).endPoint.distanceTo(loc)
+        path_distance - distance < 10 && dist_from_last < 3 # feet
+      end
     end
 
     def getZoomCenter

@@ -99,11 +99,44 @@ module Platform
       return bearing_normalized
     end
 
+    def self.offLine(c1, c2, c3)
+
+      if equalCoordinates(c1,c2)
+        return equalCoordinates(c1, c3) ? 0 : getGeoDistance(c1, c3)
+      end
+
+      if equalCoordinates(c1, c3)
+        return 0
+      end
+
+      hc1c3 = getGeoDistance(c1,c3)
+      hc1c2 = getGeoDistance(c1,c2)
+      hc2c3 = getGeoDistance(c2,c3)
+      #
+      # in the case   c
+      #      c1-----------------c2
+      # a   *                *
+      #    *          *
+      #   *    *    b
+      #  *
+      # c3
+      # We measure by making it an (a=b,c) isosceles triangle with the same perimeter. That is with sides
+      # of a = b = (H(c1,c3) + H(c2,c3))/2, and c = H(c1,c2) then measure the height
+      # by SQRT( a*a - (c/2)*(c/2)
+      #
+      a = b = (hc1c3 + hc2c3)/2.0
+      c = hc1c2
+      c_2 = c/2.0
+      off = Math.sqrt(a*a - c_2*c_2)
+    end
+
     # Returns true if point is on line within the buffer (in feet)
     def self.isOnLine(c1, c2, buffer, c3)
       c1 = toLocation(c1)
       c2 = toLocation(c2)
       c3 = toLocation(c3)
+
+      return offLine(c1,c2,c3) < buffer
 
       theta1 = getGeoAngle(c1, c2)
       theta2 = getGeoAngle(c1, c3)

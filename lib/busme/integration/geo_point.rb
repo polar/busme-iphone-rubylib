@@ -67,5 +67,13 @@ module Integration
       bearing_normalized = (bearing + 360) % 360
       return bearing_normalized
     end
+
+    def hash
+      [latitudeE6,longitudeE6].hash
+    end
+
+    def eql?(other)
+      other.class == self.class && Platform::GeoCalc.equalCoordinates(self,other)
+    end
   end
 end

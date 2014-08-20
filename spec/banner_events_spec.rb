@@ -41,18 +41,19 @@ describe Platform::BannerForeground do
   }
   let(:bannerBackground) { Platform::BannerBackground.new(api) }
   let(:bannerForeground) {TestBannerForeground.new(api) }
-  let(:eventData) { Platform::BannerEventData.new(banner)}
   before do
     bannerBackground
     bannerForeground
   end
 
   it "should with good message obey the protocol all the way through" do
+    eventData =  Platform::BannerEventData.new(banner)
     # Banner Event has been set up with a banner's message to be displayed.
     api.uiEvents.postEvent("BannerEvent", eventData)
 
     # Foreground Thread
-    api.uiEvents.roll()
+    event = api.uiEvents.roll()
+    eventData = event.eventData
     expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_PRESENT)
     expect(eventData.state).to eq(Platform::BannerEventData::S_PRESENT)
     expect(eventData.bannerForeground).to eq(bannerForeground)
@@ -60,32 +61,40 @@ describe Platform::BannerForeground do
     expect(banner.displayed).to eq(true)
 
     # Call from Foreground Thread with resolve info
-    eventData.resolve = Platform::BannerEventData::R_GO
-    eventData.bannerForeground.onInquired(eventData)
+    eventData.bannerForeground.onInquired(eventData,Platform::BannerEventData::R_GO)
 
     # Should have added a Background Event to GO to the URL
+    event = api.bgEvents.top()
+    eventData = event.eventData
     expect(eventData.resolve).to eq(Platform::BannerEventData::R_GO)
     expect(eventData.state).to eq(Platform::BannerEventData::S_INQUIRED)
 
     # Background Thread
     httpClient.mock_answer = bannerURLMessage
-    api.bgEvents.roll()
+    event = api.bgEvents.roll()
+    eventData = event.eventData
+
+    event = api.uiEvents.top
+    eventData = event.eventData
     expect(eventData.thruUrl).to eq("http://google.com")
     expect(eventData.state).to eq(Platform::BannerEventData::S_RESOLVED)
 
     # Foreground Thread
     bannerForeground.test_previous_state = nil
-    api.uiEvents.roll()
+    event = api.uiEvents.roll()
+    eventData = event.eventData
     expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_RESOLVED)
     expect(bannerForeground.test_url).to eq("http://google.com")
-    expect(eventData.state).to eq(Platform::BannerEventData::S_DONE)
 
     # Background Thread
-    api.bgEvents.roll()
+    event = api.bgEvents.roll()
+    eventData = event.eventData
+    expect(eventData.state).to eq(Platform::BannerEventData::S_DONE)
 
     # Foreground Thread
     bannerForeground.test_previous_state = nil
-    api.uiEvents.roll()
+    event = api.uiEvents.roll()
+    eventData = event.eventData
     expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_DONE)
 
     # The dismiss might happen before, but it should definitely be dismissed by now.
@@ -93,11 +102,13 @@ describe Platform::BannerForeground do
   end
 
   it "should with bad repsonse, it should still obey the protocol all the way through, but should pick up the goURL" do
+    eventData =  Platform::BannerEventData.new(banner)
     # Banner Event has been set up with a banner's message to be displayed.
     api.uiEvents.postEvent("BannerEvent", eventData)
 
     # Foreground Thread
-    api.uiEvents.roll()
+    event = api.uiEvents.roll()
+    eventData = event.eventData
     expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_PRESENT)
     expect(eventData.state).to eq(Platform::BannerEventData::S_PRESENT)
     expect(eventData.bannerForeground).to eq(bannerForeground)
@@ -105,28 +116,37 @@ describe Platform::BannerForeground do
     expect(banner.displayed).to eq(true)
 
     # Call from Foreground Thread with resolve info
-    eventData.resolve = Platform::BannerEventData::R_GO
-    eventData.bannerForeground.onInquired(eventData)
+    eventData.bannerForeground.onInquired(eventData, Platform::BannerEventData::R_GO)
 
     # Should have added a Background Event to GO to the URL
+    event = api.bgEvents.top
+    eventData = event.eventData
     expect(eventData.resolve).to eq(Platform::BannerEventData::R_GO)
     expect(eventData.state).to eq(Platform::BannerEventData::S_INQUIRED)
 
     # Background Thread
     httpClient.mock_answer = badResponse
-    api.bgEvents.roll()
+    event = api.bgEvents.roll
+    eventData = event.eventData
+    expect(eventData.resolve).to eq(Platform::BannerEventData::R_GO)
+    expect(eventData.state).to eq(Platform::BannerEventData::S_INQUIRED)
+
+    event = api.uiEvents.top
+    eventData = event.eventData
     expect(eventData.thruUrl).to eq("http://busme.us")
     expect(eventData.state).to eq(Platform::BannerEventData::S_RESOLVED)
 
     # Foreground Thread
     bannerForeground.test_previous_state = nil
-    api.uiEvents.roll()
+    event = api.uiEvents.roll
+    eventData = event.eventData
     expect(bannerForeground.test_previous_state).to eq(Platform::BannerEventData::S_RESOLVED)
     expect(bannerForeground.test_url).to eq("http://busme.us")
-    expect(eventData.state).to eq(Platform::BannerEventData::S_DONE)
 
     # Background Thread
-    api.bgEvents.roll()
+    event = api.bgEvents.roll
+    eventData = event.eventData
+    expect(eventData.state).to eq(Platform::BannerEventData::S_DONE)
 
     # Foreground Thread
     bannerForeground.test_previous_state = nil

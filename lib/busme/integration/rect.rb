@@ -1,4 +1,4 @@
-module Platform
+module Integration
   class Rect
     attr_accessor :left
     attr_accessor :top

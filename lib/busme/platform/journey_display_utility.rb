@@ -69,34 +69,66 @@ module Platform
       end
     end
 
-    def selectFromTouchOnLocator(journeyDisplays, touchRect, projection)
-      ret = []
+    ##
+    # This returns an array of two lists, one of the selected journey displays
+    # and ones that were missed. They will only come from the visible ones.
+    #
+    def hitsPaths(journeyDisplays, touchRect, projection)
+      center = touchRect.center
+      buffer = [touchRect.width, touchRect.height].max
+      unselected = []
+      selected = []
+      for journey in journeyDisplays
+        if journey.pathVisible
+          isSelected = false
+          iPath = 0
+          for path in journey.route.projectedPaths
+            # We may not have a path downloaded yet.
+            if path
+              tpath = Utils::ScreenPathUtils.toTranslatedPath(path, projection)
+              if Utils::PathUtils.isOnPath(tpath, center, buffer)
+                isSelected = true
+              end
+            end
+            iPath += 1
+          end
+          if isSelected
+            selected << journey
+          else
+            unselected << journey
+          end
+        end
+      end
+      [selected, unselected]
+    end
+
+    ##
+    # Returns the first matching JourneyDisplay in which the translated touchPoint is within the
+    # lastknownlocation or the starting measure of its route.
+    #
+    def hitsRouteLocator(journeyDisplays, touchPoint, locatorRect, projection)
       for journeyDisplay in journeyDisplays
         if journeyDisplay.pathVisible
           if journeyDisplay.route.isJourney?
-            if !journeyDisplay.isActive? && journeyDisplay.route.isTimeless?
-              # we should already have projected paths that need to be translated to the zoomlevel.
-              iPath = 0
-              for path in journeyDisplay.route.projectedPaths
-                if path
-                  if PathUtils.isOnPath(path, touchRect.center, [touchRect.width, touchRect.height].max)
-                    ret << journey
-                  end
-                end
-                iPath += 1
+            loc = journeyDisplay.route.lastKnownLocation
+            if loc.nil?
+              measure = journeyDisplay.route.getStartingMeasure
+              if 0 < measure && measure < 1.0
+                loc = journeyDisplay.route.getStartingPoint
               end
-            else
-              loc = journey.route.lastKnownLocation
-              if loc
-                rect = touchRect.dup
-                screenCoords = projection.toMapPixels(loc)
-                rect.offsetTo(screenCoords.x, screenCoords.y)
+            end
+            if loc
+              rect = locatorRect.dup
+              screenCoords = projection.toMapPixels(loc)
+              rect.offsetTo(screenCoords.x, screenCoords.y)
+              if rect.containsXY(touchPoint.x, touchPoint.y)
+                return journeyDisplay
               end
             end
           end
         end
       end
+      nil
     end
-
   end
 end

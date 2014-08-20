@@ -7,8 +7,16 @@ module Utils
     MaxLongitude = 180
 
     DefaultTileSize = 256
-    cattr_accessor :mTileSize do DefaultTileSize; end
 
+    @@mTileSize = DefaultTileSize
+
+    def self.mTileSize
+      @@mTileSize
+    end
+
+    def self.mTileSize=(size)
+      @@mTileSize = size
+    end
 
     ##
     # Clips a number to the specified minimum and maximum values.
@@ -20,7 +28,7 @@ module Utils
     #            Maximum allowable value
     # @return The clipped value.
     def self.clip(n, minValue, maxValue)
-      [[n,maxValue].max, maxValue].min
+      [[n,minValue].max, maxValue].min
     end
 
     ##
@@ -85,11 +93,11 @@ module Utils
       longitude = clip(longitude, MinLongitude, MaxLongitude)
 
       x = (longitude + 180) / 360
-      sinLatitude = Math.sin(latitude * Math.PI / 180)
-      y = 0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI)
+      sinLatitude = Math.sin(latitude * Math::PI / 180)
+      y = 0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math::PI)
 
       mapSize = getMapSize(levelOfDetail)
-      out.x = c1ip(x * mapSize + 0.5, 0, mapSize - 1)
+      out.x = clip(x * mapSize + 0.5, 0, mapSize - 1)
       out.y = clip(y * mapSize + 0.5, 0, mapSize - 1)
       return out
     end
@@ -152,7 +160,7 @@ module Utils
     #
     def self.toReducedScreenPath(geoPoints, zoomLevel = Projection::MAX_ZOOM_LEVEL)
       thePath = []
-      lastPoint =
+      lastPoint = nil
       if geoPoints.length > 0
         newPoint = latLongToPixelXY(geoPoints[0].latitude, geoPoints[0].longitude, zoomLevel)
         lastPoint = newPoint
@@ -170,6 +178,23 @@ module Utils
       thePath
     end
 
+    def self.toTranslatedPath(projectedPath, projection)
+      path = []
+      if projectedPath.length > 0
+        last = projection.translatePoint(projectedPath.first)
+        path << Integration::Point.new(last.x, last.y)
+      end
+      coords = Integration::Point.new
+      for point in projectedPath
+        projection.translatePoint(point, coords)
+        if last.x != coords.x || last.y != coords.y
+          path << Integration::Point.new(coords.x, coords.y)
+        end
+        last.set(coords.x, coords.y)
+      end
+      path
+    end
+
     class Projection
       MAX_ZOOM_LEVEL = 22
       attr_accessor :zoomLevel
@@ -181,7 +206,7 @@ module Utils
       def initialize(zoom, rect)
         self.zoomLevel = zoom
         self.screenRect = rect
-        self.worldSize_2 = ScreenPathUtils.getMapSize(zoom)
+        self.worldSize_2 = Utils::ScreenPathUtils.getMapSize(zoom)
         self.offsetX = self.offsetY = - worldSize_2
       end
 
@@ -196,23 +221,25 @@ module Utils
       # @return the Point containing the <I>Screen coordinates</I> of the initial GeoPoint passed
 		  #         to the toMapPixelsProjected.
 		  #
-      def self.translatePoint(point, reuse = nil)
-        out = reuse.nil? ? Point.new : reuse
+      def translatePoint(point, reuse = nil)
+        out = reuse.nil? ? Integration::Point.new : reuse
 
         zoomDifference = MAX_ZOOM_LEVEL - zoomLevel
-        out.x = point.x >> zoomDifference + offsetX
-        out.y = point.y >> zoomDifference + offsetY
+        out.x = (point.x >> zoomDifference) + offsetX
+        out.y = (point.y >> zoomDifference) + offsetY
+        out
       end
 
       def fromPixels(x, y)
-        ScreenPathUtils.pixelXYToLatLong(screenRect.left + x + worldSize_2,
+        Utils::ScreenPathUtils.pixelXYToLatLong(screenRect.left + x + worldSize_2,
                             screenRect.top + y + worldSize_2, zoomLevel)
       end
 
       def toMapPixels(geoPoint, reuse = nil)
-        out = reuse.nil? ? Point.new : reuse
-        ScreenPathUtils.latLongToPixelXY(geoPoint.latitude, geoPoint.longitude, zoomLevel, out)
+        out = reuse.nil? ? Integration::Point.new : reuse
+        Utils::ScreenPathUtils.latLongToPixelXY(geoPoint.latitude, geoPoint.longitude, zoomLevel, out)
         out.offset(offsetX, offsetY)
+        out
       end
     end
 

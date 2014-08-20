@@ -57,7 +57,7 @@ describe Platform::GeoPathUtils, "getGeoDistance" do
     @c2.latitude  = 53.0
     # from http://www.movable-type.co.uk/scripts/latlong.html
     @c3 = Integration::GeoPoint.new((53 +25/60 + 14/60/60) * 1E6, 84.0 * 1E6)
-    expect(Platform::GeoCalc.isOnPath([@c1,@c2,@c1], 60, @c3)).to be(true)
+    expect(Platform::GeoCalc.isOnPath([@c1,@c2,@c3], 60, @c3)).to be(true)
   end
 
   it "should have valid bearings and distances on path with midpoint" do
@@ -66,7 +66,7 @@ describe Platform::GeoPathUtils, "getGeoDistance" do
     @c2.longitude = 94.0
     @c2.latitude  = 53.0
     # midpoint
-    @c3 = Integration::GeoPoint.new((53 +25/60 + 14/60/60) * 1E6, 84.0 * 1E6)
+    @c3 = Integration::GeoPoint.new((53 +25/60 + 14/60/60) * 1E6, 94.0 * 1E6)
     points = Platform::GeoPathUtils.whereOnPath([@c1,@c2], @c3, 60)
     expect(points[0].bearing).to be_within(0.01).of(Platform::GeoCalc.getBearing(@c3, @c2))
     expect(points[0].distance).to eq(Platform::GeoCalc.getGeoDistance(@c1, @c3))
@@ -78,13 +78,13 @@ describe Platform::GeoPathUtils, "getGeoDistance" do
     @c2.longitude = 94.0
     @c2.latitude  = 53.0
     # We use the midpoint, but we go back and forth 4 times.
-    @c3 = Integration::GeoPoint.new((53 +25/60 + 14/60/60) * 1E6, 84.0 * 1E6)
+    @c3 = Integration::GeoPoint.new((53 +25/60 + 14/60/60) * 1E6, 94.0 * 1E6)
     points = Platform::GeoPathUtils.whereOnPath([@c1,@c2,@c1,@c2,@c1], @c3, 60)
     expect(points.length).to eq(4)
     expect(points[0].bearing).to be_within(0.01).of(Platform::GeoCalc.getBearing(@c3, @c2))
-    expect(points[1].bearing).to be_within(0.01).of(Platform::GeoCalc.getBearing(@c2, @c3))
+    expect(points[1].bearing).to be_within(0.01).of(Platform::GeoCalc.getBearing(@c3, @c1))
     expect(points[2].bearing).to be_within(0.01).of(Platform::GeoCalc.getBearing(@c3, @c2))
-    expect(points[3].bearing).to be_within(0.01).of(Platform::GeoCalc.getBearing(@c2, @c3))
+    expect(points[3].bearing).to be_within(0.01).of(Platform::GeoCalc.getBearing(@c3, @c1))
     expect(points[0].distance).to eq(Platform::GeoCalc.getGeoDistance(@c1, @c3))
     expect(points[1].distance).to eq(Platform::GeoCalc.getGeoDistance(@c1, @c2) + Platform::GeoCalc.getGeoDistance(@c2, @c3))
     expect(points[2].distance).to eq(Platform::GeoCalc.getGeoDistance(@c1, @c2)*2 + Platform::GeoCalc.getGeoDistance(@c1, @c3))

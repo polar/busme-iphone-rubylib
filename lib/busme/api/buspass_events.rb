@@ -52,6 +52,12 @@ module Api
       eventQ.push(event)
     end
 
+    def peek
+      eventQ.peek
+    end
+
+    alias :top :peek
+
     def roll
       event = eventQ.pop
       if event

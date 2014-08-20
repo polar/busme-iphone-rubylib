@@ -130,6 +130,12 @@ module Platform
       end
       jds
     end
+
+    # This is causing problems
+    def inspect
+      route.to_s
+    end
   end
+
 
 end

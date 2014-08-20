@@ -29,14 +29,14 @@ module Platform
       self.state       = S_PRESENT
     end
 
-    def dup(evd)
+    def dup
       evd = BannerEventData.new(banner_info)
-      evd.thruUrl = evd.thruUrl
-      evd.resolve = evd.resolve
-      evd.resolveData = evd.resolveData
-      evd.state = evd.state
-      evd.bannerForeground = evd.bannerForeground
-      evd.bannerBackground = evd.bannerBackground
+      evd.thruUrl = thruUrl
+      evd.resolve = resolve
+      evd.resolveData = resolveData
+      evd.state = state
+      evd.bannerForeground = bannerForeground
+      evd.bannerBackground = bannerBackground
       evd
     end
   end
