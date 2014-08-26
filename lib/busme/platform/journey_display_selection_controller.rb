@@ -4,6 +4,7 @@ module Platform
     attr_accessor :journeyDisplayController
     attr_accessor :journeyDisplayUtility
     attr_accessor :journeyDisplayVisibilityController
+    attr_accessor :journeyPostingController
     attr_accessor :trackingJourneyDisplay
 
     def initialize(api, journeyDisplayController, journeyDisplayVisibilityController)
@@ -28,7 +29,10 @@ module Platform
       jd = journeyDisplayUtility.hitsLocator(jds, screenPoint, touchRect, projection)
       if jd
         if jd.isActive?
-          selectTrackingJourney(jd)
+          evenData = JourneyEventData.new
+          eventData.postingRoute
+          eventData.postingRole
+          api.bgEvents.postEvent("JourneyStartPosting", eventData)
         end
       end
       journeyDisplayVisbilityController

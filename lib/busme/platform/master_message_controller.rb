@@ -22,7 +22,7 @@ module Platform
 
     def roll(now = nil)
       now = Time.now  if now.nil?
-      if currentMasterMessage
+      if currentMasterMessage && currentMasterMessage.isDisplayed?
         # message must be dismissed first
         return
       end
@@ -62,7 +62,7 @@ module Platform
 
     def presentMasterMessage(msg)
       eventData = MasterMessageEventData.new(msg)
-      api.uiEvents.postEvent("MasterMessageEvent", eventData)
+      api.uiEvents.postEvent("MasterMessage", eventData)
     end
   end
 end

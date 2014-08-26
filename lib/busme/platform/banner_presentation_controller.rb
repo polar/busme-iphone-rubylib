@@ -1,5 +1,10 @@
 module Platform
-  class BannerController
+  ##
+  # This class handles the presentation queue for displaying banners.
+  # The system will call the roll method on a period basis to cycle
+  # through the banners in the queue. The queue is filled by addBanner
+  # handed in the background by the BannerBasket.
+  class BannerPresentationController
     attr_accessor :api
     attr_accessor :currentBanner
 
@@ -56,12 +61,13 @@ module Platform
     end
 
     def presentBanner(banner)
-      eventData = BannerEventData.new(banner)
-      api.uiEvents.postEvent("BannerEvent", eventData)
+      eventData = BannerPresentEventData.new(banner)
+      api.uiEvents.postEvent("BannerPresent:Display", eventData)
     end
 
     def abandonBanner(banner)
-      raise "NotImplemented"
+      eventData = BannerPresentEventData.new(banner)
+      api.uiEvents.postEvent("BannerPresent:Dismiss", eventData)
     end
   end
 end

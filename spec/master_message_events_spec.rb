@@ -1,6 +1,17 @@
 require "spec_helper"
 require "test_platform_api"
-require 'test_master_message_foreground'
+
+class TestMasterMessageForground < Platform::FG_MasterMessageEventController
+  attr_accessor :test_previous_state
+
+  def onInquireStart(requestState)
+    test_previous_state = requestState.state
+  end
+
+  def onNotifyStart(requestState)
+
+  end
+end
 
 describe Platform::MasterMessageForeground do
   let (:time_now) {Time.now}
@@ -39,7 +50,7 @@ describe Platform::MasterMessageForeground do
     api.forceGet
     api
   }
-  let(:masterMessageBackground) { Platform::MasterMessageBackground.new(api) }
+  let(:masterMessageBackground) { Platform::BG_MasterMessageEventController.new(api) }
   let(:masterMessageForeground) {TestMasterMessageForeground.new(api) }
   let(:eventData) { Platform::MasterMessageEventData.new(masterMessage)}
   before do
@@ -49,7 +60,10 @@ describe Platform::MasterMessageForeground do
 
   it "should obey the protocol all the way through" do
     # MasterMessage Event has been set up with a masterMessage's message to be displayed.
-    api.uiEvents.postEvent("MasterMessageEvent", eventData)
+    api.bgEvents.postEvent("MasterMessage", eventData)
+
+    api.bgEvents.roll()
+
 
     # Foreground Thread
     api.uiEvents.roll()

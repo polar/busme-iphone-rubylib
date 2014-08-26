@@ -1,7 +1,7 @@
 require "spec_helper"
 require "test_banner_controller"
 
-describe Platform::BannerController do
+describe Platform::BannerPresentationController do
 
   let(:time_now)  { Time.now }
   let(:controller) { TestBannerController.new(nil) }

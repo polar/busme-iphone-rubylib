@@ -32,7 +32,7 @@ module Api
     def isLoaded()
       loaded
     end
-    def isDisplayed
+    def isDisplayed?
       displayed
     end
     def isSeen()

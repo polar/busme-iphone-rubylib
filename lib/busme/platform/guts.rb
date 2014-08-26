@@ -41,7 +41,7 @@ module Platform
     def initialize(api)
       self.api = api
 
-      self.bannerController = BannerController.new(api) # TODO: Extend with UI
+      self.bannerController = BannerPresentationController.new(api) # TODO: Extend with UI
       self.bannerStore = BannerStore.new
       self.bannerBasket = BannerBasket.new(bannerStore, bannerController)
       self.bannerForeground = BannerForeground.new(api)

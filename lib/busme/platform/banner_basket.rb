@@ -2,12 +2,10 @@ module Platform
   class BannerBasket
     attr_accessor :bannerStore
     attr_accessor :bannerController
-    attr_accessor :banners
 
     def initialize(store, controller)
       self.bannerStore = store
       self.bannerController = controller
-      self.banners = []
     end
 
     def getBanners
@@ -29,7 +27,7 @@ module Platform
         dist = GeoCalc.getGeoDistance(point, banner.point)
         if dist < banner.radius
           if banner.shouldBeSeen?(now)
-            # display a marker
+            # display a banner, put it in the display queue
             bannerController.addBanner(banner)
           end
         else

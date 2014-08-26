@@ -1,4 +1,4 @@
-class TestBannerController < Platform::BannerController
+class TestBannerController < Platform::BannerPresentationController
   attr_accessor :test_displayed_banner
   attr_accessor :test_removed_banner
   def presentBanner(banner)

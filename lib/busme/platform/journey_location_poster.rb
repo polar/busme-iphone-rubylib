@@ -60,18 +60,21 @@ module Platform
     def onBuspassEvent(event)
       eventData = event.eventData
       case event.eventName
+        # Foreground Thread
         when "LocationProviderEnabled"
           onProviderEnabled(eventData)
         when "LocationProviderDisabled"
           onProviderDisabled(eventdata)
+        when "LocationChanged"
+          onLocationChanged(eventData.location)
+
+        # Background Thread
         when "JourneyStartPosting"
           onJourneyStartPosting(eventData)
         when "JourneyStopPosting"
           onJourneyStopPosting(eventData)
         when "JourneyRemoved"
           onJourneyRemoved(eventData)
-        when "LocationChanged"
-          onLocationChanged(eventData.location)
       end
     end
 
@@ -91,6 +94,10 @@ module Platform
       end
     end
 
+    #
+    # Process the location and determine what do do.
+    # Notify the Foreground of OnRoutePosting, AtRouteStart, UpdateRoute, AtRouteEnd
+    #
     # TODO: Determine Off Route stuff.
     def processLocation(location)
       if !enabled
@@ -129,11 +136,21 @@ module Platform
       end
     end
 
+    #
+    # This method creates a background event "JourneyLocationPost", which should be
+    # picked up by the JourneyPostingController, which will post the location.
+    # Issues.
+    #   The user should be logged in by now.
+    #
     def postLocation(location)
       api.bgEvents.postEvent("JourneyLocationPost",
                              JourneyLocationEventData.new(postingRoute, location, postingRole))
     end
 
+
+    #
+    # Background Event for "JourneyStartPosting"
+    #
     def onJourneyStartPosting(eventData)
       if postingRoute
         endPosting(JourneyEventData::R_FORCED)
@@ -141,26 +158,41 @@ module Platform
       startPosting(eventData.route, eventData.role)
     end
 
+    #
+    # Background Event for "JourneyStopPosting"
+    #
     def onJourneyStopPosting(eventData)
       if postingRoute
         endPosting(JourneyEventData::R_FORCED)
       end
     end
 
+    #
+    # Background Event for "JourneyRemoved"
+    #
     def onJourneyRemoved(eventData)
       if eventData.id == postingRoute
         endPosting(JourneyEventData::R_NORMAL)
       end
     end
 
+    #
+    # Foreground Event for "LocationChanged"
+    #
     def onLocationChanged(eventData)
       processLocation(eventData.location)
     end
 
+    #
+    # Foreground Event for "LocationProviderEnabled"
+    #
     def onProviderEnabled(eventData)
       self.enabled = true
     end
 
+    #
+    # Foreground Event for "LocationProviderDisabled"
+    #
     def onProviderDisabled(eventData)
       self.enabled = false
       endPosting(JourneyEventData::R_DISABLED)
