@@ -1,7 +1,7 @@
 require "spec_helper"
 require "test_marker_controller"
 
-describe Platform::MarkerController do
+describe Platform::MarkerPresentationController do
 
   let(:time_now)  { Time.now }
   let(:controller) { TestMarkerController.new }

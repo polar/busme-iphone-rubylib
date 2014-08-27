@@ -1,4 +1,4 @@
-class TestMarkerController < Platform::MarkerController
+class TestMarkerController < Platform::MarkerPresentationController
   attr_accessor :test_current_markers
   def initialize
     super

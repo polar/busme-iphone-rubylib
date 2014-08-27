@@ -1,5 +1,5 @@
 module Platform
-  class MarkerController
+  class MarkerPresentationController
     attr_accessor :markerPresentLimit
     attr_accessor :currentMarkers
 
@@ -65,6 +65,13 @@ module Platform
       @markerQ.include?(marker) || currentMarkers.include?(marker)
     end
 
+    def removeDisplayedMarker(marker)
+      if marker && marker.displayed
+        marker.onDismiss(false, Time.now)
+        abandonMarker(marker)
+      end
+    end
+
     protected
 
     def compare(b1,b2)
@@ -78,11 +85,13 @@ module Platform
     end
 
     def presentMarker(marker)
-      raise "NotImplemented"
+      eventData = MarkerPresentEventData.new(marker)
+      api.uiEvents.postEvent("MarkerPresent:Add", eventData)
     end
-    
+
     def abandonMarker(marker)
-      raise "NotImplemented"
+      eventData = MarkerPresentEventData.new(marker)
+      api.uiEvents.postEvent("MarkerPresent:Remove", eventData)
     end
   end
 end

@@ -1,9 +1,22 @@
 require "spec_helper"
 require "test_platform_api"
 require 'test_marker_controller'
-require 'test_marker_message_foreground'
 
-describe Platform::MarkerMessageForeground do
+class TestFGMarkerMessageEventController < Platform::FG_MarkerMessageEventController
+  attr_accessor :test_previous_state
+
+  def onInquireStart(requestState)
+    self.test_previous_state = requestState.state
+    super(requestState)
+  end
+
+  def onNotifyStart(requestState)
+    self.test_previous_state = requestState.state
+    super(requestState)
+  end
+end
+
+describe Platform::MarkerMessageEventData do
   let (:time_now) {Time.now}
   let (:suGet) {
     fileName = File.join("spec", "test_data", "SUGet.xml");
@@ -41,8 +54,8 @@ describe Platform::MarkerMessageForeground do
     api
   }
   let(:markerController) {TestMarkerController.new }
-  let(:markerMessageBackground) { Platform::MarkerMessageBackground.new(api) }
-  let(:markerMessageForeground) {TestMarkerMessageForeground.new(api, markerController) }
+  let(:markerMessageBackground) { Platform::BG_MarkerMessageEventController.new(api) }
+  let(:markerMessageForeground) {TestFGMarkerMessageEventController.new(api, markerController) }
   let(:eventData) { Platform::MarkerMessageEventData.new(markerInfo)}
   let(:markerStore) { Platform::MarkerStore.new }
   let(:markerBasket) { Platform::MarkerBasket.new(markerStore, markerController) }
@@ -59,91 +72,81 @@ describe Platform::MarkerMessageForeground do
 
   it "should with good message obey the protocol all the way through" do
     # MarkerMessage Event has been set up with a markerMessage's message to be displayed.
-    api.uiEvents.postEvent("MarkerMessageEvent", eventData)
+    api.uiEvents.postEvent("MarkerMessage", eventData)
 
     # Foreground Thread
     api.uiEvents.roll()
-    expect(markerMessageForeground.test_previous_state).to eq(Platform::MarkerMessageEventData::S_PRESENT)
-    expect(eventData.state).to eq(Platform::MarkerMessageEventData::S_PRESENT)
-    expect(eventData.markerMessageForeground).to eq(markerMessageForeground)
+    # Above we transitioned it from S_START all the way to S_ANSWER_FINISH
+    expect(markerMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_INQUIRE_START)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ANSWER_START)
 
-    # Call from Foreground Thread with resolve info
-    eventData.markerMessageForeground.onInquired(eventData, Platform::MarkerMessageEventData::R_GO)
+    markerMessageForeground.resolveGo(eventData)
 
     # Should have added a Background Event to GO to the URL
-    expect(eventData.resolve).to eq(Platform::MarkerMessageEventData::R_GO)
-    expect(eventData.state).to eq(Platform::MarkerMessageEventData::S_INQUIRED)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_REQUEST_START)
+    expect(eventData.resolve).to eq(Platform::MarkerMessageConstants::R_GO)
 
     # Background Thread
     httpClient.mock_answer = markerMessageURLMessage
     api.bgEvents.roll()
+    expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)
     expect(eventData.thruUrl).to eq("http://google.com")
-
-    # Foreground Thread
-    api.uiEvents.roll()
-    expect(markerMessageForeground.test_previous_state).to eq(Platform::MarkerMessageEventData::S_RESOLVED)
-    expect(markerMessageForeground.test_url).to eq("http://google.com")
-    expect(eventData.state).to eq(Platform::MarkerMessageEventData::S_DONE)
-
-    # Background Thread
-    api.bgEvents.roll()
 
     # Foreground Thread
     markerMessageForeground.test_previous_state = nil
     api.uiEvents.roll()
-    expect(markerMessageForeground.test_previous_state).to eq(Platform::MarkerMessageEventData::S_DONE)
+    expect(markerMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_NOTIFY_START)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ACK_START)
+
+    markerMessageForeground.ackOK(eventData)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_FINISH)
   end
 
   it "should obey the protocol all the way through, but with a bad response from the server, should just go to the goUrl" do
     # MarkerMessage Event has been set up with a markerMessage's message to be displayed.
-    api.uiEvents.postEvent("MarkerMessageEvent", eventData)
+    api.uiEvents.postEvent("MarkerMessage", eventData)
 
     # Foreground Thread
     api.uiEvents.roll()
-    expect(markerMessageForeground.test_previous_state).to eq(Platform::MarkerMessageEventData::S_PRESENT)
-    expect(eventData.state).to eq(Platform::MarkerMessageEventData::S_PRESENT)
-    expect(eventData.markerMessageForeground).to eq(markerMessageForeground)
+    # Above we transitioned it from S_START all the way to S_ANSWER_FINISH
+    expect(markerMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_INQUIRE_START)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ANSWER_START)
 
-    # Call from Foreground Thread with resolve info
-    eventData.markerMessageForeground.onInquired(eventData, Platform::MarkerMessageEventData::R_GO)
+    markerMessageForeground.resolveGo(eventData)
 
     # Should have added a Background Event to GO to the URL
-    expect(eventData.resolve).to eq(Platform::MarkerMessageEventData::R_GO)
-    expect(eventData.state).to eq(Platform::MarkerMessageEventData::S_INQUIRED)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_REQUEST_START)
+    expect(eventData.resolve).to eq(Platform::MarkerMessageConstants::R_GO)
 
     # Background Thread
     httpClient.mock_answer = badResponse
     api.bgEvents.roll()
+    expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)
     expect(eventData.thruUrl).to eq("http://busme.us")
-
-    # Foreground Thread
-    api.uiEvents.roll()
-    expect(markerMessageForeground.test_previous_state).to eq(Platform::MarkerMessageEventData::S_RESOLVED)
-    expect(markerMessageForeground.test_url).to eq("http://busme.us")
-    expect(eventData.state).to eq(Platform::MarkerMessageEventData::S_DONE)
-
-    # Background Thread
-    api.bgEvents.roll()
 
     # Foreground Thread
     markerMessageForeground.test_previous_state = nil
     api.uiEvents.roll()
-    expect(markerMessageForeground.test_previous_state).to eq(Platform::MarkerMessageEventData::S_DONE)
+    expect(markerMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_NOTIFY_START)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ACK_START)
+
+    markerMessageForeground.ackOK(eventData)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_FINISH)
   end
 
-  it "should interact with basket and be removed" do
+  it "1 should interact with basket and be removed" do
     markerBasket.addMarker(markerInfo)
     markerBasket.onLocationUpdate(location1, Time.now)
     # Foreground Thread
     markerController.roll()
     expect(markerInfo.displayed).to eq(true)
     # Event Data represents the marker being depressed to get the marker message
-    api.uiEvents.postEvent("MarkerMessageEvent", eventData)
+    api.uiEvents.postEvent("MarkerMessage", eventData)
     # Foreground Thread
     api.uiEvents.roll()
     # Call from Foreground Thread with resolve info
-    eventData.markerMessageForeground.onInquired(eventData, Platform::MarkerMessageEventData::R_REMOVE)
-    expect(eventData.resolve).to eq(Platform::MarkerMessageEventData::R_REMOVE)
+    markerMessageForeground.resolveRemove(eventData)
+    expect(eventData.resolve).to eq(Platform::MarkerMessageConstants::R_REMOVE)
     # Background Thread
     api.bgEvents.roll()
     # Foreground Thread
@@ -153,19 +156,19 @@ describe Platform::MarkerMessageForeground do
     expect(markerInfo.displayed).to eq(false)
   end
 
-  it "should interact with basket and be removed, but reminded" do
+  it "2 should interact with basket and be removed, but reminded" do
     markerBasket.addMarker(markerInfo)
     markerBasket.onLocationUpdate(location1, Time.now)
     # Foreground Thread
     markerController.roll()
     expect(markerInfo.displayed).to eq(true)
     # Event Data represents the marker being depressed to get the marker message
-    api.uiEvents.postEvent("MarkerMessageEvent", eventData)
+    api.uiEvents.postEvent("MarkerMessage", eventData)
     # Foreground Thread
     api.uiEvents.roll()
     # Call from Foreground Thread with resolve info
-    eventData.markerMessageForeground.onInquired(eventData, Platform::MarkerMessageEventData::R_REMIND)
-    expect(eventData.resolve).to eq(Platform::MarkerMessageEventData::R_REMIND)
+    markerMessageForeground.resolveRemind(eventData)
+    expect(eventData.resolve).to eq(Platform::MarkerMessageConstants::R_REMIND)
     # Background Thread
     api.bgEvents.roll()
     # Foreground Thread
@@ -182,12 +185,12 @@ describe Platform::MarkerMessageForeground do
     markerController.roll()
     expect(markerInfo.displayed).to eq(true)
     # Event Data represents the marker being depressed to get the marker message
-    api.uiEvents.postEvent("MarkerMessageEvent", eventData)
+    api.uiEvents.postEvent("MarkerMessage", eventData)
     # Foreground Thread
     api.uiEvents.roll()
     # Call from Foreground Thread with resolve info
-    eventData.markerMessageForeground.onInquired(eventData, Platform::MarkerMessageEventData::R_CANCEL)
-    expect(eventData.resolve).to eq(Platform::MarkerMessageEventData::R_CANCEL)
+    markerMessageForeground.resolveCancel(eventData)
+    expect(eventData.resolve).to eq(Platform::MarkerMessageConstants::R_CANCEL)
     # Background Thread
     api.bgEvents.roll()
     # Foreground Thread
