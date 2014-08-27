@@ -48,7 +48,7 @@ module Platform
     def initialize(api)
       self.api = api
 
-      self.bannerPresentationController = BannerPresentationController.new(api) # TODO: Extend with UI
+      self.bannerPresentationController = BannerPresentationController.new(api)
       self.bannerStore = BannerStore.new
       self.bannerBasket = BannerBasket.new(bannerStore, bannerPresentationController)
 
@@ -56,7 +56,7 @@ module Platform
       self.journeyBasket = JourneyBasket.new(api, journeyStore)
       self.journeyDisplayController = JourneyDisplayController.new(api, journeyBasket) # TODO: Extend with UI
 
-      self.markerPresentationController = MarkerPresentationController.new # TODO: Extend with UI
+      self.markerPresentationController = MarkerPresentationController.new
       self.markerStore = MarkerStore.new # TODO: Serialization
       self.markerBasket = MarkerBasket.new(markerStore, markerPresentationController)
 
