@@ -1,14 +1,6 @@
 module Platform
 
-  class UpdateEventData
-    attr_accessor :pleaseStop
-    attr_accessor :progressListener
-    attr_accessor :isForced
-  end
-
   class UpdateRemoteInvocation < Api::RemoteInvocation
-    include Api::BuspassEventListener
-    attr_accessor :enabled
 
     def initialize(guts)
       super(guts.api, nil)
@@ -26,7 +18,6 @@ module Platform
       addResponseProcessor(markers)
       addResponseProcessor(messages)
       addResponseProcessor(locations)
-      api.bgEvents.registerForEvent("Update", self)
     end
 
     def requestUrl
@@ -45,17 +36,6 @@ module Platform
         true
       else
         false
-      end
-    end
-
-    def onBuspassEvent(event)
-      eventData = event.eventData
-      if eventData.pleaseStop
-        self.enabled = false
-        return
-      end
-      if enabled
-        invoke(eventData.progressListener, eventData.isForced)
       end
     end
   end

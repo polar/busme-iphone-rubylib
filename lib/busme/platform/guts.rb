@@ -32,6 +32,8 @@ module Platform
 
     attr_accessor :journeySyncController
 
+    attr_accessor :bgUpdateRemoteInvocationEventController
+
     attr_accessor :bgBannerMessageEventController
     attr_accessor :bgMarkerMessageEventController
     attr_accessor :bgMasterMessageEventController
@@ -69,6 +71,7 @@ module Platform
       self.journeyEventController = JourneyEventController.new(api)
       self.journeyPostingController = JourneyPostingController.new(api)
 
+      # Fires on a BG EVent "Update"
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
       self.externalStorageController = ExternalStorageController.new(api) # TODO: Extend for platform
@@ -76,6 +79,7 @@ module Platform
 
       self.journeySyncController = JourneySyncController.new(api, journeyDisplayController)
 
+      self.bgUpdateRemoteInvocationEventController = BG_UpdateRemoteInvocationEventController.new(api, updateRemoteInvocation)
       self.bgBannerMessageEventController = BG_BannerMessageEventController.new(api)
       self.bgMarkerMessageEventController = BG_MarkerMessageEventController.new(api)
       self.bgMasterMessageEventController = BG_MasterMessageEventController.new(api)
