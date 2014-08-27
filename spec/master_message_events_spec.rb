@@ -1,19 +1,21 @@
 require "spec_helper"
 require "test_platform_api"
 
-class TestMasterMessageForground < Platform::FG_MasterMessageEventController
+class TestFGMasterMessageController < Platform::FG_MasterMessageEventController
   attr_accessor :test_previous_state
 
   def onInquireStart(requestState)
-    test_previous_state = requestState.state
+    self.test_previous_state = requestState.state
+    super(requestState)
   end
 
   def onNotifyStart(requestState)
-
+    self.test_previous_state = requestState.state
+    super(requestState)
   end
 end
 
-describe Platform::MasterMessageForeground do
+describe Platform::MasterMessageEventData do
   let (:time_now) {Time.now}
   let (:suGet) {
     fileName = File.join("spec", "test_data", "SUGet.xml");
@@ -51,7 +53,7 @@ describe Platform::MasterMessageForeground do
     api
   }
   let(:masterMessageBackground) { Platform::BG_MasterMessageEventController.new(api) }
-  let(:masterMessageForeground) {TestMasterMessageForeground.new(api) }
+  let(:masterMessageForeground) {TestFGMasterMessageController.new(api) }
   let(:eventData) { Platform::MasterMessageEventData.new(masterMessage)}
   before do
     masterMessageBackground
@@ -60,86 +62,82 @@ describe Platform::MasterMessageForeground do
 
   it "should obey the protocol all the way through" do
     # MasterMessage Event has been set up with a masterMessage's message to be displayed.
+    masterMessage.onDisplay(Time.now)
     api.bgEvents.postEvent("MasterMessage", eventData)
 
     api.bgEvents.roll()
+    expect(eventData.state).to eq(Platform::RequestConstants::S_INQUIRE_START)
 
 
     # Foreground Thread
     api.uiEvents.roll()
-    expect(masterMessageForeground.test_previous_state).to eq(Platform::MasterMessageEventData::S_PRESENT)
-    expect(eventData.state).to eq(Platform::MasterMessageEventData::S_PRESENT)
-    expect(eventData.masterMessageForeground).to eq(masterMessageForeground)
+    expect(masterMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_INQUIRE_START)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ANSWER_START)
     expect(masterMessage.displayed).to eq(true)
 
     # Call from Foreground Thread with resolve info
-    eventData.masterMessageForeground.onInquired(eventData, Platform::MasterMessageEventData::R_GO)
+    masterMessageForeground.resolveGo(eventData)
 
     # Should have added a Background Event to GO to the URL
-    expect(eventData.resolve).to eq(Platform::MasterMessageEventData::R_GO)
-    expect(eventData.state).to eq(Platform::MasterMessageEventData::S_INQUIRED)
+    expect(eventData.resolve).to eq(Platform::MasterMessageConstants::R_GO)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_REQUEST_START)
 
     # Background Thread
     httpClient.mock_answer = masterMessageURLMessage
     api.bgEvents.roll()
     expect(eventData.thruUrl).to eq("http://google.com")
+    expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)
 
-    # Foreground Thread
-    api.uiEvents.roll()
-    expect(masterMessageForeground.test_previous_state).to eq(Platform::MasterMessageEventData::S_RESOLVED)
-    expect(masterMessageForeground.test_url).to eq("http://google.com")
-    expect(eventData.state).to eq(Platform::MasterMessageEventData::S_DONE)
-
-    # Background Thread
-    api.bgEvents.roll()
-
-    # Foreground Thread
     masterMessageForeground.test_previous_state = nil
+    # Foreground Thread
     api.uiEvents.roll()
-    expect(masterMessageForeground.test_previous_state).to eq(Platform::MasterMessageEventData::S_DONE)
+    expect(masterMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_NOTIFY_START)
+    expect(eventData.thruUrl).to eq("http://google.com")
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ACK_START)
 
-    # The dismiss might happen before, but it should definitely be dismissed by now.
-    expect(masterMessage.displayed).to eq(false)
+    masterMessageForeground.ackOK(eventData)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_FINISH)
+
   end
 
   it "should obey the protocol all the way through, but with a bad response from the server, should just go to the goUrl" do
     # MasterMessage Event has been set up with a masterMessage's message to be displayed.
-    api.uiEvents.postEvent("MasterMessageEvent", eventData)
+    masterMessage.onDisplay(Time.now)
+    api.bgEvents.postEvent("MasterMessage", eventData)
+
+    api.bgEvents.roll()
+    expect(eventData.state).to eq(Platform::RequestConstants::S_INQUIRE_START)
+
 
     # Foreground Thread
     api.uiEvents.roll()
-    expect(masterMessageForeground.test_previous_state).to eq(Platform::MasterMessageEventData::S_PRESENT)
-    expect(eventData.state).to eq(Platform::MasterMessageEventData::S_PRESENT)
-    expect(eventData.masterMessageForeground).to eq(masterMessageForeground)
+    expect(masterMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_INQUIRE_START)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ANSWER_START)
+    expect(masterMessage.displayed).to eq(true)
 
     # Call from Foreground Thread with resolve info
-    eventData.masterMessageForeground.onInquired(eventData, Platform::MasterMessageEventData::R_GO)
+    masterMessageForeground.resolveGo(eventData)
 
     # Should have added a Background Event to GO to the URL
-    expect(eventData.resolve).to eq(Platform::MasterMessageEventData::R_GO)
-    expect(eventData.state).to eq(Platform::MasterMessageEventData::S_INQUIRED)
+    expect(eventData.resolve).to eq(Platform::MasterMessageConstants::R_GO)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_REQUEST_START)
 
     # Background Thread
     httpClient.mock_answer = badResponse
     api.bgEvents.roll()
     expect(eventData.thruUrl).to eq("http://busme.us")
+    expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)
 
-    # Foreground Thread
-    api.uiEvents.roll()
-    expect(masterMessageForeground.test_previous_state).to eq(Platform::MasterMessageEventData::S_RESOLVED)
-    expect(masterMessageForeground.test_url).to eq("http://busme.us")
-    expect(eventData.state).to eq(Platform::MasterMessageEventData::S_DONE)
-
-    # Background Thread
-    api.bgEvents.roll()
-
-    # Foreground Thread
     masterMessageForeground.test_previous_state = nil
+    # Foreground Thread
     api.uiEvents.roll()
-    expect(masterMessageForeground.test_previous_state).to eq(Platform::MasterMessageEventData::S_DONE)
+    expect(masterMessageForeground.test_previous_state).to eq(Platform::RequestConstants::S_NOTIFY_START)
+    expect(eventData.thruUrl).to eq("http://busme.us")
+    expect(eventData.state).to eq(Platform::RequestConstants::S_ACK_START)
 
-    # The dismiss might happen before, but it should definitely be dismissed by now.
-    expect(masterMessage.displayed).to eq(false)
+    masterMessageForeground.ackOK(eventData)
+    expect(eventData.state).to eq(Platform::RequestConstants::S_FINISH)
+
   end
 
 end

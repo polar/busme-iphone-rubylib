@@ -1,6 +1,6 @@
 module Platform
-  class BG_BannerMessageEventController < RequestController
-    include BannerMessageConstants
+  class BG_MasterMessageEventController < RequestController
+    include MasterMessageConstants
     include Api::BuspassEventListener
     attr_accessor :api
 

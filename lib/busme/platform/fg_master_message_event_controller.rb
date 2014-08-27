@@ -62,9 +62,14 @@ module Platform
 
     def onNotifyStart(requestState)
       # Put up the browser for the thruURL
-      raise "NotImplemented"
       requestState.state = S_NOTIFY_IN_PROGRESS
       requestState.state = S_NOTIFY_FINISH
+      requestState.state = S_ACK_START
+    end
+
+    def ackOK(requestState)
+      requestState.state = S_ACK_IN_PROGRESS
+      requestState.state = S_ACK_FINISH
       requestState.state = S_FINISH
     end
   end

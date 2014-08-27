@@ -1,5 +1,5 @@
 module Platform
-  class MasterMessageConstants
+  module MasterMessageConstants
     R_GO     = 1
     R_OK     = 2
     R_REMIND = 3
