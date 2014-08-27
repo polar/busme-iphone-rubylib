@@ -2,7 +2,7 @@ module Platform
   ##
   # This class merely handles event processing for the BannerPresentationController
   #
-  class FGBannerPresentationEventController
+  class FG_BannerPresentationEventController
     attr_accessor :api
 
     def initialize(api)

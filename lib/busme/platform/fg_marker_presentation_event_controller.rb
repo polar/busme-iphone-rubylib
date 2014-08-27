@@ -2,7 +2,7 @@ module Platform
   ##
   # This class merely handles event processing for the MarkerPresentationController
   #
-  class FGMarkerPresentationEventController
+  class FG_MarkerPresentationEventController
     attr_accessor :api
 
     def initialize(api)
