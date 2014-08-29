@@ -219,7 +219,7 @@ describe Platform::JourneyVisibilityController do
     jd_journey = journeyDisplayController.journeyDisplayMap[journey_id.id]
 
     # It should change the jd_journey to name visible.
-    expect(controller.onTrackingSelected(jd_journey)).to eq(true)
+    expect(controller.onVehicleSelected(jd_journey)).to eq(true)
 
     expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_VEHICLE)
 
@@ -238,7 +238,7 @@ describe Platform::JourneyVisibilityController do
     jd_journey = journeyDisplayController.journeyDisplayMap[journey_id.id]
 
     # It should change the jd_journey to name visible.
-    expect(controller.onTrackingSelected(jd_journey)).to eq(true)
+    expect(controller.onVehicleSelected(jd_journey)).to eq(true)
 
     expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_VEHICLE)
     journeyids = [route_id]
@@ -260,7 +260,7 @@ describe Platform::JourneyVisibilityController do
     jd_journey = journeyDisplayController.journeyDisplayMap[journey_id.id]
 
     # It should change the jd_journey to name visible.
-    expect(controller.onTrackingSelected(jd_journey)).to eq(true)
+    expect(controller.onVehicleSelected(jd_journey)).to eq(true)
 
     expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_VEHICLE)
 

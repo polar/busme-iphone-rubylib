@@ -25,8 +25,27 @@ module Platform
       journeyBasket.onJourneyRemovedListener = self
     end
 
+    ##
+    # Returns the Current JourneyDisplays in use by this Controller.
+    #
     def getJourneyDisplays
       journeyDisplays
+    end
+
+    ##
+    # Returns the list of JourneyPatterns in use by the
+    # current JourneyPatterns of this Controller.
+    #
+    def getJourneyPatterns
+      patterns = {}
+      for jd in journeyDisplays do
+        if jd.route.isRouteDefinition?
+          for pat in jd.route.journeyPatterns
+            patterns[pat.id] = pat
+          end
+        end
+      end
+      patterns.values
     end
 
     # JourneyBasket.OnJourneyAddedListener

@@ -46,7 +46,7 @@ describe Platform::JourneyDisplayUtility do
 
   let(:response) { TestHttpMessage.new(200, "OK", responseData)}
 
-  let(:utility) { Platform::JourneyDisplayUtility.new(api)}
+  let(:utility) { class T; include Platform::JourneyDisplayUtility; end; T.new}
 
   before do
     controller

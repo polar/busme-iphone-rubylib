@@ -49,7 +49,6 @@ module Platform
       self.stateStack.push(VisualState.new)
       controller.onJourneyDisplayAddedListener = self
       controller.onJourneyDisplayRemovedListener = self
-      api.uiEvents.registerForEvent("Map:SelectionChanged", self)
     end
 
     def journeyDisplays
@@ -173,11 +172,27 @@ module Platform
       return false
     end
 
+    def onSelectionChanged(selected, unselected, geoPoint)
+      newState = VisualState.new
+      newState.state = stateStack.peek.state
+      newState.nearBy = stateStack.peek.nearBy
+      newState.onlyActive = stateStack.peek.onlyActive
+      newState.onlySelected = true
+      newState.selectedLocations = stateStack.peek.selectedLocations.dup
+      newState.selectedLocations << geoPoint
+      newState.selectedRoutes =  stateStack.peek.selectedRoutes.dup
+      newState.selectedRoutes.merge(selected)
+      newState.selectedRoutes.subtract(unselected)
+      newState.selectedRouteCodes.merge(newState.selectedRoutes.map{|x| x.route.code})
+      stateStack.push(newState)
+      setVisibility(newState)
+    end
+
     #
     # Called when User selects a vehicle to track
     # Moves to the S_VEHICLE state
     #
-    def onTrackingSelected(display)
+    def onVehicleSelected(display)
       state = stateStack.peek
       if state.state == VisualState::S_VEHICLE
         if state.selectedRoute == display
@@ -412,33 +427,6 @@ module Platform
         display.pathVisible = display.nameVisible = true
       end
       changed = display.pathVisible != pathVisible || display.nameVisible != nameVisible
-    end
-
-    def onBusPassEvent(event)
-      eventData = event.eventData
-      case event.eventName
-        when "Map:SelectionChanged"
-          onSelectionChanged(eventData)
-      end
-    end
-
-    def onSelectionChanged(eventData)
-      geoPoint = eventData.geoPoint
-      selected = eventData.selected
-      unselected = eventData.unselected
-      newState = VisualState.new
-      newState.state = stateStack.peek.state
-      newState.nearBy = stateStack.peek.nearBy
-      newState.onlyActive = stateStack.peek.onlyActive
-      newState.onlySelected = true
-      newState.selectedLocations = stateStack.peek.selectedLocations.dup
-      newState.selectedLocations << geoPoint
-      newState.selectedRoutes =  stateStack.peek.selectedRoutes.dup
-      newState.selectedRoutes.merge(selected)
-      newState.selectedRoutes.subtract(unselected)
-      newState.selectedRouteCodes.merge(newState.selectedRoutes.map{|x| x.route.code})
-      stateStack.push(newState)
-      setVisibility(newState)
     end
 
   end

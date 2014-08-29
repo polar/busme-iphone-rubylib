@@ -1,31 +1,5 @@
 module Platform
-  class MapSelectionChangedEventData
-    attr_accessor :selected
-    attr_accessor :unselected
-    attr_accessor :geoPoint
-  end
-
-  class MapPathSearchEventData
-    attr_accessor :journeyDisplays
-    attr_accessor :geoPoint
-    attr_accessor :zoomLevel
-  end
-
-  class JourneyDisplayUtility
-    attr_accessor :api
-
-    def initialize(api)
-      self.api = api
-      api.bgEvents.registerForEvent("Map:SelectionPathSearch", self)
-    end
-
-    def onBuspassEvent(event)
-      eventData = event.eventData
-      case event.eventName
-        when "Map:SelectionPathSearch"
-          pathSearch(eventData.journeyDisplays, eventData.geoPoint, eventData.zoomLevel)
-      end
-    end
+  module JourneyDisplayUtility
 
     def pathSearch(journeyDisplays, touchGP, zoomLevel)
       selectionChanged = false
@@ -61,11 +35,9 @@ module Platform
         end
       end
       if selectionChanged
-        eventData = MapSelectionChangedEventData.new
-        eventData.selected = selected
-        eventData.unselected = unselected
-        eventData.geoPoint = touchGP
-        api.uiEvents.postEvent("Map:SelectionChanged", eventData)
+        [selected, unselected, touchGP]
+      else
+        nil
       end
     end
 

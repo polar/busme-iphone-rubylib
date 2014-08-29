@@ -1,41 +1,54 @@
 module Platform
   class JourneyDisplaySelectionController
+    includes JourneyDisplayUtility
     attr_accessor :api
     attr_accessor :journeyDisplayController
-    attr_accessor :journeyDisplayUtility
     attr_accessor :journeyDisplayVisibilityController
     attr_accessor :journeyPostingController
     attr_accessor :trackingJourneyDisplay
+    attr_accessor :highlightJourneyDisplay
+    attr_accessor :postingJourneyDisplay
 
     def initialize(api, journeyDisplayController, journeyDisplayVisibilityController)
       self.api = api
       self.journeyDisplayController = journeyDisplayController
       self.journeyDisplayVisibilityController = journeyDisplayVisibilityController
-      api.uiEvents.registerForEvent("Map:SelectionChanged", self)
     end
 
     def selectTrackingJourney(journeyDisplay)
       if journeyDisplayController.journeyDisplays.include?(journeyDisplay)
+        if self.trackingJourneyDisplay
+          self.trackingJourneyDisplay.tracking = false
+        end
         self.trackingJourneyDisplay = journeyDisplay
         journeyDisplay.tracking = true
-      else
+      end
+    end
+
+    def selectHighlightJourney(journeyDisplay)
+      if journeyDisplayController.journeyDisplays.include?(journeyDisplay)
+        if self.highlightJourneyDisplay
+          self.highlightJourneyDisplay.pathHighlighted = false
+        end
         self.trackingJourneyDisplay = journeyDisplay
+        journeyDisplay.pathHighlighted = true
       end
     end
 
     def onSelectForPosting(screenPoint, screenRect, touchRect, zoomLevel)
       projection = Utils::ScreenPathUtils::Projection.new(zoomLevel, screenRect)
       jds = journeyDisplayController.journeyDisplays
-      jd = journeyDisplayUtility.hitsLocator(jds, screenPoint, touchRect, projection)
+      jd = hitsRouteLocator(jds, screenPoint, touchRect, projection)
       if jd
         if jd.isActive?
-          evenData = JourneyEventData.new
-          eventData.postingRoute
-          eventData.postingRole
-          api.bgEvents.postEvent("JourneyStartPosting", eventData)
+          self.postingJourneyDisplay = jd
         end
       end
-      journeyDisplayVisbilityController
+    end
+
+
+    def onSelectionChanged(selected, unselected, touchGP)
+      journeyDisplayVisibilityController.onSelectionChanged(selected, unselected, touchGP)
     end
   end
 end
