@@ -12,7 +12,7 @@ module Platform
     def getArguments
       params = []
       if journeyBasketController
-        displays = journeyBasketController.getJourneyDisplays.select {|x| x.route.isJourney? && x.isPathVisible }
+        displays = journeyBasketController.getJourneyDisplays.select {|x| x.route.isJourney? && x.isPathVisible? }
         displays.each do |jd|
           params << ["journey_ids[]", jd.route.id]
         end

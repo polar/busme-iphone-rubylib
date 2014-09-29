@@ -9,6 +9,7 @@ module Platform
     attr_accessor :journeyBasket
     attr_accessor :journeyDisplayController
     attr_accessor :journeyStore
+    attr_accessor :journeyVisibilityController
 
     attr_accessor :markerBasket
     attr_accessor :markerPresentationController
@@ -30,7 +31,7 @@ module Platform
     attr_accessor :externalStorageController
     attr_accessor :storageSerializerController
 
-    attr_accessor :journeySyncController
+    attr_accessor :bgJourneySyncController
 
     attr_accessor :bgUpdateRemoteInvocationEventController
 
@@ -44,6 +45,7 @@ module Platform
     attr_accessor :fgBannerMessageEventController
     attr_accessor :fgMarkerMessageEventController
     attr_accessor :fgMasterMessageEventController
+    attr_accessor :fgJourneySyncProgressEventController
 
     def initialize(api)
       self.api = api
@@ -54,7 +56,10 @@ module Platform
 
       self.journeyStore = JourneyStore.new # TODO: Serialization
       self.journeyBasket = JourneyBasket.new(api, journeyStore)
-      self.journeyDisplayController = JourneyDisplayController.new(api, journeyBasket) # TODO: Extend with UI
+      # Posts JourneyAdded and JourneyRemoved UI Events
+      self.journeyDisplayController = JourneyDisplayController.new(api, journeyBasket)
+
+      self.journeyVisibilityController = JourneyVisibilityController.new(api, journeyDisplayController)
 
       self.markerPresentationController = MarkerPresentationController.new
       self.markerStore = MarkerStore.new # TODO: Serialization
@@ -77,8 +82,7 @@ module Platform
       self.externalStorageController = ExternalStorageController.new(api) # TODO: Extend for platform
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
 
-      self.journeySyncController = JourneySyncController.new(api, journeyDisplayController)
-
+      self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)
       self.bgUpdateRemoteInvocationEventController = BG_UpdateRemoteInvocationEventController.new(api, updateRemoteInvocation)
       self.bgBannerMessageEventController = BG_BannerMessageEventController.new(api)
       self.bgMarkerMessageEventController = BG_MarkerMessageEventController.new(api)
@@ -91,6 +95,7 @@ module Platform
       self.fgBannerMessageEventController = FG_BannerMessageEventController.new(api)
       self.fgMarkerMessageEventController = FG_MarkerMessageEventController.new(api, markerPresentationController)
       self.fgMasterMessageEventController = FG_MasterMessageEventController.new(api)
+      self.fgJourneySyncProgressEventController = FG_JourneySyncProgressEventController.new(api)
 
     end
   end

@@ -4,7 +4,7 @@ module Platform
     attr_accessor :isForced
   end
 
-  class JourneySyncController
+  class BG_JourneySyncController
     include Api::BuspassEventListener
     attr_accessor :api
     attr_accessor :journeyDisplayController

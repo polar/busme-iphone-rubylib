@@ -20,7 +20,7 @@ describe Platform::JourneyDisplayUtility do
     basket
   }
   let(:journeyDisplayController) { Platform::JourneyDisplayController.new(api, basket) }
-  let(:controller) { Platform::JourneySyncController.new(api,journeyDisplayController )}
+  let(:controller) { Platform::BG_JourneySyncController.new(api,journeyDisplayController )}
   let(:route_id) {Api::NameId.new(["643", "9864eb9e615f740526e93f6297e29435", "R", 1399939597])}
   let(:journey_id) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3ca", "V", "643", 1399940355])}
   let(:journey_id2) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3cb", "V", "643", 1399940355])}

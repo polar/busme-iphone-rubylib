@@ -10,6 +10,7 @@ module Platform
       self.api = api
       self.updateRemoteInvocation = updateRemoteInvocation
       api.bgEvents.registerForEvent("Update", self)
+      self.enabled = true
     end
 
     def onBuspassEvent(event)

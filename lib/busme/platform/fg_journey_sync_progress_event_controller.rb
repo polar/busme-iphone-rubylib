@@ -1,5 +1,5 @@
 module Platform
-  class FGJourneySyncProgressController
+  class FG_JourneySyncProgressEventController
     include Api::BuspassEventListener
     include JourneySyncProgressEventDataConstants
 

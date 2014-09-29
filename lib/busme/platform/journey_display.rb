@@ -45,10 +45,10 @@ module Platform
     def isNameVisible?
       nameVisible && ! route.isFinished?
     end
-    def isPathVisible
+    def isPathVisible?
       pathVisible
     end
-    def isPathHidden
+    def isPathHidden?
       !pathVisible
     end
     def pathVisible=(visible)

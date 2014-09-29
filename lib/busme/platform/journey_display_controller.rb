@@ -1,9 +1,11 @@
 module Platform
   class JourneyAddedData
+    attr_accessor :journeyDisplayController
     attr_accessor :journeyDisplay
   end
 
   class JourneyRemovedData
+    attr_accessor :journeyDisplayController
     attr_accessor :id
   end
 
@@ -89,12 +91,14 @@ module Platform
     def presentJourneyDisplay(journey_display)
       eventData = JourneyAddedData.new
       eventData.journeyDisplay = journey_display
+      eventData.journeyDisplayController = self
       api.uiEvents.postEvent("JourneyAdded", eventData)
     end
 
     def abandonJourneyDisplay(journey_display)
       eventData = JourneyRemovedData.new
       eventData.id = journey_display.route.id
+      eventData.journeyDisplayController = self
       api.uiEvents.postEvent("JourneyRemoved", eventData)
     end
 

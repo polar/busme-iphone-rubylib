@@ -1,7 +1,7 @@
 require "spec_helper"
 require "test_platform_api"
 
-class TestFGJourneySyncProgressController < Platform::FGJourneySyncProgressController
+class TestFGJourneySyncProgressController < Platform::FGJourneySyncProgressEventController
   attr_accessor :test_onBegin
   attr_accessor :test_onSyncStart
   attr_accessor :test_onSyncEnd
@@ -26,7 +26,7 @@ class DummyListener
   end
 end
 
-describe Platform::FGJourneySyncProgressController do
+describe Platform::FGJourneySyncProgressEventController do
   let (:suGet) {
     fileName = File.join("spec", "test_data", "SUGet.xml");
     TestHttpMessage.new(200, "OK", File.read(fileName))
@@ -44,7 +44,7 @@ describe Platform::FGJourneySyncProgressController do
     basket
   }
   let(:journeyDisplayController) { Platform::JourneyDisplayController.new(api, basket) }
-  let(:controller) { Platform::JourneySyncController.new(api,journeyDisplayController )}
+  let(:controller) { Platform::BG_JourneySyncController.new(api,journeyDisplayController )}
   let(:route_id) {Api::NameId.new(["643", "9864eb9e615f740526e93f6297e29435", "R", 1399939597])}
   let(:journey_id) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3ca", "V", "643", 1399940355])}
   let(:journey_id2) {Api::NameId.new(["643", "968f501b3e02890cffa2a1e1b80bc3cb", "V", "643", 1399940355])}
