@@ -1,6 +1,6 @@
 module Platform
   class JourneyDisplaySelectionController
-    includes JourneyDisplayUtility
+    include JourneyDisplayUtility
     attr_accessor :api
     attr_accessor :journeyDisplayController
     attr_accessor :journeyDisplayVisibilityController

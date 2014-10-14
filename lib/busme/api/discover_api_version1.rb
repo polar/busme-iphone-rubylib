@@ -3,26 +3,37 @@ module Api
     attr_accessor :initialUrl
     attr_accessor :discoverUrl
     attr_accessor :masterUrl
+    attr_accessor :bgEvents
+    attr_accessor :uiEvents
 
-    def initialize(url)
-      super()
+    def initialize(httpClient, url, bgEvents = nil, uiEvents = nil)
+      super(httpClient)
       self.initialUrl = url
+      self.bgEvents = bgEvents || BuspassEventDistributor.new(:name => "BGEvents")
+      self.uiEvents = uiEvents || BuspassEventDistributor.new(:name => "UIEvents")
     end
 
     def get
       ent = openURL(initialUrl)
-      tag = xmlParse(ent)
-      if "API" == tag.name
-        version = tag.attributes["version"]
-        if "d1" == version || "td1" == version
-          self.discoverUrl = tag.attributes["discover"]
-          self.masterUrl = tag.attributes["master"]
-          return true
+      if ent
+        tag = xmlParse(ent)
+        if "api" == tag.name.downcase
+          version = tag.attributes["version"]
+          if "d1" == version || "td1" == version
+            self.discoverUrl = tag.attributes["discover"]
+            self.masterUrl = tag.attributes["master"]
+            return true
+          end
         end
+      else
+        puts "No Answer from #{initialUrl}"
       end
+      return false
+    rescue
       return false
     end
 
+    # Zoomlevel here is Android specific.
     def discoverZoom(lon, lat, zoomlevel = nil, width = nil, height = nil)
       buffer = 0
       if zoomlevel
@@ -39,19 +50,23 @@ module Api
     end
 
     def discover(lon, lat, buffer)
-      url = "#{discoverUrl}?lon=#{lon}&lat=#{lat}&buf=#{buffer}"
-      ent = openURL(url)
-      tag = xmlParse(ent)
-      masters = []
-      if "masters" == tag.name.downcase
-        for t in tag.childNodes do
-          if "master" == t.name.downcase
-            m = parse_master(t)
-            masters << m
+      if discoverUrl
+        url = "#{discoverUrl}?lon=#{lon}&lat=#{lat}&buf=#{buffer}"
+        ent = openURL(url)
+        tag = xmlParse(ent)
+        masters = []
+        if "masters" == tag.name.downcase
+          for t in tag.childNodes do
+            if "master" == t.name.downcase
+              m = parse_master(t)
+              masters << m
+            end
           end
         end
+        return masters
       end
-      return masters
+    rescue
+      nil
     end
 
     def find_master(slug)
@@ -63,6 +78,10 @@ module Api
       end
     end
 
+    def to_s
+      "<#{self.class.name} initialUrl = #{initialUrl}, masterUrl = #{masterUrl}, discoverUrl = #{discoverUrl}>"
+    end
+
     private
 
     def parse_master(tag)
@@ -72,7 +91,7 @@ module Api
       master.name = tag.attributes["name"]
       master.slug = tag.attributes["slug"]
       master.apiUrl = tag.attributes["api"]
-      bounds = tag.attributes["api"]
+      bounds = tag.attributes["bounds"]
       box = bounds.split(",")
       if box.length == 4
         master.bbox = box.map {|x| x.to_f}

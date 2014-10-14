@@ -1,0 +1,14 @@
+<masters>
+  <master name="Onondaga-CC" slug="onondaga-cc" mode="active" deployment_slug="spring-and-fall-semester" lon="-76.196280" lat="43.004624" bounds="-76.202108,43.011596,-76.186425,43.001862" api="http://busme-apis.herokuapp.com/masters/521679a96eec8b000800710b/apis/1/get">
+    <title>Onondaga-CC</title>
+    <description>Onondaga Community College Shuttle Routes</description>
+  </master>
+  <master name="Lake Shore Limited Amtrak" slug="lake-shore-limited-amtrak" mode="active" deployment_slug="deployment-1" lon="-77.317205" lat="41.612683" bounds="-87.639359,43.20031,-73.738298,40.75041" api="http://busme-apis.herokuapp.com/masters/512e7ea39f9501000e0000d0/apis/1/get">
+    <title>Lake Shore Limited Amtrak</title>
+    <description>The Amtrak Train between New York and Chicago</description>
+  </master>
+  <master name="Syracuse-University" slug="syracuse-university" mode="active" deployment_slug="year2014-2015" lon="-76.131539" lat="43.037268" bounds="-76.176869,43.076736,-76.052041,42.995355" api="http://busme-apis.herokuapp.com/masters/50fcc339223520000c000088/apis/1/get">
+    <title>Syracuse-University</title>
+    <description/>
+  </master>
+</masters>

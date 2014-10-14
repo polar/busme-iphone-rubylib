@@ -1,3 +1,7 @@
+unless defined?(Motion::Project::Config)
+
+require "httpclient"
+
 require "busme/iphone/rubylib/version"
 require "busme/api/banner_info"
 require "busme/api/name_id"
@@ -82,6 +86,10 @@ require "busme/platform/marker_message_event_data"
 require "busme/platform/bg_marker_message_event_controller"
 require "busme/platform/fg_marker_presentation_event_controller"
 require "busme/platform/fg_marker_message_event_controller"
+require "busme/platform/fg_journey_sync_progress_event_controller"
+require "busme/platform/busme_locator_controller"
+require "busme/platform/fg_busme_locator_controller"
+require "busme/platform/guts"
 require "busme/api/buspass_events"
 require "busme/integration/bounding_box_e6"
 require "busme/integration/geo_point"
@@ -91,8 +99,8 @@ require "busme/integration/path"
 require "busme/integration/http/header"
 require "busme/integration/http/http_entity"
 require "busme/integration/http/http_response"
-require "busme/integration/http/my_http_client"
 require "busme/integration/http/status_line"
+require "busme/integration/http/http_client"
 require "busme/utils/screen_path_utils"
 require "busme/utils/path_utils"
 require "busme/utils/priority_queue"
@@ -100,6 +108,8 @@ require "busme/utils/queue"
 require "busme/utils/stack"
 require "rexml/document"
 require "yaml"
+end
+
 
 module Busme
   module Iphone

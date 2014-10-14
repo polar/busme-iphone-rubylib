@@ -1,7 +1,7 @@
 require "spec_helper"
 require "test_platform_api"
 
-class TestFGJourneySyncProgressController < Platform::FGJourneySyncProgressEventController
+class TestFGJourneySyncProgressController < Platform::FG_JourneySyncProgressEventController
   attr_accessor :test_onBegin
   attr_accessor :test_onSyncStart
   attr_accessor :test_onSyncEnd
@@ -26,14 +26,14 @@ class DummyListener
   end
 end
 
-describe Platform::FGJourneySyncProgressEventController do
+describe Platform::FG_JourneySyncProgressEventController do
   let (:suGet) {
     fileName = File.join("spec", "test_data", "SUGet.xml");
     TestHttpMessage.new(200, "OK", File.read(fileName))
   }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api
@@ -87,7 +87,7 @@ describe Platform::FGJourneySyncProgressEventController do
     evd.isForced = true
     api.bgEvents.postEvent("JourneySync", evd)
 
-    httpClient.mock_answer = response
+    api.mock_answer = response
     api.bgEvents.roll
 
     expect(store.journeys.size).to eq(7)
@@ -98,7 +98,7 @@ describe Platform::FGJourneySyncProgressEventController do
     evd.isForced = true
     api.bgEvents.postEvent("JourneySync", evd)
 
-    httpClient.mock_answer = response
+    api.mock_answer = response
     api.bgEvents.roll
 
     api.uiEvents.roll

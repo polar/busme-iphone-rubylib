@@ -11,6 +11,15 @@ describe Integration::BoundingBoxE6 do
     expect(bbox.west).to eq(54.0)
   end
 
+  it "should with an array initialize" do
+    bbox = Integration::BoundingBoxE6.new([-74.0 * 1E6, 53.0 * 1E6, -75.0 * 1E6, 54.0 * 1E6])
+
+    expect(bbox.north).to eq(-74.0)
+    expect(bbox.east).to eq(53.0)
+    expect(bbox.south).to eq(-75.0)
+    expect(bbox.west).to eq(54.0)
+  end
+
   it "should assign" do
     bbox = Integration::BoundingBoxE6.new(0,0,0,0)
 

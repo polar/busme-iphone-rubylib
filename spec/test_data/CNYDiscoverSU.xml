@@ -1,0 +1,5 @@
+
+  <master name="Syracuse-University" slug="syracuse-university" mode="active" deployment_slug="year2014-2015" lon="-76.131539" lat="43.037268" bounds="-76.176869,43.076736,-76.052041,42.995355" api="http://busme-apis.herokuapp.com/masters/50fcc339223520000c000088/apis/1/get">
+    <title>Syracuse-University</title>
+    <description/>
+  </master>

@@ -1,11 +1,9 @@
-require "httpclient"
-
 module Api
   class APIBase
     attr_accessor :http_client
 
-    def initialize
-      self.http_client = Integration::Http::MyHttpClient.new
+    def initialize(http_client)
+      self.http_client = http_client
     end
 
     def openURL(url)

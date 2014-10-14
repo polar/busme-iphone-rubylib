@@ -44,11 +44,9 @@ describe Platform::MarkerMessageEventData do
       info.loadParsedXML(tag)
     end
   }
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api
@@ -87,7 +85,7 @@ describe Platform::MarkerMessageEventData do
     expect(eventData.resolve).to eq(Platform::MarkerMessageConstants::R_GO)
 
     # Background Thread
-    httpClient.mock_answer = markerMessageURLMessage
+    api.mock_answer = markerMessageURLMessage
     api.bgEvents.roll()
     expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)
     expect(eventData.thruUrl).to eq("http://google.com")
@@ -119,7 +117,7 @@ describe Platform::MarkerMessageEventData do
     expect(eventData.resolve).to eq(Platform::MarkerMessageConstants::R_GO)
 
     # Background Thread
-    httpClient.mock_answer = badResponse
+    api.mock_answer = badResponse
     api.bgEvents.roll()
     expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)
     expect(eventData.thruUrl).to eq("http://busme.us")

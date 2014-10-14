@@ -3,7 +3,7 @@ module Platform
   # This class handles the Foreground Thread's handling of messages
   class FGMasterMessageController
     include Api::BuspassEventListener
-    include MasterMessageEventConstants
+    include MasterMessageConstants
     attr_accessor :api
 
     def initialize(api)

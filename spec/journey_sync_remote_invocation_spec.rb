@@ -28,11 +28,9 @@ describe Platform::JourneySyncRemoteInvocation do
   }
   let (:badResponse) { TestHttpMessage.new(500, "Internal Error", "")}
 
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
     api.forceGet
     api
   }
@@ -57,7 +55,7 @@ describe Platform::JourneySyncRemoteInvocation do
     expect(api.updateRate.to_i).to eq(60000)
     expect(api.syncRate.to_i).to eq(60000)
     expect(display.journeys.count).to be == 0
-    httpClient.mock_answer = response2
+    guts.api.mock_answer = response2
 
     guts.api.bgEvents.postEvent("JourneySync", Platform::UpdateEventData.new)
     guts.api.bgEvents.roll
@@ -90,11 +88,11 @@ describe Platform::JourneySyncRemoteInvocation do
     expect(api.syncRate.to_i).to eq(60000)
     expect(display.journeys.count).to be == 0
 
-    httpClient.mock_answer = response2
+    guts.api.mock_answer = response2
     guts.api.bgEvents.postEvent("JourneySync", Platform::UpdateEventData.new)
     guts.api.bgEvents.roll
 
-    httpClient.mock_answer = response3
+    api.mock_answer = response3
     guts.api.bgEvents.postEvent("JourneySync", Platform::UpdateEventData.new)
     guts.api.bgEvents.roll
 

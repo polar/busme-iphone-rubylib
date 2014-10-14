@@ -11,11 +11,9 @@ describe Api::LoginManager do
   let (:InvalidPassword) { TestHttpMessage.new(200, "OK", "<Login status='InvalidPassword'/>'")}
   let (:notRegistered) { TestHttpMessage.new(200, "OK", "<Login status='NotRegistered'/>'")}
   let (:loginOK) { TestHttpMessage.new(200, "OK", "<login roleIntent='' email='polar@syr.edu' name='Dr Polar Humenn' roles='driver' authToken='testToken' status='OK'/>'")}
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api
@@ -56,7 +54,7 @@ describe Api::LoginManager do
     login.email = "polar@syr.edu"
     login.loginState = startState
 
-    httpClient.mock_answer = response
+    api.mock_answer = response
 
     api.loginManager.enterProtocol(login)
   end
@@ -119,7 +117,7 @@ describe Api::LoginManager do
     login.email = "polar@syr.edu"
     login.loginState = startState
 
-    httpClient.mock_answer = response
+    api.mock_answer = response
 
     api.loginManager.enterProtocol(login)
     api.loginManager.exitProtocol

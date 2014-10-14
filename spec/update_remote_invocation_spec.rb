@@ -9,11 +9,9 @@ describe Platform::UpdateRemoteInvocation do
   }
   let (:badResponse) { TestHttpMessage.new(500, "Internal Error", "")}
 
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
     api.forceGet
     api
   }
@@ -31,7 +29,7 @@ describe Platform::UpdateRemoteInvocation do
     # From the SUGet.xml
     expect(api.updateRate.to_i).to eq(60000)
     expect(api.syncRate.to_i).to eq(60000)
-    httpClient.mock_answer = response
+    guts.api.mock_answer = response
     guts.updateRemoteInvocation.invoke(nil, nil)
     # From the SUUpdate.xml
     expect(guts.bannerBasket.getBanners.map {|x| x.id}).to include("1")
@@ -46,7 +44,7 @@ describe Platform::UpdateRemoteInvocation do
     # From the SUGet.xml
     expect(api.updateRate.to_i).to eq(60000)
     expect(api.syncRate.to_i).to eq(60000)
-    httpClient.mock_answer = response
+    guts.api.mock_answer = response
 
     guts.api.bgEvents.postEvent("Update", Platform::UpdateEventData.new)
     guts.api.bgEvents.roll

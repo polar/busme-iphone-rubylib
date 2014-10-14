@@ -75,5 +75,9 @@ module Integration
     def eql?(other)
       other.class == self.class && Platform::GeoCalc.equalCoordinates(self,other)
     end
+
+    def to_s
+      "GeoPoint(#{latitude},#{longitude})"
+    end
   end
 end

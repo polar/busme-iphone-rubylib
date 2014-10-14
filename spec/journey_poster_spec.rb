@@ -61,11 +61,9 @@ describe Platform::JourneyLocationPoster do
     fileName = File.join("spec", "test_data", "SUGet.xml")
     TestHttpMessage.new(200, "OK", File.read(fileName))
   }
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     TestPlatformApi.new.tap do |theApi|
-      theApi.http_client.httpClient = httpClient
-      httpClient.mock_answer = suGet
+      theApi.mock_answer = suGet
 
       theApi.forceGet
     end
@@ -140,7 +138,7 @@ describe Platform::JourneyLocationPoster do
     locationPoster.enabled = true
     locationPoster.startPosting(journey, "driver")
 
-    httpClient.mock_answer = TestHttpMessage.new(200, "OK","<OK/>")
+    api.mock_answer = TestHttpMessage.new(200, "OK","<OK/>")
 
     path = journey.paths[0]
     iPoint = 0

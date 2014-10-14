@@ -45,11 +45,9 @@ describe Platform::BannerMessageEventData do
       info.loadParsedXML(tag)
     end
   }
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api
@@ -78,7 +76,7 @@ describe Platform::BannerMessageEventData do
     expect(eventData.resolve).to eq(Platform::BannerMessageConstants::R_GO)
 
     # Background Thread
-    httpClient.mock_answer = bannerURLMessage
+    api.mock_answer = bannerURLMessage
     api.bgEvents.roll()
 
     # Foreground Thread
@@ -109,7 +107,7 @@ describe Platform::BannerMessageEventData do
     expect(eventData.resolve).to eq(Platform::BannerMessageConstants::R_GO)
 
     # Background Thread
-    httpClient.mock_answer = badResponse
+    api.mock_answer = badResponse
     api.bgEvents.roll()
 
     # Foreground Thread

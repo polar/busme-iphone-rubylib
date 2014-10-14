@@ -43,11 +43,9 @@ describe Platform::MasterMessageEventData do
       info.loadParsedXML(tag)
     end
   }
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api
@@ -83,7 +81,7 @@ describe Platform::MasterMessageEventData do
     expect(eventData.state).to eq(Platform::RequestConstants::S_REQUEST_START)
 
     # Background Thread
-    httpClient.mock_answer = masterMessageURLMessage
+    api.mock_answer = masterMessageURLMessage
     api.bgEvents.roll()
     expect(eventData.thruUrl).to eq("http://google.com")
     expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)
@@ -123,7 +121,7 @@ describe Platform::MasterMessageEventData do
     expect(eventData.state).to eq(Platform::RequestConstants::S_REQUEST_START)
 
     # Background Thread
-    httpClient.mock_answer = badResponse
+    api.mock_answer = badResponse
     api.bgEvents.roll()
     expect(eventData.thruUrl).to eq("http://busme.us")
     expect(eventData.state).to eq(Platform::RequestConstants::S_NOTIFY_START)

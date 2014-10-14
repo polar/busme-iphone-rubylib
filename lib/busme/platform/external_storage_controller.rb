@@ -43,6 +43,8 @@ module Platform
         file = File.open(fn, "r")
         file.read
       end
+    rescue Exception => boom
+      nil
     end
 
   end

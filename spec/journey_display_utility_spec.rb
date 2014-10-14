@@ -9,7 +9,7 @@ describe Platform::JourneyDisplayUtility do
   }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api

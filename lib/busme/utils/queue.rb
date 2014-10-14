@@ -26,8 +26,15 @@ module Utils
       return v
     end
 
+    def copy
+      raise "Copy Called"
+    end
+
     def poll
-      @queue.slice!(0,1)[0]
+      res = @queue.slice!(0)
+      res
+    rescue Exception => boom
+      puts boom
     end
 
     alias_method :pop, :poll

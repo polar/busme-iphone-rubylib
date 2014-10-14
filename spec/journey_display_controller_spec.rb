@@ -1,4 +1,4 @@
-ssrequire "spec_helper"
+require "spec_helper"
 require "test_api"
 require "test_journey_display_controller"
 

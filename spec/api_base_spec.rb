@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Api::APIBase, "Http" do
   let(:api) {
-    Api::APIBase.new
+    Api::APIBase.new(Testlib::MyHttpClient.new)
   }
 
   it "should get a url" do

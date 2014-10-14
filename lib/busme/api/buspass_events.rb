@@ -34,22 +34,33 @@ module Api
     end
   end
 
+  module BuspassEventPostListener
+    def onPostEvent(queue)
+
+    end
+  end
+
   class BuspassEventDistributor
     attr_accessor :eventNotifiers
     attr_accessor :eventQ
+    attr_accessor :postEventListener
+    attr_accessor :name
 
-    def initialize
+    def initialize(args = {})
       self.eventNotifiers = {}
-      self.eventQ = Utils::Queue.new
+      self.eventQ = args[:queue] || Utils::Queue.new
+      self.name = args[:name]
     end
 
     def postEvent(event, data = nil)
+      puts "#{self.to_s}.postEvent(#{event})"
       event = event.is_a?(BuspassEvent) ? event : BuspassEvent.new(event, data)
       postBuspassEvent(event)
     end
 
     def postBuspassEvent(event)
       eventQ.push(event)
+      postEventListener.onPostEvent(self) if postEventListener
     end
 
     def peek
@@ -74,8 +85,8 @@ module Api
     end
 
     def triggerEvent(event, data = nil)
-      event = event.is_a?(BuspassEvent) ? event : BuspassEvent.new(event, data)
-      triggerBuspassEvent(event)
+      new_event = event.is_a?(BuspassEvent) ? event : BuspassEvent.new(event, data)
+      triggerBuspassEvent(new_event)
     end
 
     def triggerBuspassEvent(event)
@@ -83,13 +94,17 @@ module Api
       if notifier
         notifier.notifyEventListeners(event)
       else
-        raise "UnknownEvent"
+        raise "UnknownEvent #{event.eventName} on #{self.to_s}"
       end
     end
 
     def registerForEvent(eventName, eventListener)
       notifier = eventNotifiers[eventName] ||= BuspassEventNotifier.new(eventName)
       notifier.register(eventListener)
+    end
+
+    def to_s
+      name ? "BPD(#{name})" : super.to_s
     end
   end
 

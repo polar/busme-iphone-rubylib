@@ -51,11 +51,9 @@ describe Platform::LoginForeground do
   let (:InvalidPassword) { TestHttpMessage.new(200, "OK", "<Login status='InvalidPassword'/>'")}
   let (:notRegistered) { TestHttpMessage.new(200, "OK", "<Login status='NotRegistered'/>'")}
   let (:loginOK) { TestHttpMessage.new(200, "OK", "<login roleIntent='' email='polar@syr.edu' name='Dr Polar Humenn' roles='driver' authToken='testToken' status='OK'/>'")}
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestPlatformApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api
@@ -86,7 +84,7 @@ describe Platform::LoginForeground do
     # Foreground hit of submit button
     loginForeground.onSubmit(eventData)
 
-    httpClient.mock_answer = loginOK
+    api.mock_answer = loginOK
     api.bgEvents.roll()
     expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
     api.uiEvents.roll()
@@ -104,7 +102,7 @@ describe Platform::LoginForeground do
 
       loginForeground.presented = false
 
-      httpClient.mock_answer = invalidToken
+      api.mock_answer = invalidToken
       api.bgEvents.roll()
       expect(login.loginState).to eq(Api::Login::LS_LOGIN)
       api.uiEvents.roll()
@@ -126,7 +124,7 @@ describe Platform::LoginForeground do
     # Foreground hit of submit button
     loginForeground.onSubmit(eventData)
 
-    httpClient.mock_answer = IOError.new("Network unreachable")
+    api.mock_answer = IOError.new("Network unreachable")
 
     api.bgEvents.roll()
     expect(login.loginState).to eq(Api::Login::LS_LOGIN)

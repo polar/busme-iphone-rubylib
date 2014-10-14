@@ -40,11 +40,9 @@ describe Api::RemoteInvocation do
     fileName = File.join("spec", "test_data", "SUGet.xml")
     TestHttpMessage.new(200, "OK", File.read(fileName))
   }
-  let (:httpClient) { TestHttpClient.new }
   let (:api) {
     api = TestApi.new
-    api.http_client.httpClient = httpClient
-    httpClient.mock_answer = suGet
+    api.mock_answer = suGet
 
     api.forceGet
     api
@@ -62,38 +60,38 @@ describe Api::RemoteInvocation do
   it "should make prepare arguments" do
     invocation.addArgumentPreparer(testInvocation1)
     invocation.invoke
-    expect(httpClient.url).to eq(api.buspass.updateUrl)
-    expect(httpClient.params).to include(["arg1", "val1"])
+    expect(api.http_client.httpClient.url).to eq(api.buspass.updateUrl)
+    expect(api.http_client.httpClient.params).to include(["arg1", "val1"])
   end
 
   it "should make prepare arguments for multiple preparers" do
     invocation.addArgumentPreparer(testInvocation1)
     invocation.addArgumentPreparer(testInvocation2)
     invocation.invoke
-    expect(httpClient.url).to eq(api.buspass.updateUrl)
-    expect(httpClient.params).to include(["arg1", "val1"])
-    expect(httpClient.params).to include(["arg2", "val2"])
+    expect(api.http_client.httpClient.url).to eq(api.buspass.updateUrl)
+    expect(api.http_client.httpClient.params).to include(["arg1", "val1"])
+    expect(api.http_client.httpClient.params).to include(["arg2", "val2"])
   end
 
   it "should make process parsed result" do
-    httpClient.mock_answer = testResponse
+    api.mock_answer = testResponse
     invocation.addArgumentPreparer(testInvocation1)
     invocation.addResponseProcessor(testInvocation1)
     invocation.invoke
-    expect(httpClient.url).to eq(api.buspass.updateUrl)
-    expect(httpClient.params).to include(["arg1", "val1"])
+    expect(api.http_client.httpClient.url).to eq(api.buspass.updateUrl)
+    expect(api.http_client.httpClient.params).to include(["arg1", "val1"])
     expect(testInvocation1.tag.name).to eq("Example")
     expect(testInvocation1.tag.attributes["attr"]).to eq("3")
   end
 
   it "should make process parsed result on multiple repsonse processors" do
-    httpClient.mock_answer = testResponse
+    api.mock_answer = testResponse
     invocation.addArgumentPreparer(testInvocation1)
     invocation.addResponseProcessor(testInvocation1)
     invocation.addResponseProcessor(testInvocation2)
     invocation.invoke
-    expect(httpClient.url).to eq(api.buspass.updateUrl)
-    expect(httpClient.params).to include(["arg1", "val1"])
+    expect(api.http_client.httpClient.url).to eq(api.buspass.updateUrl)
+    expect(api.http_client.httpClient.params).to include(["arg1", "val1"])
     expect(testInvocation1.tag.name).to eq("Example")
     expect(testInvocation1.tag.attributes["attr"]).to eq("3")
     expect(testInvocation2.tag.name).to eq("Example")

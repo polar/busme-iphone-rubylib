@@ -66,7 +66,7 @@ describe Platform::JourneyStore do
 
       store1 = storageSerializerController.retrieveStorage("testFile", api)
 
-      # post serialize gets run and ressocates the new store to the route
+      # post serialize gets run and re-associates the new store to the route
       # so that it can get the patterns.
       r = store1.getJourney(route.id)
       j = store1.getJourney(journey.id)

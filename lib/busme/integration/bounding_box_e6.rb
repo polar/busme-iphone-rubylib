@@ -37,11 +37,51 @@ module Integration
       @westE6/1E6
     end
 
-    def initialize(northE6, eastE6, southE6, westE6)
+    def initialize(*args)
+      if args.length == 4
+          initNESW(*args)
+      else
+        if args[0].is_a?(Array) && args[0].length == 4
+          initNESW(*args[0])
+        else
+          raise "IllegalArgument"
+        end
+      end
+    end
+
+    def initNESW(northE6, eastE6, southE6, westE6)
       self.northE6 = northE6.to_i
       self.eastE6 = eastE6.to_i
       self.southE6 = southE6.to_i
       self.westE6 = westE6.to_i
+    end
+
+    def getCenter2
+      x = 0
+      y = 0
+      z = 0
+      [[north,west],[north,east],[south,east],[south,west]].each do |lon,lat|
+        lon2 = (lon * Math::PI) /180.0
+        lat2 = (lat * Math::PI) / 180.0
+        x += Math.cos(lat2) * Math.cos(lon2)
+        y += Math.cos(lat2) * Math.sin(lon2)
+        z += Math.sin(lat2)
+      end
+      x = x/4
+      y = y/4
+      z = z/4
+      lon3 = Math.atan2(y, x)
+      hyp = Math.sqrt(x * x + y * y)
+      lat3 = Math.atan2(z, hyp)
+      GeoPoint.new((lat3 * 180 /Math::PI)*1E6, (lon3 * 180)/Math::PI * 1E6)
+    end
+
+    def getCenter
+      GeoPoint.new((northE6 + southE6)/2, (eastE6 + westE6)/2)
+    end
+
+    def to_s
+      "#{north},#{east},#{south},#{west}"
     end
 
   end

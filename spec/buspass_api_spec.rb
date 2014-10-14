@@ -5,7 +5,7 @@ describe Api::BuspassAPI, "API" do
     url = "https://busme-apis.herokuapp.com/masters/521679a96eec8b000800710b/apis/1/get"
     platform = "Android"
     version = "0.0.0"
-    api = Api::BuspassAPI.new(url, platform, version)
+    api = Api::BuspassAPI.new(Testlib::MyHttpClient.new, url, platform, version)
     api.get
     expect(api.ready).to be(true)
     # Since the version is nothing, we should get an upgrade message

@@ -3,8 +3,7 @@ require "test_http_client"
 class TestPlatformApi < Platform::PlatformApi
 
   def initialize
-    super("http://nothing", "android", "3.2.1")
-    self.http_client.httpClient = TestHttpClient.new
+    super(Testlib::MyHttpClient.new(TestHttpClient.new), "http://nothing", "android", "3.2.1")
   end
 
   def activeStartDisplayThreshold
@@ -13,6 +12,10 @@ class TestPlatformApi < Platform::PlatformApi
 
   def offRouteDistanceThreshold
     100
+  end
+
+  def mock_answer=(x)
+    http_client.mock_answer = x
   end
 
   def getRouteDefinition(nameid)
