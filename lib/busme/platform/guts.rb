@@ -164,9 +164,15 @@ module Platform
 
     def storeApi
       if api.ready
+        journeyStore.preSerialize(api)
         storageSerializerController.cacheStorage(journeyStore, "#{api.buspass.slug}-Journeys.xml", api)
+        journeyStore.postSerialize(api)
+        markerStore.preSerialize(api)
         storageSerializerController.cacheStorage(markerStore, "#{api.buspass.slug}-Markers.xml", api)
+        markerStore.postSerialize(api)
+        masterMessageStore.preSerialize(api)
         storageSerializerController.cacheStorage(masterMessageStore, "#{api.buspass.slug}-Messages.xml", api)
+        masterMessageStore.postSerialize(api)
       else
         puts "Guts.storeApi: API not ready"
       end

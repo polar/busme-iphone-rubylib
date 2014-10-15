@@ -2,6 +2,9 @@ module Platform
 
   class JourneySyncEventData
     attr_accessor :isForced
+    def initialize(isForced)
+      self.isForced = isForced
+    end
   end
 
   class BG_JourneySyncController
