@@ -5,16 +5,26 @@ module Integration
     attr_accessor :right
     attr_accessor :bottom
 
+    def self.initWithLineCoords(x1,y1,x2,y2)
+      r = self.new
+      r.left = [x1,x2].min
+      r.top = [y1,y2].max
+      r.right = [x1,x2].max
+      r.bottom = [y1,y2].min
+      r
+    end
+
     def initialize(left = 0, top = 0, right = 0, bottom = 0)
       set(left, top, right, bottom)
     end
 
     def set(left, top, right, bottom)
-      self.left = left
-      self.top = top
-      self.right = right
-      self.bottom = bottom
+      self.left = left.to_f
+      self.top = top.to_f
+      self.right = right.to_f
+      self.bottom = bottom.to_f
     end
+
 
     def dup
       Rect.new(left, top, right, bottom)
@@ -25,19 +35,19 @@ module Integration
     end
 
     def left=(x)
-      @left = x.to_i
+      @left = x.to_f
     end
 
     def right=(x)
-      @right = x.to_i
+      @right = x.to_f
     end
 
     def top=(y)
-      @top = y.to_i
+      @top = y.to_f
     end
 
     def bottom=(y)
-      @bottom = y.to_i
+      @bottom = y.to_f
     end
 
     def width
@@ -45,11 +55,11 @@ module Integration
     end
 
     def height
-      bottom - top
+      top - bottom
     end
 
     def centerX
-      (exactCenterX).to_i
+      (exactCenterX).to_f
     end
 
     def exactCenterX
@@ -57,11 +67,11 @@ module Integration
     end
 
     def centerY
-      (exactCenterY).to_i
+      (exactCenterY).to_f
     end
 
     def exactCenterY
-      top + height/2.0
+      bottom + height/2.0
     end
 
     def center
@@ -73,46 +83,59 @@ module Integration
     end
 
     def offset(dx, dy)
-      self.left += dx
-      self.right += dx
-      self.top += dy
-      self.bottom += dy
+      self.left += dx.to_f
+      self.right += dx.to_f
+      self.top += dy.to_f
+      self.bottom += dy.to_f
     end
 
     def offsetTo(newX, newY)
       w = width
       h = height
-      self.left = newX
-      self.top = newY
+      self.left = newX.to_f
+      self.top = newY.to_f
       self.right = left + w
       self.bottom = top + h
     end
 
     def containsXY(x, y)
-      left <= x && x <= right && top <= y && y <= bottom
+      left <= x && x <= right && bottom <= y && y <= top
     end
 
     def contains(l, t, r, b)
-      left <= l && top <= t && r <= right && b <= bottom
+      l >= left && t <= top && r <= right && b >= bottom
     end
 
     def containsRect(rect)
-      left <= rect.left && top <= rect.top && rect.right <= right && rect.bottom <= bottom
+      rect.left >= left && rect.top <= top && rect.right <= right && rect.bottom >= bottom
     end
 
     def intersect(l, t, r, b)
-      !(left > r || right < l || top > b || bottom < t)
+      rect = Rect.new(l,t,r,b)
+      intersectRect(rect)
     end
 
+    # Intersects a rect if it contains a corner
     def intersectRect(rect)
-      !(left > rect.right || right < rect.left || top > rect.bottom || bottom < rect.top)
+      rect.containsXY(left,top) ||
+        rect.containsXY(right,top) ||
+        rect.containsXY(left,bottom) ||
+        rect.containsXY(right,bottom) ||
+        self.containsXY(rect.left,rect.top) ||
+        self.containsXY(rect.right,rect.top) ||
+        self.containsXY(rect.left, rect.bottom) ||
+        self.containsXY(rect.right,rect.bottom)
     end
 
     def resizeCenter(dw, dh)
-      self.left -= dw/2.0
-      self.right += dw/2.0
-      self.top -= dh/2.0
-      self.bottom += dh/2.0
+      self.left -= (dw/2.0).to_f
+      self.right += (dw/2.0).to_f
+      self.top -= (dh/2.0).to_f
+      self.bottom += (dh/2.0).to_f
+    end
+
+    def to_s
+      "Rect(#{left},#{top},#{right},#{bottom})"
     end
 
 

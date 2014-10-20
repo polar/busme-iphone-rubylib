@@ -14,6 +14,9 @@ module IPhone
       def content
         @s = @body.to_s
       end
+      def to_s
+        content
+      end
     end
     class RWrap
       def initialize(response)

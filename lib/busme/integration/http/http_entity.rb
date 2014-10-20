@@ -16,7 +16,7 @@ module Integration
       end
 
       def getContent
-        response.body.content
+        response.body.to_s
       end
     end
 end

@@ -20,6 +20,9 @@ class TestHttpMessage
     def initialize(content)
       self.content = content
     end
+    def to_s
+      content
+    end
   end
   def initialize(code, reason, body, headers = {})
     self.header = TestHttpHeader.new(code, reason, headers)

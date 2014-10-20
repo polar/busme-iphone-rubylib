@@ -18,7 +18,7 @@ module Api
     end
 
     def register(eventListener)
-      eventListeners << eventListener
+      self.eventListeners << eventListener
     end
 
     def notifyEventListeners(event)
@@ -94,11 +94,12 @@ module Api
       if notifier
         notifier.notifyEventListeners(event)
       else
-        raise "UnknownEvent #{event.eventName} on #{self.to_s}"
+        puts "No receptors for Event #{event.eventName} on #{self.to_s}"
       end
     end
 
     def registerForEvent(eventName, eventListener)
+      puts "#{self}: Register for #{eventName} lis = #{eventListener}"
       notifier = eventNotifiers[eventName] ||= BuspassEventNotifier.new(eventName)
       notifier.register(eventListener)
     end

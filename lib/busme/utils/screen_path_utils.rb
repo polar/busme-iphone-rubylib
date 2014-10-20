@@ -241,41 +241,62 @@ module Utils
         out.offset(offsetX, offsetY)
         out
       end
+
+      def to_s
+        "Projection(Z=#{zoomLevel}, WS2=#{worldSize_2}, SR=#{screenRect})"
+      end
     end
 
     def self.toClippedScreenPath(projectedPath, projection)
+      puts "toClippedScreenPath(#{projectedPath.length} points) on #{projection}"
       rect = projection.screenRect
       path = Integration::Path.new
       if projectedPath.length > 0
         last = projection.translatePoint(projectedPath[0])
         onscreen = rect.containsXY(last.x, last.y)
-        if ! onscreen
-          path.moveTo(last.x, last.y)
-        end
       end
       coords = Integration::Point.new
       for point in projectedPath
-        projection.translatePoint(point, coords)
         if last.x != coords.x || last.y != coords.y
           if rect.containsXY(coords.x, coords.y)
+            #puts "Point #{point} translated to #{coords} is in #{rect}"
             # if we were offscreen, we start a new segment from offscreen
             # to draw to onscreen, which will be clipped.
-            if ! onscreen
+            # If we aren't initialized yet, we have to start somewhere.
+            # This might be the first point in the projected path that is actually onscreen, which could
+            # be considerably far down the line.
+            if ! onscreen || path.paths.size == 0
               path.moveTo(last.x, last.y)
             end
             # Duplicates will be noticed and not added, but we never add dups anyway
             path.lineTo(coords.x, coords.y)
             onscreen = true
           else
+            #puts "Point #{point} translated to #{coords} is NOT in #{rect}"
             # If we were onscreen then we draw to off screen, which will be clipped.
             if onscreen
+              # We may have not started yet!
+              if path.paths.size == 0
+                path.moveTo(last.x, last.y)
+              end
               path.lineTo(coords.x, coords.y)
+            else
+              # We were offscreen to offscreen.
+              # We draw a line if the line intersects the rect
+              lineRect = Integration::Rect.initWithLineCoords(last.x,last.y,coords.x,coords.y)
+              if lineRect.intersectRect(rect)
+                if path.paths.size == 0
+                  path.moveTo(last.x, last.y)
+                end
+                path.lineTo(coords.x,coords.y)
+              end
             end
             onscreen = false
           end
         end
         last.set(coords.x, coords.y)
       end
+      puts "to Path #{path.to_s}"
       path
     end
   end

@@ -95,8 +95,8 @@ module Platform
             if route.isJourney?
               measure = route.getStartingMeasure
             end
+            addedJourneys << route
           end
-          addedJourneys << route
         end
 
         if progressListener
@@ -134,6 +134,7 @@ module Platform
         notifyOnJourneyRemovedListener(route)
       end
       for route in addedJourneys
+        puts "JourneyBasket. onJourneyAdded #{route.name} #{route.direction}"
         notifyOnJourneyAddedListener(route)
       end
       notifyOnBasketUpdateListener()

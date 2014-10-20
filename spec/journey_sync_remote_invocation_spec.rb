@@ -34,7 +34,7 @@ describe Platform::JourneySyncRemoteInvocation do
     api.forceGet
     api
   }
-  let (:guts) { Platform::Guts.new(api) }
+  let (:guts) { Platform::Guts.new(api: api) }
   let (:response2) {
     fileName = File.join("spec", "test_data", "SUUpdateWithRoutes.xml")
     TestHttpMessage.new(200, "OK", File.read(fileName))

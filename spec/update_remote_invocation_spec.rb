@@ -15,7 +15,7 @@ describe Platform::UpdateRemoteInvocation do
     api.forceGet
     api
   }
-  let (:guts) { Platform::Guts.new(api) }
+  let (:guts) { Platform::Guts.new(api: api) }
   let (:response) {
     fileName = File.join("spec", "test_data", "SUUpdate.xml");
     TestHttpMessage.new(200, "OK", File.read(fileName))

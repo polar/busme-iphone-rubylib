@@ -14,7 +14,7 @@ module Api
 
     def addArgumentPreparer(preparer)
       if preparer.is_a? Api::ArgumentPreparer
-        argumentPreparers << preparer
+        self.argumentPreparers << preparer
       else
         raise "Bad Argument Preparer"
       end
@@ -22,7 +22,7 @@ module Api
 
     def addResponseProcessor(processor)
       if processor.is_a? Api::ResponseProcessor
-        responseProcessors << processor
+        self.responseProcessors << processor
       else
         raise "Bad ResponseProcessor"
       end

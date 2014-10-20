@@ -28,5 +28,8 @@ module Integration
     def equals?(point)
       point.x == x && point.y == y
     end
+    def to_s
+      "P(#{x},#{y})"
+    end
   end
 end

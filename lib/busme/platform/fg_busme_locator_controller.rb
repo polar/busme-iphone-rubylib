@@ -14,6 +14,7 @@ module Platform
       self.api = discover_api
       api.uiEvents.registerForEvent("Locator:onGet", self)
       api.uiEvents.registerForEvent("Locator:onDiscover", self)
+      api.uiEvents.registerForEvent("Locator:onSelect", self)
     end
 
     def onBuspassEvent(event)
@@ -22,6 +23,8 @@ module Platform
           onGet(event.eventData)
         when "Locator:onDiscover"
           onDiscover(event.eventData)
+        when "Locator:onSelect"
+          onSelect(event.eventData)
       end
     end
 
@@ -35,11 +38,19 @@ module Platform
       api.bgEvents.postEvent("Locator:discover", evd)
     end
 
+    def performSelect(uiData, loc)
+      api.bgEvents.postEvent("Locator:select", loc)
+    end
+
     def onGet(eventData)
 
     end
 
     def onDiscover(eventData)
+
+    end
+
+    def onSelect(eventData)
 
     end
 

@@ -126,7 +126,7 @@ describe Platform::JourneyDisplayUtility do
     expect(jds[0].empty?).to eq(false)
 
     # This should be enough to move away from the route with in the 5 pixel buffer
-    touchRect.offset(4, 5)
+    touchRect.offset(10, 10)
     jds = utility.hitsPaths(journeyDisplayController.getJourneyDisplays, touchRect, projection)
     # None selected
     expect(jds[0].empty?).to eq(true)

@@ -37,7 +37,7 @@ module Api
     end
 
     def getTrackingArgs()
-      nil
+      "lat=43.0&lon=-76.0"
     end
 
     def get()
@@ -260,13 +260,40 @@ module Api
       login
     end
 
+    class Query
+      attr_accessor :query
+
+      def initialize
+        self.query = ""
+      end
+
+      def <<(args)
+        if args && ! args.empty?
+          if query.empty?
+            self.query = args || ""
+          else
+            self.query += "&#{args}"
+          end
+        end
+      end
+      def to_s
+        query.empty? ? "" : "?#{query}"
+      end
+    end
+
+    def getDefaultQuery
+      q = Query.new
+      q << getPlatformArgs
+      q << getTrackingArgs
+      q
+    end
+
     def getBannerClickThru(id)
       if isReady?
         url = buspass.bannerClickThru
         if url
-          url += getPlatformArgs
-          args = getTrackingArgs
-          url = args ? url : "#{url}&#{args}"
+          query = getDefaultQuery
+          url += query.to_s
           params = []
           params << ["banner_id", id]
           params << ["master_slug", buspass.slug]
@@ -288,9 +315,8 @@ module Api
       if isReady?
         url = buspass.messageClickThru
         if url
-          url += getPlatformArgs
-          args = getTrackingArgs
-          url = args ? url : "#{url}&#{args}"
+          query = getDefaultQuery
+          url += query.to_s
           params = []
           params << ["message_id", id]
           params << ["master_slug", buspass.slug]
@@ -312,9 +338,8 @@ module Api
       if isReady?
         url = buspass.markerClickThru
         if url
-          url += getPlatformArgs
-          args = getTrackingArgs
-          url = args ? url : "#{url}&#{args}"
+          query = getDefaultQuery
+          url += query.to_s
           params = []
           params << ["message_id", id]
           params << ["master_slug", buspass.slug]
@@ -358,6 +383,54 @@ module Api
                 when "notloggedin"
               end
               return tag.name.downcase
+            end
+          end
+        end
+      end
+    end
+
+    def getRouteDefinition(nameid)
+      if isReady?
+        url = buspass.getRouteDefinitionUrl
+        if url
+          query = getDefaultQuery
+          query << "id=#{nameid.id}"
+          query << "type=#{nameid.type}" if nameid.type
+          url += query.to_s
+
+          entity = openURL(url)
+          if entity
+            tag = xmlParse(entity)
+            if tag
+              route = Api::Route.new
+              route.loadParsedXML(tag)
+              return route
+            else
+              puts "getRouteDefinition(#{url}) did not parse"
+            end
+          end
+        end
+      end
+    end
+
+    def getJourneyPattern(id)
+      if isReady?
+        url = buspass.getRouteDefinitionUrl
+        if url
+          query = getDefaultQuery
+          query << "id=#{id}"
+          query << "type=P"
+          url += query.to_s
+
+          entity = openURL(url)
+          if entity
+            tag = xmlParse(entity)
+            if tag
+              pattern = Api::JourneyPattern.new
+              pattern.loadParsedXML(tag)
+              return pattern
+            else
+              puts "getJourneyPattern(#{url}) did not parse"
             end
           end
         end

@@ -8,9 +8,9 @@ module Integration
 
     def moveTo(x, y = nil)
       if x.is_a? Point
-        paths << [x]
+        self.paths << [x]
       else
-        paths << [Point.new(x, y)]
+        self.paths << [Point.new(x, y)]
       end
     end
 
@@ -23,6 +23,11 @@ module Integration
         last = path.last
         path << point if last.nil? || point.x != last.x || point.y != last.y
       end
+    end
+
+    def to_s
+      lens = paths.map {|x| x.length}
+      "Integration::Path(#{paths.length} segments, #{lens.inspect})"
     end
   end
 end

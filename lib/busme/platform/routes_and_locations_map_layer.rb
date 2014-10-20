@@ -134,15 +134,15 @@ module Platform
     end
 
     def placePatterns(patterns, disposition, context)
-      self.lastNumberOfPathsVisible = 0
+      lastNumberOfPathsVisible = 0
       placed = {}
       for pat in patterns
         if p.isReady?
-          if mustPlacePaths || self.lastNumberOfPathsVisible < PATTERN_PLACING_THRESHOLD
+          if mustPlacePaths || lastNumberOfPathsVisible < PATTERN_PLACING_THRESHOLD
             if placed[pat.id].nil?
               placePattern(pat, disposition, context)
               placed[pat.id] = pat
-              self.lastNumberOfPathsVisible += 1
+              lastNumberOfPathsVisible += 1
             end
           else
             break

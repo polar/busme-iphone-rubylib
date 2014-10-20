@@ -13,12 +13,16 @@ module Api
       path != nil
     end
 
+    def isReady?
+      path != nil
+    end
+
     def distance
       @distance ||= Platform::GeoPathUtils.getDistance(path) if path
     end
 
     def projectedPath
-      @projectedPath = Utils::ScreenPathUtils.toProjectedPath(path) if @projectedPath.nil?
+      @projectedPath ||= Utils::ScreenPathUtils.toProjectedPath(path)
     end
 
     def endPoint

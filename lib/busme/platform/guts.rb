@@ -51,9 +51,11 @@ module Platform
     attr_accessor :fgJourneySyncProgressEventController
     attr_accessor :fgBusmeLocatorController
 
-    def initialize(api, discoverApi = nil)
-      self.api = api
-      self.discoverApi = discoverApi
+    attr_accessor :busmeApiController
+
+    def initialize(args)
+      self.api = args[:api]
+      self.discoverApi = args[:discoverApi]
 
       self.bannerPresentationController = BannerPresentationController.new(api)
       self.bannerStore = BannerStore.new
@@ -80,6 +82,8 @@ module Platform
       self.journeyEventController = JourneyEventController.new(api)
       self.journeyPostingController = JourneyPostingController.new(api)
 
+      # Fires on BG Event "BusmeApi:get"
+      self.busmeApiController = BusmeApiController.new(guts: self)
       # Fires on a BG EVent "Update"
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
@@ -113,15 +117,9 @@ module Platform
     end
 
     def reinitializeAPI(args)
-      if api
-        bgEvents = api.bgEvents
-        uiEvents = api.uiEvents
-      end
-
+      # We install new event Distributors because the old ones still hold
+      # on to the event handlers.
       self.api = args.delete :api
-
-      api.bgEvents = bgEvents if bgEvents
-      api.uiEvents = uiEvents if uiEvents
 
       self.bannerPresentationController = BannerPresentationController.new(api)
       self.bannerStore = BannerStore.new
@@ -147,6 +145,8 @@ module Platform
       self.journeyEventController = JourneyEventController.new(api)
       self.journeyPostingController = JourneyPostingController.new(api)
 
+      # Fires on BG Event "BusmeApi:get"
+      self.busmeApiController = BusmeApiController.new(guts: self)
       # Fires on a BG EVent "Update"
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
@@ -160,9 +160,11 @@ module Platform
       self.bgMasterMessageEventController = BG_MasterMessageEventController.new(api)
 
       self.externalStorageController.directory = args.delete :directory
+
+      # TODO: UI Components.
     end
 
-    def storeApi
+    def storeMasterApi
       if api.ready
         journeyStore.preSerialize(api)
         storageSerializerController.cacheStorage(journeyStore, "#{api.buspass.slug}-Journeys.xml", api)
@@ -179,7 +181,7 @@ module Platform
     end
 
     def getMasterApi
-      api.get
+      get = api.get
       if api.ready
         js = storageSerializerController.retrieveStorage("#{api.buspass.slug}-Journeys.xml", api)
         if js
@@ -202,6 +204,7 @@ module Platform
       else
         puts "Guts.getMasterApi: API not ready"
       end
+      get
     end
   end
 end

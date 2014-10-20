@@ -83,8 +83,7 @@ describe Platform::FG_JourneySyncProgressEventController do
   end
 
   it "should accept an event and get all journeys" do
-    evd = Platform::JourneySyncEventData.new()
-    evd.isForced = true
+    evd = Platform::JourneySyncEventData.new(true)
     api.bgEvents.postEvent("JourneySync", evd)
 
     api.mock_answer = response
@@ -94,8 +93,7 @@ describe Platform::FG_JourneySyncProgressEventController do
   end
 
   it "should accept an event and produce a protocol of events" do
-    evd = Platform::JourneySyncEventData.new()
-    evd.isForced = true
+    evd = Platform::JourneySyncEventData.new(true)
     api.bgEvents.postEvent("JourneySync", evd)
 
     api.mock_answer = response

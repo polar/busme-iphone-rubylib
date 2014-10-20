@@ -6,6 +6,7 @@ module Platform
 
   class JourneyRemovedData
     attr_accessor :journeyDisplayController
+    attr_accessor :journeyDisplay
     attr_accessor :id
   end
 
@@ -53,7 +54,8 @@ module Platform
     # JourneyBasket.OnJourneyAddedListener
     def onJourneyAdded(basket, route)
       newRoute = JourneyDisplay.new(self, route)
-      journeyDisplays << newRoute
+      self.journeyDisplays << newRoute
+      puts "#{self}:onJourneyAdded #{route.name} #{route.direction} - #{journeyDisplays.length} JourneyDisplays"
       journeyDisplayMap[newRoute.route.id] = newRoute
       onJourneyDisplayAddedListener.onJourneyDisplayAdded(newRoute) if onJourneyDisplayAddedListener
       presentJourneyDisplay(newRoute)
@@ -97,6 +99,7 @@ module Platform
 
     def abandonJourneyDisplay(journey_display)
       eventData = JourneyRemovedData.new
+      eventData.journeyDisplay = journey_display
       eventData.id = journey_display.route.id
       eventData.journeyDisplayController = self
       api.uiEvents.postEvent("JourneyRemoved", eventData)

@@ -18,17 +18,17 @@ describe Platform::Guts do
     api = TestPlatformApi.new
   }
   let (:guts) {
-    Platform::Guts.new(api)
+    Platform::Guts.new(api: api)
   }
   let (:guts2) {
-    guts1 = Platform::Guts.new(api2)
+    guts1 = Platform::Guts.new(api: api2)
     guts1.reinitializeAPI(api: api2, directory: "/tmp")
     api2.mock_answer = suGet
     guts1.getMasterApi
     api2.mock_answer = updateWithRoutes
     guts1.api.bgEvents.postEvent("JourneySync", Platform::JourneySyncEventData.new(true))
     guts1.api.bgEvents.roll
-    guts1.storeApi
+    guts1.storeMasterApi
     guts1
   }
   before {
@@ -56,12 +56,12 @@ describe Platform::Guts do
 
   it "should store routes" do
     expect(!File.exists?("/tmp/syracuse-university-journeys.xml"))
-    guts2.storeApi
+    guts2.storeMasterApi
     expect(File.exists?("/tmp/syracuse-university-journeys.xml"))
   end
 
   it "after reinitialization should be able to get and save routes" do
-    guts2.storeApi
+    guts2.storeMasterApi
 
     guts.reinitializeAPI(api: api, directory: "/tmp")
     api.mock_answer = suGet
