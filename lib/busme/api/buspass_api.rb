@@ -1,6 +1,7 @@
 module Api
   class BuspassAPI < APIBase
     attr_accessor :apiURL
+    attr_accessor :master_slug
     attr_accessor :appVersion
     attr_accessor :platformName
     attr_accessor :buspass
@@ -13,9 +14,10 @@ module Api
     attr_accessor :uiEvents
     attr_accessor :bgEvents
 
-    def initialize(http_client, initialURL, platform, appVersion)
+    def initialize(http_client, master_slug, initialURL, platform, appVersion)
       super(http_client)
       self.apiURL = initialURL
+      self.master_slug = master_slug
       self.appVersion = appVersion
       self.platformName = platform
 
@@ -23,8 +25,8 @@ module Api
       self.ready = false
       self.activeStartDisplayThreshold = 10 * 60 # minutes
       self.busmeAppVersionString = "#{self.platformName} #{self.appVersion}"
-      self.uiEvents = BuspassEventDistributor.new()
-      self.bgEvents = BuspassEventDistributor.new()
+      self.uiEvents = BuspassEventDistributor.new(name: "BGEvemts:#{master_slug}")
+      self.bgEvents = BuspassEventDistributor.new(name: "UIEvents:#{master_slug}")
       self.loginManager = LoginManager.new(self)
     end
 

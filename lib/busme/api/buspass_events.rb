@@ -21,6 +21,14 @@ module Api
       self.eventListeners << eventListener
     end
 
+    def unregister(eventListener)
+      self.eventListeners.delete(eventListener)
+    end
+
+    def reset
+      self.eventListeners = []
+    end
+
     def notifyEventListeners(event)
       eventListeners.each do |lis|
         lis.onBuspassEvent(event)
@@ -102,6 +110,16 @@ module Api
       puts "#{self}: Register for #{eventName} lis = #{eventListener}"
       notifier = eventNotifiers[eventName] ||= BuspassEventNotifier.new(eventName)
       notifier.register(eventListener)
+    end
+
+    def unregisterForEvent(eventName, eventListener)
+      notifier = eventNotifiers[eventName]
+      notifier.unregister(eventListener) if notifier
+    end
+
+    def clearRegistrationsForEvent(eventName)
+      notifier = eventNotifiers[eventName]
+      notifier.reset if notifier
     end
 
     def to_s

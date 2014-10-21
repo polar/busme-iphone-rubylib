@@ -24,6 +24,12 @@ describe Api::BuspassEventNotifier do
     expect(notifier.eventListeners).to include(listener1)
   end
 
+  it "should remove listener" do
+    notifier.register(listener1)
+    notifier.unregister(listener1)
+    expect(notifier.eventListeners).to_not include(listener1)
+  end
+
   it "should notify listener of event" do
     notifier.register(listener1)
     notifier.notifyEventListeners(event1)
@@ -51,6 +57,16 @@ describe Api::BuspassEventDistributor do
 
     expect(listener1.testEventName).to eq(event1.eventName)
     expect(listener1.testEventData).to eq(event1.eventData)
+  end
+
+  it "should register a buspass event and not distribute it after it unregisters for it" do
+    distributor.registerForEvent("A", listener1)
+
+    distributor.unregisterForEvent("A", listener1)
+    distributor.triggerBuspassEvent(event1)
+
+    expect(listener1.testEventName).to_not eq(event1.eventName)
+    expect(listener1.testEventData).to_not eq(event1.eventData)
   end
 
   it "should register event with data and distribute it" do
