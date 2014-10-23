@@ -1,12 +1,12 @@
 module Platform
   module JourneySyncProgressEventDataConstants
-    P_BEGIN =1
-    P_SYNC_START = 2
-    P_SYNC_END = 3
+    P_BEGIN       = 1
+    P_SYNC_START  = 2
+    P_SYNC_END    = 3
     P_ROUTE_START = 4
-    P_ROUTE_END = 5
-    P_IOERROR = 6
-    P_DONE = 7
+    P_ROUTE_END   = 5
+    P_IOERROR     = 6
+    P_DONE        = 7
   end
 
   class JourneySyncProgressEventData

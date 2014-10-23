@@ -8,17 +8,22 @@ module Platform
       self.externalStorageController = externalStorageController
     end
 
-    def retrieveStorage(fileName, api)
+    def retrieveStorage(filename, api)
       if externalStorageController.isAvailable?
-        data = externalStorageController.readData(fileName)
-        if data
-          store = YAML::load(data)
+        puts "Trying to read #{filename}....."
+        store = externalStorageController.deserializeObjectFromFile(filename)
+        if store
           if store.is_a? Api::Storage
             store.postSerialize(api)
+            return store
+          else
+            return nil
           end
-          return store
         end
       end
+    rescue Exception => boom
+      puts "retrieveStorage(#{filename}) => #{boom}"
+      nil
     end
 
     def cacheStorage(store, filename, api)
@@ -29,12 +34,11 @@ module Platform
             store.preSerialize(api)
             preserialized = true
           end
-          data = YAML::dump(store)
-          externalStorageController.writeFile(data, filename)
+          externalStorageController.serializeObjectToFile(store, filename)
         end
       end
     rescue Exception => boom
-
+      puts "cacheStorage(#{filename}) => #{boom}"
     ensure
       if preserialized && store.is_a?(Api::Storage)
         store.postSerialize(api)

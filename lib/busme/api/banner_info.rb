@@ -19,6 +19,78 @@ module Api
     attr_accessor :displayed
 
     attr_accessor :loaded
+    
+    def propList
+      %w(
+      @id
+      @point
+      @version
+      @length
+      @frequency
+      @radius
+      @priority
+      @expiryTime
+      @title
+      @description
+      @goUrl
+      @iconUrl
+      @seen
+      @lastSeen
+      @beginSeen
+      @onDisplayQueue
+      @displayed
+      @loaded
+      )
+    end
+
+    def initWithCoder(decoder)
+      self.id = decoder[:id]
+      self.point = decoder[:point]
+      self.version = decoder[:version]
+      self.length = decoder[:length]
+      self.frequency = decoder[:frequency]
+      self.radius = decoder[:radius]
+      self.priority = decoder[:priority]
+      self.expiryTime = decoder[:expiryTime]
+      self.title = decoder[:title]
+      self.description = decoder[:description]
+      self.goUrl = decoder[:goUrl]
+      self.iconUrl = decoder[:iconUrl]
+      self.seen = decoder[:seen]
+      self.lastSeen = decoder[:lastSeen]
+      self.beginSeen = decoder[:beginSeen]
+      self.onDisplayQueue = decoder[:onDisplayQueue]
+      self.displayed = decoder[:displayed]
+      self.loaded = decoder[:loaded]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder(encoder)
+      encoder[:id] = id
+      encoder[:point] = point
+      encoder[:version] = version
+      encoder[:length] = length
+      encoder[:frequency] = frequency
+      encoder[:radius] = radius
+      encoder[:priority] = priority
+      encoder[:expiryTime] = expiryTime
+      encoder[:title] = title
+      encoder[:description] = description
+      encoder[:goUrl] = goUrl
+      encoder[:iconUrl] = iconUrl
+      encoder[:seen] = seen
+      encoder[:lastSeen] = lastSeen
+      encoder[:beginSeen] = beginSeen
+      encoder[:onDisplayQueue] = onDisplayQueue
+      encoder[:displayed] = displayed
+      encoder[:loaded] = loaded
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
 
     def initialize
       @seen = false
@@ -95,6 +167,10 @@ module Api
       self.radius = tag.attributes["radius"].to_i
       self.loaded = true
     end
+
+  end
+
+  def to_json
 
   end
 end

@@ -26,7 +26,7 @@ describe Platform::Guts do
     api2.mock_answer = suGet
     guts1.getMasterApi
     api2.mock_answer = updateWithRoutes
-    guts1.api.bgEvents.postEvent("JourneySync", Platform::JourneySyncEventData.new(true))
+    guts1.api.bgEvents.postEvent("JourneySync", Platform::JourneySyncEventData.new(isForce: true))
     guts1.api.bgEvents.roll
     guts1.storeMasterApi
     guts1
@@ -49,7 +49,7 @@ describe Platform::Guts do
     api.mock_answer = suGet
     guts.getMasterApi
     api.mock_answer = updateWithRoutes
-    guts.api.bgEvents.postEvent("JourneySync", Platform::JourneySyncEventData.new(true))
+    guts.api.bgEvents.postEvent("JourneySync", Platform::JourneySyncEventData.new(isForced: true))
     guts.api.bgEvents.roll
     expect(guts.journeyStore.getPattern("b2d03c4880f6d57b3b4edfa5aa9c9211")).to_not eq(nil)
   end

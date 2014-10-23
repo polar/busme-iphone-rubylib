@@ -20,7 +20,7 @@ module Platform
         return
       end
       if enabled
-        updateRemoteInvocation.invoke(eventData.progressListener, eventData.isForced)
+        updateRemoteInvocation.invoke(eventData.syncProgressListener, eventData.isForced)
       end
     end
   end

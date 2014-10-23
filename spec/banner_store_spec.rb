@@ -10,7 +10,7 @@ describe Platform::BannerStore do
   let(:api) { TestApi.new }
   let(:time_now) { Time.now }
   let(:store) {Platform::BannerStore.new}
-  let(:externalStorageController) { Platform::ExternalStorageController.new(api)}
+  let(:externalStorageController) { Platform::ExternalStorageController.new(api: api)}
   let(:storageSerializerController) {Platform::StorageSerializerController.new(api, externalStorageController)}
   let(:banner1) do
     b = Api::BannerInfo.new

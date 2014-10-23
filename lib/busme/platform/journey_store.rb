@@ -3,6 +3,26 @@ module Platform
     attr_accessor :journeys
     attr_accessor :patterns
 
+    def propList
+      %w(@journeys @patterns)
+    end
+
+    def initWithCoder1(decoder)
+      self.journeys = decoder[:journeys]
+      self.patterns = decoder[:patterns]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder1(encoder)
+      encoder[:journeys] = journeys
+      encoder[:patterns] = patterns
+    rescue Exception => boom
+      puts "#{boom}"
+    end
+
     def initialize
       self.journeys = {}
       self.patterns = {}

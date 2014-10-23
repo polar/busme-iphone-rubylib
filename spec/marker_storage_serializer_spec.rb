@@ -11,7 +11,7 @@ describe Platform::MarkerStore do
   let(:api) { TestApi.new }
   let(:time_now) { Time.now }
   let(:store) { Platform::MarkerStore.new }
-  let(:externalStorageController) { Platform::ExternalStorageController.new(api)}
+  let(:externalStorageController) { Platform::ExternalStorageController.new(api: api)}
   let(:storageSerializerController) {Platform::StorageSerializerController.new(api, externalStorageController)}
   let(:marker1) do
     m = Api::MarkerInfo.new

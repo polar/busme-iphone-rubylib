@@ -27,7 +27,7 @@ end
 describe Platform::StorageSerializerController do
   let (:api) { TestApi.new }
   let (:externalStorageController) {
-    Platform::ExternalStorageController.new(api)
+    Platform::ExternalStorageController.new(api: api)
   }
   let (:test_data) { "This is Data for the file" }
   let (:store) {

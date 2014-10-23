@@ -1,9 +1,11 @@
 module Platform
 
-  class UpdateEventData
+  class UpdateEventData < JourneySyncEventData
     attr_accessor :pleaseStop
-    attr_accessor :progressListener
-    attr_accessor :isForced
+    def initialize(args = {})
+      self.pleaseStop = args[:pleaseStop]
+      super(args)
+    end
   end
 
 end

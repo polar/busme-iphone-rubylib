@@ -2,6 +2,24 @@ module Integration
   class Path
     attr_accessor :paths
 
+    def propList
+      ["@paths"]
+    end
+
+    def initWithCoder1(decoder)
+      self.paths = decoder[:paths]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+    def encodeWithCoder1(encoder)
+      encoder[:paths] = paths
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def initialize
       self.paths = []
     end

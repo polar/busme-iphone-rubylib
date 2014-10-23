@@ -26,6 +26,7 @@ module Api
     LS_AUTHTOKEN_FAILURE = 10
     LS_AUTHTOKEN_SUCCESS =11
 
+
     def initialize
       self.roles = []
       self.rolesLiteral = ""

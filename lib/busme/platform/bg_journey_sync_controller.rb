@@ -2,8 +2,10 @@ module Platform
 
   class JourneySyncEventData
     attr_accessor :isForced
-    def initialize(isForced)
-      self.isForced = isForced
+    attr_accessor :syncProgressListener
+    def initialize(args)
+      self.isForced = args[:isForced]
+      self.syncProgressListener = args[:syncProgressListener]
     end
   end
 
@@ -26,7 +28,8 @@ module Platform
     end
 
     def onSync(eventData)
-      invocation = JourneySyncRemoteInvocation.new(api, journeyDisplayController, syncProgressListener)
+      invocation = JourneySyncRemoteInvocation.new(api, journeyDisplayController,
+                                                   eventData.syncProgressListener || syncProgressListener)
       invocation.perform(eventData.isForced)
     end
 

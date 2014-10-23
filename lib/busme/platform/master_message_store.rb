@@ -3,6 +3,27 @@ module Platform
     attr_accessor :masterMessages
     attr_accessor :dirty
 
+    def propList
+      %w(@masterMessages @dirty)
+    end
+
+    def initWithCoder1(decoder)
+      self.masterMessages = decoder[:masterMessages]
+      self.dirty = decoder[:dirty]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder1(encoder)
+      encoder[:masterMessages] = masterMessages
+      encoder[:dirty] = dirty
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def initialize
       self.masterMessages = {}
       self.dirty = true

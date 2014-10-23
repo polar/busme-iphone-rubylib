@@ -15,6 +15,8 @@ module Platform
   end
   class MasterController
     attr_accessor :api
+    attr_accessor :master
+    attr_accessor :directory
     attr_accessor :mainController
 
     attr_accessor :bannerBasket
@@ -69,17 +71,21 @@ module Platform
 
     def initialize(args)
       self.api = args.delete :api
+      self.master = args.delete :master
       self.mainController = args.delete :mainController
+      self.directory = mainController.directory
       assignStorageSerializerControllers
       assignComponents
       assignBackgroundControllers
       assignForegroundControllers
 
       mainController.bgEvents.registerForEvent("Master:init", self)
+      api.bgEvents.registerForEvent("Master:init", self)
     end
 
     def unregisterForEvents
       mainController.bgEvents.unregisterForEvent("Master:init", self)
+      api.bgEvents.unregisterForEvent("Master:init", self)
     end
 
     def onBuspassEvent(event)
@@ -97,10 +103,11 @@ module Platform
       evd.error = boom
     ensure
       mainController.uiEvents.postEvent("Master:Init:return", evd)
+      api.uiEvents.postEvent("Master:Init:return", evd)
     end
 
     def assignStorageSerializerControllers
-      self.externalStorageController = ExternalStorageController.new(api) # TODO: Extend for platform
+      self.externalStorageController = ExternalStorageController.new(masterController: self, api: api) # TODO: Extend for platform
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
     end
 
@@ -115,7 +122,7 @@ module Platform
       self.journeyDisplayController = JourneyDisplayController.new(api, journeyBasket)
       self.journeyVisibilityController = JourneyVisibilityController.new(api, journeyDisplayController)
 
-      ms = storageSerializerController.retrieveStorage("#{api.buspass.slug}-Messages.xml", api)
+      ms = storageSerializerController.retrieveStorage("#{api.master_slug}-Messages.xml", api)
       self.masterMessageStore = ms || MasterMessageStore.new
       self.masterMessageController = MasterMessageController.new(api)
       self.masterMessageBasket = MasterMessageBasket.new(masterMessageStore, masterMessageController)

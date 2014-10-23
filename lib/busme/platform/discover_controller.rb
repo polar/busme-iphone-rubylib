@@ -16,8 +16,6 @@ module Platform
 
   class DiscoverController
     attr_accessor :api
-    attr_accessor :bgEvents
-    attr_accessor :uiEvents
     attr_accessor :masters
     attr_accessor :mainController
 
@@ -87,7 +85,7 @@ module Platform
     def onSearchSelectEvent(event)
       evd = event.eventData
       evd.controller = self
-      evd.return = mainController.switchMaster(evd.data[:masterApi])
+      evd.return = mainController.switchMaster(evd.data[:master], evd.data[:masterApi])
     rescue Exception => boom
       evd.error = boom
     ensure

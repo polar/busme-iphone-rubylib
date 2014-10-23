@@ -82,12 +82,10 @@ module Platform
       self.journeyEventController = JourneyEventController.new(api)
       self.journeyPostingController = JourneyPostingController.new(api)
 
-      # Fires on BG Event "BusmeApi:get"
-      self.busmeApiController = BusmeApiController.new(guts: self)
       # Fires on a BG EVent "Update"
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
-      self.externalStorageController = ExternalStorageController.new(api) # TODO: Extend for platform
+      self.externalStorageController = ExternalStorageController.new(api: api) # TODO: Extend for platform
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
 
       self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)
@@ -145,12 +143,10 @@ module Platform
       self.journeyEventController = JourneyEventController.new(api)
       self.journeyPostingController = JourneyPostingController.new(api)
 
-      # Fires on BG Event "BusmeApi:get"
-      self.busmeApiController = BusmeApiController.new(guts: self)
       # Fires on a BG EVent "Update"
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
-      self.externalStorageController = ExternalStorageController.new(api)
+      self.externalStorageController = ExternalStorageController.new(api: api)
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
 
       self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)

@@ -4,8 +4,11 @@ require 'test_foreground'
 
 class TestMainController < Platform::MainController
   attr_accessor :switched
-  def switchMaster(api)
+  attr_accessor :switched_master
+  def switchMaster(master, api)
     self.switched = api
+    self.switched_master = master
+    super(master, api)
   end
 end
 
@@ -76,7 +79,10 @@ describe Platform::DiscoverController do
     event = mainController.uiEvents.peek
     expect(event.eventName).to eq("Search:Discover:return")
     mainController.uiEvents.roll
-    expect(testForeground.lastEvent.eventData.return).to_not be nil
+    evd = testForeground.lastEvent.eventData
+    expect(evd.return).to_not be nil
+    expect(evd.return).to be_a_kind_of Array
+    expect(evd.return[0]).to be_a_kind_of Api::Master
   end
 
   it "should find master from discover" do
@@ -121,7 +127,8 @@ describe Platform::DiscoverController do
     master = testForeground.lastEvent.eventData.return
     expect(master).to_not eq(nil)
     masterApi = Api::BuspassAPI.new(httpClient, master.slug, master.apiUrl, "TestPlatform", "0.0.0")
-    mainController.bgEvents.postEvent("Search:select", Platform::DiscoverEventData.new(data:{masterApi: masterApi}))
+    mainController.bgEvents.postEvent("Search:select",
+                        Platform::DiscoverEventData.new(data:{master: master, masterApi: masterApi}))
     mainController.bgEvents.roll
     expect(mainController.switched).to_not eq(nil)
     expect(mainController.switched).to be_a_kind_of(Api::BuspassAPI)

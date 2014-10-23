@@ -4,6 +4,26 @@ module Platform
     attr_accessor :markers
     attr_accessor :dirty
 
+    def propList
+      %w(@markers @dirty)
+    end
+
+    def initWithCoder1(decoder)
+      self.markers = decoder[:markers]
+      self.dirty = decoder[:dirty]
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder1(encoder)
+      encoder[:markers] = markers
+      encoder[:dirty] = dirty
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def initialize
       self.markers = {}
       self.dirty = true

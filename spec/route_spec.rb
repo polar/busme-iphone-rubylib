@@ -284,7 +284,7 @@ routeid='89abcb460e3a73c5c839e1b99e838996'
   end
 
   it "journey should push locations" do
-    api = Api::BuspassAPI.new(Testlib::MyHttpClient.new, "", "Android", "0.0")
+    api = Api::BuspassAPI.new(Testlib::MyHttpClient.new, "slug", "http://nothing", "Android", "0.0")
     route = Api::Route.new
     tag = Api::Tag.new(REXML::Document.new(@journey_spec).root)
     route.loadParsedXML(tag)

@@ -12,7 +12,7 @@ describe Platform::JourneyStore do
   let(:store) {
     Platform::JourneyStore.new
   }
-  let(:externalStorageController) { Platform::ExternalStorageController.new(api)}
+  let(:externalStorageController) { Platform::ExternalStorageController.new(api: api)}
   let(:storageSerializerController) {Platform::StorageSerializerController.new(api, externalStorageController)}
   let(:route) {
     filename = File.join("spec", "test_data", "R_643_9864eb9e615f740526e93f6297e29435_1399939597.xml")

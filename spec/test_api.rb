@@ -3,7 +3,7 @@ require "test_http_client"
 class TestApi   < Api::BuspassAPI
 
   def initialize
-    super(Testlib::MyHttpClient.new(TestHttpClient.new), "http://nothing", "android", "3.2.1")
+    super(Testlib::MyHttpClient.new(TestHttpClient.new), "slug", "http://nothing", "android", "3.2.1")
   end
 
   def activeStartDisplayThreshold

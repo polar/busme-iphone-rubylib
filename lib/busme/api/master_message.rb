@@ -17,6 +17,72 @@ module Api
     attr_accessor :lastSeen
     attr_accessor :remindable
     attr_accessor :remindTime
+    
+    def propList
+      super.propList +
+      %w(
+    @title
+    @priority
+    @seen
+    @content
+    @goUrl
+    @goLabel
+    @remindPeriod
+
+    @point
+    @radius
+    @displayed
+
+    @loaded
+
+    @lastSeen
+    @remindable
+    @remindTime
+      )
+    end
+
+    def initWithCoder1(decoder)
+      super(decoder)
+      self.title = decoder[:title]
+      self.priority = decoder[:priority]
+      self.seen = decoder[:seen]
+      self.content = decoder[:content]
+      self.goUrl = decoder[:goUrl]
+      self.goLabel = decoder[:goLabel]
+      self.remindPeriod = decoder[:remindPeriod]
+      self.point = decoder[:point]
+      self.radius = decoder[:radius]
+      self.displayed = decoder[:displayed]
+      self.loaded = decoder[:loaded]
+      self.lastSeen = decoder[:lastSeen]
+      self.remindable = decoder[:remindable]
+      self.remindTime = decoder[:remindTime]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder1(encoder)
+      super(encoder)
+      encoder[:title] = title
+      encoder[:priority] = priority
+      encoder[:seen] = seen
+      encoder[:content] = content
+      encoder[:goUrl] = goUrl
+      encoder[:goLabel] = goLabel
+      encoder[:remindPeriod] = remindPeriod
+      encoder[:point] = point
+      encoder[:radius] = radius
+      encoder[:displayed] = displayed
+      encoder[:loaded] = loaded
+      encoder[:lastSeen] = lastSeen
+      encoder[:remindable] = remindable
+      encoder[:remindTime] = remindTime
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
 
     def initialize(id = "")
       super(id, nil, nil)

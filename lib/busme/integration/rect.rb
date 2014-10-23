@@ -5,6 +5,34 @@ module Integration
     attr_accessor :right
     attr_accessor :bottom
 
+    def propList
+      %w(
+    @left
+    @top
+    @right
+    @bottom
+      )
+    end
+    def initWithCoder1(decoder)
+      self.left = decoder[:left]
+      self.top = decoder[:top]
+      self.right = decoder[:right]
+      self.bottom = decoder[:bottom]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+    def encodeWithCoder1(encoder)
+      encoder[:left] = left
+      encoder[:top] = top
+      encoder[:right] = right
+      encoder[:bottom] = bottom
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def self.initWithLineCoords(x1,y1,x2,y2)
       r = self.new
       r.left = [x1,x2].min

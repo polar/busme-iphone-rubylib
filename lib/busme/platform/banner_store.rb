@@ -3,6 +3,25 @@ module Platform
     include Api::Storage
 
     attr_accessor :banners
+
+    def propList
+      ["@banners"]
+    end
+
+    def initWithCoder1(decoder)
+      self.banners = decoder[:banners]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+    def encodeWithCoder1(encoder)
+      encoder[:banners] = banners
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def initialize
       @banners = {}
     end

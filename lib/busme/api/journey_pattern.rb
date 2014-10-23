@@ -5,6 +5,35 @@ module Api
     attr_writer   :projectedPath
     attr_writer   :distance
 
+    def propList
+      %w(
+    @id
+    @path
+    @projectedPath
+    @distance
+      )
+    end
+    def initWithCoder(decoder)
+      self.id = decoder[:id]
+      self.path = decoder[:path]
+      self.projectedPath = decoder[:projectedPath]
+      self.distance = decoder[:distance]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder(encoder)
+      encoder[:id] = id
+      encoder[:path] = path
+      encoder[:projectedPath] = projectedPath
+      encoder[:distance] = distance
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def getPatternNameId()
       @name_id ||= NameId.new( [id, id, "P", "1"] )
     end

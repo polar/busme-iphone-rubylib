@@ -5,6 +5,33 @@ module Integration
     attr_accessor :southE6
     attr_accessor :westE6
 
+    def propList
+      %w(
+    @northE6
+    @eastE6
+    @southE6
+    @westE6
+      )
+    end
+    def initWithCoder1(decoder)
+      self.northE6 = decoder[:northE6]
+      self.eastE6 = decoder[:eastE6]
+      self.southE6 = decoder[:southE6]
+      self.westE6 = decoder[:westE6]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+    def encodeWithCoder1(encoder)
+      encoder[:northE6] = northE6
+      encoder[:eastE6] = eastE6
+      encoder[:southE6] = southE6
+      encoder[:westE6] = westE6
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
     def north=(north)
       @northE6 = (north * 1E6).to_i
     end

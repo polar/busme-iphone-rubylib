@@ -34,7 +34,121 @@ module Api
     attr_accessor :reported
 
     attr_accessor :journeyStore
+    
+    def propList
+      # We do not save the busApi or journeyStore
+      %w(
+    @name
+    @type
+    @id
+    @code
+    @direction
+    @vid
+    @workingVid
+    @timeless
+    @sort
+    @version
+    @nw_lon
+    @nw_lat
+    @se_lon
+    @se_lat
+    @locationRefreshRate
+    @startOffset
+    @duration
+    @startTime
+    @endTime
+    @schedStartTime
+    @actualStartTime
+    @patternid
+    @patternids
+    @lastKnownLocation
+    @lastKnownTime
+    @lastKnownTimediff
+    @lastKnownDistance
+    @lastKnownDirection
+    @onRoute
+    @timeZone
+    @reported
+      )
+    end
 
+    def initWithCoder1(decoder)
+      self.busAPI = decoder[:busAPI]
+      self.name = decoder[:name]
+      self.type = decoder[:type]
+      self.id = decoder[:id]
+      self.code = decoder[:code]
+      self.direction = decoder[:direction]
+      self.vid = decoder[:vid]
+      self.workingVid = decoder[:workingVid]
+      self.timeless = decoder[:timeless]
+      self.sort = decoder[:sort]
+      self.version = decoder[:version]
+      self.nw_lon = decoder[:nw_lon]
+      self.nw_lat = decoder[:nw_lat]
+      self.se_lon = decoder[:se_lon]
+      self.se_lat = decoder[:se_lat]
+      self.locationRefreshRate = decoder[:locationRefreshRate]
+      self.startOffset = decoder[:startOffset]
+      self.duration = decoder[:duration]
+      self.startTime = decoder[:startTime]
+      self.endTime = decoder[:endTime]
+      self.schedStartTime = decoder[:schedStartTime]
+      self.actualStartTime = decoder[:actualStartTime]
+      self.patternid = decoder[:patternid]
+      self.patternids = decoder[:patternids]
+      self.lastKnownLocation = decoder[:lastKnownLocation]
+      self.lastKnownTime = decoder[:lastKnownTime]
+      self.lastKnownTimediff = decoder[:lastKnownTimediff]
+      self.lastKnownDistance = decoder[:lastKnownDistance]
+      self.lastKnownDirection = decoder[:lastKnownDirection]
+      self.onRoute = decoder[:onRoute]
+      self.timeZone = decoder[:timeZone]
+      self.reported = decoder[:reported]
+      self.journeyStore = decoder[:journeyStore]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+    def encodeWitHCoder1(encoder)
+      encoder[:busAPI] = busAPI
+      encoder[:name] = name
+      encoder[:type] = type
+      encoder[:id] = id
+      encoder[:code] = code
+      encoder[:direction] = direction
+      encoder[:vid] = vid
+      encoder[:workingVid] = workingVid
+      encoder[:timeless] = timeless
+      encoder[:sort] = sort
+      encoder[:version] = version
+      encoder[:nw_lon] = nw_lon
+      encoder[:nw_lat] = nw_lat
+      encoder[:se_lon] = se_lon
+      encoder[:se_lat] = se_lat
+      encoder[:locationRefreshRate] = locationRefreshRate
+      encoder[:startOffset] = startOffset
+      encoder[:duration] = duration
+      encoder[:startTime] = startTime
+      encoder[:endTime] = endTime
+      encoder[:schedStartTime] = schedStartTime
+      encoder[:actualStartTime] = actualStartTime
+      encoder[:patternid] = patternid
+      encoder[:patternids] = patternids
+      encoder[:lastKnownLocation] = lastKnownLocation
+      encoder[:lastKnownTime] = lastKnownTime
+      encoder[:lastKnownTimediff] = lastKnownTimediff
+      encoder[:lastKnownDistance] = lastKnownDistance
+      encoder[:lastKnownDirection] = lastKnownDirection
+      encoder[:onRoute] = onRoute
+      encoder[:timeZone] = timeZone
+      encoder[:reported] = reported
+      encoder[:journeyStore] = journeyStore
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
     def preSerialize(api)
       self.busAPI = nil
       self.journeyStore = nil
@@ -59,10 +173,6 @@ module Api
     def initialize
       self.version = -1
       self.locationRefreshRate = 10 # seconds
-    end
-
-    def postSerialize(api)
-      self.busAPI = api
     end
 
     def getNameId
@@ -278,7 +388,7 @@ module Api
 
     def to_s
       if isRouteDefinition?
-        s = "Route(#{code}, #{name}, pc=#{path.size}, id=#{id}"
+        s = "Route(#{code}, #{name}, pc=#{paths.size}, id=#{id}"
       end
       if isJourney?
         s = "Journey(#{code}, #{name}, id=#{id}, ver=#{version}, patid=#{patternid}"

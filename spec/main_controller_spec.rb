@@ -2,7 +2,7 @@ require "spec_helper"
 require "test_http_client"
 require 'test_foreground'
 
-describe Platform::DiscoverController do
+describe Platform::MainController do
   let(:httpClient) {
     Testlib::MyHttpClient.new(TestHttpClient.new)
   }
@@ -17,7 +17,7 @@ describe Platform::DiscoverController do
   }
   let (:testForeground) {
     # We list only the events that we care about in this spec
-    TestForeground.new(mainController, ["Main:Discover:Init:return", "Main:Master:Init:return", "Master:Init:return"])
+    TestForeground.new(mainController, ["Main:Discover:Init:return", "Main:Master:Init:return", "Master:Init:return", "Search:Find:return"])
   }
   let (:discoverGet) {
     fileName = File.join("spec", "test_data", "CNYDiscoverGet.xml")
@@ -48,14 +48,6 @@ describe Platform::DiscoverController do
     mainController.bgEvents.roll
     expect(mainController.masterController).to_not eq(nil)
     expect(mainController.masterController).to be_a_kind_of(Platform::MasterController)
-  end
-
-  it "should get the right urls" do
-    httpClient.mock_answer = discoverGet
-    mainController.bgEvents.postEvent("Search:init", Platform::DiscoverEventData.new())
-    mainController.bgEvents.roll
-    expect(api.discoverUrl).to_not be nil
-    expect(api.masterUrl).to_not be nil
   end
 
   it "should on discover fire UI EVent" do
@@ -101,13 +93,18 @@ describe Platform::DiscoverController do
     master = testForeground.lastEvent.eventData.return
     expect(master).to_not eq(nil)
     #masterApi = Api::BuspassAPI.new(httpClient, master.slug, master.apiUrl, "TestPlatform", "0.0.0")
-    mainController.bgEvents.postEvent("Search:select", Platform::DiscoverEventData.new(data:{masterApi: masterApi}))
+    mainController.bgEvents.postEvent("Search:select",
+                                      Platform::DiscoverEventData.new(data:{master: master, masterApi: masterApi}))
     mainController.bgEvents.roll
     expect(mainController.masterController).to_not be(nil)
     expect(mainController.masterController).to be_a_kind_of(Platform::MasterController)
     event = mainController.uiEvents.peek
     expect(event.eventName).to eq("Search:Select:return")
     mainController.uiEvents.roll
+    expect(mainController.masterController).to_not eq(nil)
+    expect(mainController.masterController.master).to_not eq(nil)
+    expect(mainController.masterController.master).to be_a_kind_of(Api::Master)
+    expect(mainController.masterController.master.slug).to eq("syracuse-university")
     httpClient.mock_answer = suGet
     mainController.bgEvents.postEvent("Master:init", Platform::MasterEventData.new())
     mainController.bgEvents.roll

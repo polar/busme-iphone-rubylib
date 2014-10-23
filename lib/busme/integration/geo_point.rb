@@ -9,6 +9,27 @@ module Integration
     attr_reader :longitudeE6
     attr_reader :latitudeE6
 
+    def propList
+      %w(@longitudeE6 @latitudeE6)
+    end
+
+    def initWithCoder1(decoder)
+      self.longitudeE6 = decoder[:longitudeE6]
+      self.latitudeE6 = decoder[:latitudeE6]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder1(encoder)
+      encoder[:longitudeE6] = longitudeE6
+      encoder[:latitudeE6] = latitudeE6
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def initialize(latE6 = 0, lonE6 = 0)
       self.latitudeE6 = latE6
       self.longitudeE6 = lonE6

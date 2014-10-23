@@ -15,7 +15,7 @@ end
 describe Platform::ExternalStorageController do
   let (:api) { TestApi.new }
   let (:controller) {
-    Platform::ExternalStorageController.new(api)
+    Platform::ExternalStorageController.new(api: api)
   }
   let (:data) { "This is Data for the file" }
 

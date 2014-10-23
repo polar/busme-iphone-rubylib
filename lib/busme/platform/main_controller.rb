@@ -16,6 +16,7 @@ module Platform
   end
 
   class MainController
+    attr_accessor :directory
     attr_accessor :discoverApi
     attr_accessor :masterApi
     attr_accessor :bgEvents
@@ -23,7 +24,9 @@ module Platform
     attr_accessor :masterController
     attr_accessor :discoverController
 
-    def initialize
+    def initialize(args = {})
+      self.directory = args[:directory]
+
       self.bgEvents = Api::BuspassEventDistributor.new(:name => "BGEvents:Main")
       self.uiEvents = Api::BuspassEventDistributor.new(:name => "UIEvents:Main")
 
@@ -64,7 +67,8 @@ module Platform
       evd = event.eventData
       evd.controller = self
       api = evd.data[:masterApi]
-      evd.return = switchMaster(api)
+      master = evd.data[:master]
+      evd.return = switchMaster(master, api)
     rescue Exception => boom
       self.masterController = oldMasterController
       evd.error = boom
@@ -72,12 +76,12 @@ module Platform
       uiEvents.postEvent("Main:Master:Init:return", evd)
     end
 
-    def switchMaster(api)
+    def switchMaster(master, api)
       oldMasterController = masterController
       if oldMasterController
         oldMasterController.storeMaster
       end
-      self.masterController = MasterController.new(api: api, mainController: self)
+      self.masterController = MasterController.new(api: api, master: master, mainController: self)
       if masterController
         self.masterApi = api
         if oldMasterController

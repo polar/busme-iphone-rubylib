@@ -3,6 +3,27 @@ module Integration
     attr_accessor :x
     attr_accessor :y
 
+    def propList
+      %w(@x @y)
+    end
+
+    def initWithCoder1(decoder)
+      self.x = decoder[:x]
+      self.y = decoder[:y]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithEncoder1(encoder)
+      encoder[:x] = x
+      encoder[:y] = y
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
     def initialize(x = 0, y = 0)
       set(x, y)
     end

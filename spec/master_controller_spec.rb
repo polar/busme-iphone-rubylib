@@ -4,7 +4,9 @@ require 'test_foreground'
 
 class TestMainController < Platform::MainController
   attr_accessor :switched
-  def switchMaster(api)
+  attr_accessor :switched_master
+  def switchMaster(master, api)
+    self.switched_master = master
     self.switched = api
   end
 end

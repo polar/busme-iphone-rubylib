@@ -10,7 +10,7 @@ describe Platform::MasterMessageStore do
   let(:api) { TestApi.new }
   let(:time_now) { Time.now }
   let(:store) { Platform::MasterMessageStore.new }
-  let(:externalStorageController) { Platform::ExternalStorageController.new(api)}
+  let(:externalStorageController) { Platform::ExternalStorageController.new(api: api)}
   let(:storageSerializerController) {Platform::StorageSerializerController.new(api, externalStorageController)}
   let(:masterMessage1) do
     m = Api::MasterMessage.new("1")

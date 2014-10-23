@@ -7,6 +7,45 @@ module Api
     attr_accessor :version
     attr_accessor :sched_time_start
     attr_accessor :time_start
+    
+    def propList
+      %w(
+    @name
+    @id
+    @route_id
+    @type
+    @version
+    @sched_time_start
+    @time_start
+      )
+    end
+
+    def initWithCoder1(decoder)
+      self.name = decoder[:name]
+      self.id = decoder[:id]
+      self.route_id = decoder[:route_id]
+      self.type = decoder[:type]
+      self.version = decoder[:version]
+      self.sched_time_start = decoder[:sched_time_start]
+      self.time_start = decoder[:time_start]
+      self
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
+
+    def encodeWithCoder1(encoder)
+      encoder[:name] = name
+      encoder[:id] = id
+      encoder[:route_id] = route_id
+      encoder[:type] = type
+      encoder[:version] = version
+      encoder[:sched_time_start] = sched_time_start
+      encoder[:time_start] = time_start
+    rescue Exception => boom
+      puts "#{boom}"
+      p boom.backtrace
+    end
 
     def initialize(*arguments)
       if arguments[0].is_a?(Array)
