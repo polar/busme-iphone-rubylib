@@ -81,7 +81,7 @@ module Platform
       if oldMasterController
         oldMasterController.storeMaster
       end
-      self.masterController = MasterController.new(api: api, master: master, mainController: self)
+      self.masterController = instantiateMasterController(api: api, master: master, mainController: self)
       if masterController
         self.masterApi = api
         if oldMasterController
@@ -92,6 +92,10 @@ module Platform
     rescue Exception => boom
       self.masterController = oldMasterController
       raise boom
+    end
+
+    def instantiateMasterController(args)
+      MasterController.new(api: api, master: master, mainController: self)
     end
 
   end

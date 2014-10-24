@@ -68,14 +68,14 @@ module Api
       Api::Tag.new(doc.root)
     end
 
-    def self.encode(val)
+    def self.encode(val, io = nil)
       IdentityMap.clear
-      encodeWithCoder(val, Coder.new)
+      res = encodeWithCoder(val, Coder.new(:io => io))
     end
 
-    def self.decodeTag(tag)
+    def self.decodeTag(tag, io = nil)
       IdentityMap.clear
-      decodeWithCoder(tag, Coder.new)
+      decodeWithCoder(tag, Coder.new(:io => io))
     end
 
     def self.decode(data)
@@ -85,21 +85,21 @@ module Api
 
     def self.encodeWithCoder(val, coder)
       case val.class.name
-        when "Fixnum", "String", "Boolean", "TrueClass", "FalseClass", "Hash", "Array", "Float"
+        when "Fixnum", "String", "Boolean", "TrueClass", "FalseClass", "Hash", "Array", "Float", "Bignum"
           coder.encodeContent(val)
 
         else
           if val.respond_to? :encodeWithCoder
-            s = ""
-            s += "<Object class='#{val.class.name}' id='#{val.__id__}'>"
-            Coder.new.tap do |coder|
+            s = coder.io || StringIO.new("")
+            s.write "<Object class='#{val.class.name}' id='#{val.__id__}'>"
+            Coder.new(:io => coder.io).tap do |coder|
               val.encodeWithCoder(coder)
               coder.hash.each do |k,v|
-                s += "<Item key='#{k}'>#{v}</Item>"
-              end
+                s.write "<Item key='#{k}'>#{v}</Item>"
+              end if coder.io.nil?
             end
-            s += "</Object>"
-            s
+            s.write "</Object>"
+            s.string if coder.io.nil?
           else
             coder.encodeContent(value)
           end
@@ -111,7 +111,7 @@ module Api
       tag.childNodes.each do |node|
         hash[node.attributes["key"]] = node.childNodes.first
       end
-      object.initWithCoder(Coder.new(hash))
+      object.initWithCoder(Coder.new(hash: hash))
     end
 
     def self.decodeWithCoder(tag, coder)
@@ -153,9 +153,11 @@ module Api
   end
 
   class Coder
+    attr_accessor :io
     attr_accessor :hash
-    def initialize(hash = {})
-      self.hash = hash
+    def initialize(args = {})
+      self.hash = args[:hash] || {}
+      self.io = args[:io]
     end
 
     def decodeObjectForKey(key)
@@ -163,46 +165,59 @@ module Api
     end
 
     def encodeObjectForKey(value, key)
-      s = encodeContent(value)
-      hash[key] = s
+      s = io || StringIO.new("")
+      s.write "<Item key='#{key}'>"
+      s.write (x = encodeContent(value))
+      s.write "</Item>"
+      hash[key] = x if io.nil?
     end
 
     def encodeContent(value)
-      case value.class.name
+      s = io || StringIO.new("")
+      x = case value.class.name
         when "String", "NSString"
           "<String>#{value}</String>".tap do |x|
-            puts x
+            s.write x
           end
+          s
         when "Array", "NSArray"
-          s = "<Array>"
+          s.write "<Array>"
           value.each_with_index do |val, index|
-            s += "<Item index='#{index}'>"
-            s += Archiver.encodeWithCoder(val, self)
-            s += "</Item>"
+            s.write "<Item index='#{index}'>"
+            s.write Archiver.encodeWithCoder(val, self)
+            s.write "</Item>"
           end
-          s += "</Array>"
+          s.write "</Array>"
           s
         when "Hash"
-          s = "<Hash>"
+          s.write "<Hash>"
           value.each do |key, val|
-            s += "<HashItem>"
-            s += "<Key>"
-            s += Archiver.encodeWithCoder(key, self)
-            s += "</Key><Value>"
-            s += Archiver.encodeWithCoder(val, self)
-            s += "</Value></HashItem>"
+            s.write "<HashItem>"
+            s.write "<Key>"
+            s.write Archiver.encodeWithCoder(key, self)
+            s.write "</Key><Value>"
+            s.write Archiver.encodeWithCoder(val, self)
+            s.write "</Value></HashItem>"
           end
-          s += "</Hash>"
+          s.write "</Hash>"
           s
-        when "Fixnum", "Number", "Float"
+        when "Fixnum", "Number", "Float", "Bignum"
           "<Number>#{value}</Number>".tap do |x|
-            puts x
+            s.write x
           end
+          s
         when "Boolean", "TrueClass", "FalseClass"
           "<Boolean>#{value.to_s == "true"}</Boolean>".tap do |x|
-            puts x
+            s.write x
           end
+          s
+        when "NilClass"
+          s
+        else
+          Archiver.encodeWithCoder(value, self)
       end
+      x.string if io.nil?
+
     end
 
     def [] key

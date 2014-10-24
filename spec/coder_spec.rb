@@ -160,6 +160,17 @@ describe Api::Archiver do
     val = Api::Archiver.encode(C::D.new)
     puts val
     obj = Api::Archiver.decode(val)
-
+    expect(obj).to be_a_kind_of C::D
+    expect(obj.at1).to eq(nil)
+  end
+  it "should with StringIO encode module classes" do
+    val = StringIO.new("")
+    x = C::D.new
+    x.at1 = obj1
+    Api::Archiver.encode(x, val)
+    val.rewind
+    obj = Api::Archiver.decode(val)
+    expect(obj).to be_a_kind_of C::D
+    expect(obj.at1).to be_a_kind_of A
   end
 end
