@@ -70,7 +70,6 @@ module Platform
       master = evd.data[:master]
       evd.return = switchMaster(master, api)
     rescue Exception => boom
-      self.masterController = oldMasterController
       evd.error = boom
     ensure
       uiEvents.postEvent("Main:Master:Init:return", evd)

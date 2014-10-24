@@ -57,7 +57,7 @@ describe Api::Archiver do
     end
   }
   let(:obj1lit) {
-    "<A id='70190458451860'><Item key='_imid_'><String>A:70190458451860</String></Item><Item key='__imr__'><Boolean>true</Boolean></Item><Item key='@at1'><Number>34</Number></Item><Item key='@at2'><String>Hello There!</String></Item></A>
+    "<Object class='A' id='70190458451860'><Item key='_imid_'><String>A:70190458451860</String></Item><Item key='__imr__'><Boolean>true</Boolean></Item><Item key='@at1'><Number>34</Number></Item><Item key='@at2'><String>Hello There!</String></Item></Object>
 "
   }
 

@@ -14,7 +14,7 @@ module Api
     @distance
       )
     end
-    def initWithCoder(decoder)
+    def initWithCoder1(decoder)
       self.id = decoder[:id]
       self.path = decoder[:path]
       self.projectedPath = decoder[:projectedPath]
@@ -25,7 +25,7 @@ module Api
       p boom.backtrace
     end
 
-    def encodeWithCoder(encoder)
+    def encodeWithCoder1(encoder)
       encoder[:id] = id
       encoder[:path] = path
       encoder[:projectedPath] = projectedPath

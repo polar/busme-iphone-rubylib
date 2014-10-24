@@ -5,7 +5,9 @@ module Platform
           if isWriteable?
             FileUtils.mkdir_p(directory)
             fn = File.join(directory, legalize(filename))
-            data = Api::Archiver.encode(store, File.open(fn, "w+"))
+            file = File.open(fn, "w+")
+            data = Api::Archiver.encode(store, file)
+            file.close
             #writeFile(data, fn)
             true
           end

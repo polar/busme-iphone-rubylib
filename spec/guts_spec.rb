@@ -39,7 +39,7 @@ describe Platform::Guts do
     api2.mock_answer = updateWithRoutes
     guts1.api.bgEvents.postEvent("JourneySync", Platform::JourneySyncEventData.new(isForce: true))
     guts1.api.bgEvents.roll
-    guts1.externalStorageController = Platform::XMLExternalStorageController.new(api: api2)
+    guts1.externalStorageController = Platform::XMLExternalStorageController.new(api: api2, directory: "/tmp")
     guts1.storageSerializerController = Platform::StorageSerializerController.new(api2,guts1.externalStorageController)
     guts1.storeMasterApi
     guts1
@@ -89,10 +89,11 @@ describe Platform::Guts do
   end
 
   it "after reinitialization xml should be able to get and save routes" do
+    guts3
     guts3.storeMasterApi
 
     guts3.reinitializeAPI(api: api, directory: "/tmp")
-    guts3.externalStorageController = Platform::XMLExternalStorageController.new(api: guts3.api)
+    guts3.externalStorageController = Platform::XMLExternalStorageController.new(api: guts3.api, directory: "/tmp")
     guts3.storageSerializerController = Platform::StorageSerializerController.new(guts3.api,guts3.externalStorageController)
     api.mock_answer = suGet
     guts3.getMasterApi

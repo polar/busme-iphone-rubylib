@@ -8,6 +8,7 @@ module Platform
 
     def initialize(args)
       self.masterController = args[:masterController]
+      self.directory = args[:directory] if args[:directory]
       self.api = args[:api]
       self.available = true
       self.writeable = true
