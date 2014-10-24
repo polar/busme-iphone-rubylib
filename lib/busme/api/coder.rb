@@ -21,7 +21,7 @@ module Api
 
     def initWithCoder(decoder)
       id = decoder["_imid_"]
-      puts "Retrieving #{id} #{self.class} #{self.propList}"
+      #puts "Retrieving #{id} #{self.class} #{self.propList}"
       x = IdentityMap.retrieve(id)
       if x.nil?
         x = self
@@ -46,12 +46,12 @@ module Api
       if IdentityMap.retrieve(id)
         encoder["_imid_"] = id
         encoder.setBool("__imr__", false)
-        puts "Storing #{id} for retrieval"
+       # puts "Storing #{id} for retrieval"
       else
         IdentityMap.store(self, id)
         encoder["_imid_"] = id
         encoder.setBool("__imr__", true)
-        puts "Storing #{id} ==> #{self.propList}"
+        #puts "Storing #{id} ==> #{self.propList}"
         self.propList.each do |x|
           val =  self.instance_variable_get(x)
           #puts " ==>  #{x} = #{val.inspect}"

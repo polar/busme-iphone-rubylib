@@ -15,12 +15,7 @@ module Platform
       def deserializeObjectFromFile(filename)
         if isAvailable?
           fn = File.join(directory, legalize(filename))
-          data = readData(fn)
-          if data
-            store = Api::Archiver.decode(data)
-            return store
-          end
-          nil
+          store = Api::Archiver.decode(File.open(fn))
         end
       end
   end

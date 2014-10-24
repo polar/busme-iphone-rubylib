@@ -179,6 +179,7 @@ module Platform
         # TODO: Do personal login information.
         journeyStore.preSerialize(api)
         storageSerializerController.cacheStorage(journeyStore, "#{api.buspass.slug}-Journeys.xml", api)
+        journeyStore.printContents
         journeyStore.postSerialize(api)
         markerStore.preSerialize(api)
         storageSerializerController.cacheStorage(markerStore, "#{api.buspass.slug}-Markers.xml", api)

@@ -68,5 +68,15 @@ module Platform
     def postSerialize(api)
       journeys.values.each {|x| x.postSerialize(api); x.journeyStore = self}
     end
+
+    def printContents
+      puts "JourneyStore(#{journeys.values.size} Journeys, #{patterns.size} Patterns)"
+      journeys.values.each do |x|
+        puts "#{x}"
+      end
+      patterns.values.each do |x|
+        puts "#{x}"
+      end
+    end
   end
 end
