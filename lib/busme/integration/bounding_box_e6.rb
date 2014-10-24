@@ -1,5 +1,6 @@
 module Integration
   class BoundingBoxE6
+    include Api::Encoding
     attr_accessor :northE6
     attr_accessor :eastE6
     attr_accessor :southE6

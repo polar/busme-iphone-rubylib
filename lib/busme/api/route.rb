@@ -1,5 +1,6 @@
 module Api
   class Route
+    include Encoding
     attr_accessor :busAPI
     attr_accessor :name
     attr_accessor :type
@@ -213,12 +214,12 @@ module Api
     end
 
     def isStartingJourney?(threshold = nil, time = nil)
-      threshold = busAPI.activeStartDisplayThreshold if threshold.nil?
+      threshold = busAPI.activeStartDisplayThreshold if threshold.nil? && busAPI
       time = Time.now if time.nil?
     end
 
     def isNotYetStartingJourney?
-      if isJourney?
+      if isJourney? && busAPI
         startMeasure = getStartingMeasure(busAPI.activeStartDisplayThreshold, Time.now)
         return startMeasure < 0.0
       end
@@ -387,6 +388,15 @@ module Api
     end
 
     def to_s
+      if busAPI.nil?
+        if isRouteDefinition?
+          s = "Route(#{code}, #{name}, pc=#{paths.size}, id=#{id}"
+        end
+        if isJourney?
+          s = "Journey(#{code}, #{name}, id=#{id}, ver=#{version}, patid=#{patternid}"
+        end
+        return s
+      end
       if isRouteDefinition?
         s = "Route(#{code}, #{name}, pc=#{paths.size}, id=#{id}"
       end

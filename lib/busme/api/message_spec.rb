@@ -1,5 +1,6 @@
 module Api
   class MessageSpec
+    include Encoding
     attr_accessor :id
     attr_accessor :version
     attr_accessor :expiryTime
@@ -9,7 +10,6 @@ module Api
     @id
     @version
     @expiryTime
-
       )
     end
     def initWithCoder1(decoder)

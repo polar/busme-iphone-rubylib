@@ -1,5 +1,6 @@
 module Integration
   class Path
+    include Api::Encoding
     attr_accessor :paths
 
     def propList

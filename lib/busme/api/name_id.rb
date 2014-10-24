@@ -1,5 +1,6 @@
 module Api
   class NameId
+    include Encoding
     attr_accessor :name
     attr_accessor :id
     attr_accessor :route_id

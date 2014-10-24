@@ -1,5 +1,6 @@
 module Integration
   class Point
+    include Api::Encoding
     attr_accessor :x
     attr_accessor :y
 

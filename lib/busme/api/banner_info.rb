@@ -1,5 +1,6 @@
 module Api
   class BannerInfo
+    include Encoding
     attr_accessor :id
     attr_accessor :point
     attr_accessor :version

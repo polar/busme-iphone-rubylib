@@ -1,5 +1,6 @@
 module Integration
   class Rect
+    include Api::Encoding
     attr_accessor :left
     attr_accessor :top
     attr_accessor :right

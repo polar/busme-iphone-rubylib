@@ -31,6 +31,19 @@ describe Platform::Guts do
     guts1.storeMasterApi
     guts1
   }
+  let (:guts3) {
+    guts1 = Platform::Guts.new(api: api2)
+    guts1.reinitializeAPI(api: api2, directory: "/tmp")
+    api2.mock_answer = suGet
+    guts1.getMasterApi
+    api2.mock_answer = updateWithRoutes
+    guts1.api.bgEvents.postEvent("JourneySync", Platform::JourneySyncEventData.new(isForce: true))
+    guts1.api.bgEvents.roll
+    guts1.externalStorageController = Platform::XMLExternalStorageController.new(api: api2)
+    guts1.storageSerializerController = Platform::StorageSerializerController.new(api2,guts1.externalStorageController)
+    guts1.storeMasterApi
+    guts1
+  }
   before {
     Dir.glob("/tmp/syracuse-university*.xml").each do |file|
       File.delete(file)
@@ -60,6 +73,12 @@ describe Platform::Guts do
     expect(File.exists?("/tmp/syracuse-university-journeys.xml"))
   end
 
+  it "should xml store routes" do
+    expect(!File.exists?("/tmp/syracuse-university-journeys.xml"))
+    guts3.storeMasterApi
+    expect(File.exists?("/tmp/syracuse-university-journeys.xml"))
+  end
+
   it "after reinitialization should be able to get and save routes" do
     guts2.storeMasterApi
 
@@ -67,5 +86,16 @@ describe Platform::Guts do
     api.mock_answer = suGet
     guts.getMasterApi
     expect(guts.journeyStore.getPattern("b2d03c4880f6d57b3b4edfa5aa9c9211")).to_not eq(nil)
+  end
+
+  it "after reinitialization xml should be able to get and save routes" do
+    guts3.storeMasterApi
+
+    guts3.reinitializeAPI(api: api, directory: "/tmp")
+    guts3.externalStorageController = Platform::XMLExternalStorageController.new(api: guts3.api)
+    guts3.storageSerializerController = Platform::StorageSerializerController.new(guts3.api,guts3.externalStorageController)
+    api.mock_answer = suGet
+    guts3.getMasterApi
+    expect(guts3.journeyStore.getPattern("b2d03c4880f6d57b3b4edfa5aa9c9211")).to_not eq(nil)
   end
 end

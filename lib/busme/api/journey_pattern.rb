@@ -1,5 +1,6 @@
 module Api
   class JourneyPattern
+    include Encoding
     attr_accessor :id
     attr_accessor :path
     attr_writer   :projectedPath

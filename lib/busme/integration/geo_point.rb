@@ -1,5 +1,6 @@
 module Integration
   class GeoPoint
+    include Api::Encoding
     DEG2RAD = (Math::PI / 180.0)
     LAT_PER_FOOT =  2.738129E-6
     LON_PER_FOOT = 2.738015E-6

@@ -2,6 +2,7 @@ unless defined?(Motion::Project::Config)
 
 require "httpclient"
 
+require "busme/api/coder"
 require "busme/iphone/rubylib/version"
 require "busme/api/banner_info"
 require "busme/api/name_id"
@@ -64,6 +65,7 @@ require "busme/platform/update_remote_invocation"
 require "busme/platform/bg_update_remote_invocation_event_controller"
 require "busme/platform/guts"
 require "busme/platform/external_storage_controller"
+require "busme/platform/xml_external_storage_controller"
 require "busme/platform/storage_serializer_controller"
 require "busme/platform/journey_sync_progress_events"
 require "busme/platform/fg_journey_sync_progress_event_controller"

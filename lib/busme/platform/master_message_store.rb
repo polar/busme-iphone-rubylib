@@ -1,5 +1,6 @@
 module Platform
   class MasterMessageStore
+    include Api::Storage
     attr_accessor :masterMessages
     attr_accessor :dirty
 
