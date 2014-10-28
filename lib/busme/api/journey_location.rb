@@ -14,8 +14,8 @@ module Api
 
     def loadParsedXMLTag(tag)
       self.id = tag.attributes["id"]
-      self.lat = tag.attributes["lat"].to_f * 1E6
-      self.lon = tag.attributes["lon"].to_f * 1E6
+      self.lat = tag.attributes["lat"].to_f
+      self.lon = tag.attributes["lon"].to_f
       self.dir = tag.attributes["dir"].to_f
       self.reported = tag.attributes["reported"] == "true"
       self.reported_time = Time.at(tag.attributes["reported_time"].to_i)

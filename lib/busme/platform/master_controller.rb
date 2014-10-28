@@ -73,18 +73,16 @@ module Platform
       self.api = args.delete :api
       self.master = args.delete :master
       self.mainController = args.delete :mainController
-      self.directory = mainController.directory
+      self.directory = args[:directory] || mainController.directory
       assignStorageSerializerControllers
       assignComponents
       assignBackgroundControllers
       assignForegroundControllers
 
-      mainController.bgEvents.registerForEvent("Master:init", self)
       api.bgEvents.registerForEvent("Master:init", self)
     end
 
     def unregisterForEvents
-      mainController.bgEvents.unregisterForEvent("Master:init", self)
       api.bgEvents.unregisterForEvent("Master:init", self)
     end
 
@@ -102,7 +100,6 @@ module Platform
     rescue Exception => boom
       evd.error = boom
     ensure
-      mainController.uiEvents.postEvent("Master:Init:return", evd)
       api.uiEvents.postEvent("Master:Init:return", evd)
     end
 
@@ -143,7 +140,9 @@ module Platform
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
       self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)
-      self.bgUpdateRemoteInvocationEventController = BG_UpdateRemoteInvocationEventController.new(api, updateRemoteInvocation)
+      self.bgUpdateRemoteInvocationEventController =
+          BG_UpdateRemoteInvocationEventController.new(
+              masterController: self, updateRemoteInvocation: updateRemoteInvocation)
 
       self.bgBannerMessageEventController = BG_BannerMessageEventController.new(api)
       self.bgMarkerMessageEventController = BG_MarkerMessageEventController.new(api)
@@ -187,6 +186,7 @@ module Platform
         masterMessageStore.preSerialize(api)
         storageSerializerController.cacheStorage(masterMessageStore, "#{api.buspass.slug}-Messages.xml", api)
         masterMessageStore.postSerialize(api)
+        puts "MasterController.storeMaster: DONE"
       else
         puts "MasterController.storeMaster: API not ready"
       end

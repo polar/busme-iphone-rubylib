@@ -25,7 +25,7 @@ module Api
       self.ready = false
       self.activeStartDisplayThreshold = 10 * 60 # minutes
       self.busmeAppVersionString = "#{self.platformName} #{self.appVersion}"
-      self.uiEvents = BuspassEventDistributor.new(name: "UIEvemts:#{master_slug}")
+      self.uiEvents = BuspassEventDistributor.new(name: "UIEvents:#{master_slug}")
       self.bgEvents = BuspassEventDistributor.new(name: "BGEvents:#{master_slug}")
       self.loginManager = LoginManager.new(self)
     end

@@ -4,8 +4,11 @@ module Platform
     attr_accessor :isForced
     attr_accessor :syncProgressListener
     def initialize(args)
+      puts "JourneySyncEventData #{args.inspect}"
       self.isForced = args[:isForced]
       self.syncProgressListener = args[:syncProgressListener]
+      puts "JourneySyncEventData Done"
+      self
     end
   end
 

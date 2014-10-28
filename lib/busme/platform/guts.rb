@@ -89,7 +89,8 @@ module Platform
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
 
       self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)
-      self.bgUpdateRemoteInvocationEventController = BG_UpdateRemoteInvocationEventController.new(api, updateRemoteInvocation)
+      self.bgUpdateRemoteInvocationEventController =
+          BG_UpdateRemoteInvocationEventController.new(api: api, updateRemoteInvocation: updateRemoteInvocation)
       self.bgBannerMessageEventController = BG_BannerMessageEventController.new(api)
       self.bgMarkerMessageEventController = BG_MarkerMessageEventController.new(api)
       self.bgMasterMessageEventController = BG_MasterMessageEventController.new(api)
@@ -150,7 +151,8 @@ module Platform
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
 
       self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)
-      self.bgUpdateRemoteInvocationEventController = BG_UpdateRemoteInvocationEventController.new(api, updateRemoteInvocation)
+      self.bgUpdateRemoteInvocationEventController = BG_UpdateRemoteInvocationEventController.new(
+          api: api, updateRemoteInvocation: updateRemoteInvocation, masterController: self)
       self.bgBannerMessageEventController = BG_BannerMessageEventController.new(api)
       self.bgMarkerMessageEventController = BG_MarkerMessageEventController.new(api)
       self.bgMasterMessageEventController = BG_MasterMessageEventController.new(api)

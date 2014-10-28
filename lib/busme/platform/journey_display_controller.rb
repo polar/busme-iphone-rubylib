@@ -10,6 +10,12 @@ module Platform
     attr_accessor :id
   end
 
+  class JourneyLocationUpdateEventData
+    attr_accessor :journeyDisplay
+    attr_accessor :newLocation
+    attr_accessor :oldLocation
+  end
+
   class JourneyDisplayController
     attr_accessor :api
     attr_accessor :journeyBasket
@@ -55,7 +61,7 @@ module Platform
     def onJourneyAdded(basket, route)
       newRoute = JourneyDisplay.new(self, route)
       self.journeyDisplays << newRoute
-      puts "#{self}:onJourneyAdded #{route.name} #{route.direction} - #{journeyDisplays.length} JourneyDisplays"
+      puts "#{self}:onJourneyAdded #{route.id} #{route.name} #{route.direction} - #{journeyDisplays.length} JourneyDisplays"
       journeyDisplayMap[newRoute.route.id] = newRoute
       onJourneyDisplayAddedListener.onJourneyDisplayAdded(newRoute) if onJourneyDisplayAddedListener
       presentJourneyDisplay(newRoute)
@@ -88,13 +94,18 @@ module Platform
 
     def onLocationUpdate(route, locations)
       jd = journeyDisplayMap[route.id]
+      eventData = JourneyLocationUpdateEventData.new
+      eventData.journeyDisplay = jd
+      eventData.newLocation = locations[0]
+      eventData.oldLocation = locations[1]
+      api.uiEvents.postEvent("JourneyLocationUpdate", eventData)
     end
 
     def presentJourneyDisplay(journey_display)
       eventData = JourneyAddedData.new
       eventData.journeyDisplay = journey_display
       eventData.journeyDisplayController = self
-      api.uiEvents.postEvent("JourneyAdded", eventData)
+     # api.uiEvents.postEvent("JourneyAdded", eventData)
     end
 
     def abandonJourneyDisplay(journey_display)

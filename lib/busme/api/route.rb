@@ -151,10 +151,13 @@ module Api
       p boom.backtrace
     end
     def preSerialize(api)
-      self.busAPI = nil
-      self.journeyStore = nil
-      @paths = nil
-      @projectedPaths = nil
+      # We no longer use YAML so we don't serialize these properties.
+      # Doing this was interfering with iPhone concurrent access.
+      # giving nil pointer errors accessing journeyStore.
+      #self.busAPI = nil
+      #self.journeyStore = nil
+      #@paths = nil
+      #@projectedPaths = nil
     end
 
     def postSerialize(api)

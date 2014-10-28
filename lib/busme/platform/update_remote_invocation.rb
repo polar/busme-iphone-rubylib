@@ -1,5 +1,6 @@
 module Platform
 
+
   class UpdateRemoteInvocation < Api::RemoteInvocation
 
     def initialize(guts)
