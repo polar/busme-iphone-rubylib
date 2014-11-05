@@ -55,6 +55,30 @@ module Platform
       journeyDisplayController.getJourneyDisplays
     end
 
+    def getCurrentState
+      stateStack.peek()
+    end
+
+    def setNearByState(nearby)
+      puts( "setNearByState")
+      newState = VisualState.new
+      newState.nearBy = nearby
+      newState.onlyActive = stateStack.peek().onlyActive
+      self.stateStack = Utils::Stack.new
+      stateStack.push(newState)
+      setVisibility(newState)
+    end
+
+    def setOnlyActiveState(active)
+      puts( "setOnlyActive")
+      newState = VisualState.new
+      newState.onlyActive = active
+      newState.nearBy = stateStack.peek().nearBy
+      self.stateStack = Utils::Stack.new
+      stateStack.push(newState)
+      setVisibility(newState)
+    end
+
     #
     # Called from JourneyDisplayController
     #

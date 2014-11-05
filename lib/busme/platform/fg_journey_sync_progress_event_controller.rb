@@ -11,6 +11,8 @@ module Platform
     end
 
     def onBuspassEvent(event)
+      puts "#{self}: onBuspassEvent(#{event.eventName})"
+      puts " onBupassEvent make Array #{[]}"
       eventData = event.eventData
       case eventData.action
         when P_BEGIN
@@ -28,6 +30,8 @@ module Platform
         when P_IOERROR
           onIOError(eventData)
       end
+      puts "#onBuspassEvent end(#{event.eventName})"
+      puts "#onBupassEvent end make Array #{[]}"
     end
 
     def present(eventData)

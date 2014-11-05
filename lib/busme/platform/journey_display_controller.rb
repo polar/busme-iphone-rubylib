@@ -105,7 +105,7 @@ module Platform
       eventData = JourneyAddedData.new
       eventData.journeyDisplay = journey_display
       eventData.journeyDisplayController = self
-     # api.uiEvents.postEvent("JourneyAdded", eventData)
+      api.uiEvents.postEvent("JourneyAdded", eventData)
     end
 
     def abandonJourneyDisplay(journey_display)

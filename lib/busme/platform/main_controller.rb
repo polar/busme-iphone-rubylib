@@ -16,6 +16,7 @@ module Platform
   end
 
   class MainController
+    attr_accessor :busmeConfigurator
     attr_accessor :directory
     attr_accessor :discoverApi
     attr_accessor :masterApi
@@ -23,24 +24,47 @@ module Platform
     attr_accessor :uiEvents
     attr_accessor :masterController
     attr_accessor :discoverController
+    attr_accessor :loginManager
 
     def initialize(args = {})
       self.directory = args[:directory]
+      self.busmeConfigurator = args[:busmeConfigurator] || BusmeConfigurator.new
 
       self.bgEvents = Api::BuspassEventDistributor.new(:name => "BGEvents:Main")
       self.uiEvents = Api::BuspassEventDistributor.new(:name => "UIEvents:Main")
 
+      bgEvents.registerForEvent("Main:init", self)
       bgEvents.registerForEvent("Main:Discover:init", self)
       bgEvents.registerForEvent("Main:Master:init", self)
     end
 
     def onBuspassEvent(event)
       case event.eventName
+        when "Main:init"
+          onInitEvent(event)
         when "Main:Discover:init"
           onDiscoverInitEvent(event)
         when "Main:Master:init"
           onMasterInitEvent(event)
       end
+    end
+
+    def onInitEvent(event)
+      evd = event.eventData
+      evd.controller = self
+      defaultMaster = busmeConfigurator.getDefaultMaster()
+      if defaultMaster
+        evd.data = { :master => defaultMaster }
+        evd.return = "defaultMaster"
+      else
+        location = busmeConfigurator.getLastLocation()
+        evd.data = { lastLocation: location }
+        evd.return = "discover"
+      end
+    rescue Exception => boom
+      evd.error = boom
+    ensure
+      uiEvents.postEvent("Main:Init:return", evd)
     end
 
     def onDiscoverInitEvent(event)
@@ -68,14 +92,15 @@ module Platform
       evd.controller = self
       api = evd.data[:masterApi]
       master = evd.data[:master]
-      evd.return = switchMaster(master, api)
+      saveAsDefault = evd.data[:saveAsDefault]
+      evd.return = switchMaster(master, api, saveAsDefault)
     rescue Exception => boom
       evd.error = boom
     ensure
       uiEvents.postEvent("Main:Master:Init:return", evd)
     end
 
-    def switchMaster(master, api)
+    def switchMaster(master, api, saveAsDefault)
       oldMasterController = masterController
       if oldMasterController
         oldMasterController.storeMaster
@@ -86,6 +111,9 @@ module Platform
         if oldMasterController
           oldMasterController.unregisterForEvents
         end
+        if saveAsDefault
+          busmeConfigurator.saveAsDefaultMaster(master)
+        end
       end
       masterController
     rescue Exception => boom
@@ -94,8 +122,13 @@ module Platform
     end
 
     def instantiateMasterController(args)
-      MasterController.new(api: api, master: master, mainController: self)
+      api = args[:api]
+      master = args[:master]
+      controller = args[:mainController] || self
+      MasterController.new(api: api, master: master, mainController: controller)
     end
+
+
 
   end
 end

@@ -3,6 +3,18 @@ require "test_http_client"
 require 'test_foreground'
 
 describe Platform::MainController do
+  let(:defaultMaster) {
+    master = Api::Master.new
+    master.name = "Lake Shore Limited Amtrak"
+    master.slug = "lake-shore-limited-amtrak"
+    master.lon = "-77.317205"
+    master.lat = "41.612683"
+    master.bbox = [-87.639359,43.20031,-73.738298,40.75041]
+    master.apiUrl = "http://busme-apis.herokuapp.com/masters/512e7ea39f9501000e0000d0/apis/1/get"
+    master.title = "Lake Shore Limited Amtrak"
+    master.description = "The Amtrak Train between New York and Chicago"
+    master
+  }
   let(:httpClient) {
     Testlib::MyHttpClient.new(TestHttpClient.new)
   }
@@ -17,7 +29,7 @@ describe Platform::MainController do
   }
   let (:testForeground) {
     # We list only the events that we care about in this spec
-    TestForeground.new(mainController, ["Main:Discover:Init:return", "Main:Master:Init:return", "Master:Init:return", "Search:Find:return"])
+    TestForeground.new(mainController, ["Main:Init:return", "Main:Discover:Init:return", "Main:Master:Init:return", "Master:Init:return", "Search:Find:return"])
   }
   let (:discoverGet) {
     fileName = File.join("spec", "test_data", "CNYDiscoverGet.xml")
@@ -118,5 +130,41 @@ describe Platform::MainController do
     expect(event.eventName).to eq("Master:Init:return")
     mainController.uiEvents.roll
     expect(testForeground.lastEvent.eventData.return).to eq(true)
+  end
+
+  it "should get a discover for initial start" do
+    mainController.bgEvents.postEvent("Main:init", Platform::MainEventData.new(data:{}))
+    mainController.bgEvents.roll
+    event = mainController.uiEvents.peek
+    expect(event.eventName).to eq("Main:Init:return")
+    expect(event.eventData).to_not be nil
+    expect(event.eventData.return).to eq("discover")
+  end
+
+  it "should get a discover with LastLocation for initial start" do
+    lastLocation = Integration::GeoPoint.new(43.0, -76.0)
+    mainController.busmeConfigurator.setLastLocation(lastLocation)
+    mainController.bgEvents.postEvent("Main:init", Platform::MainEventData.new(data:{}))
+    mainController.bgEvents.roll
+    event = mainController.uiEvents.peek
+    expect(event.eventName).to eq("Main:Init:return")
+    expect(event.eventData).to_not be nil
+    expect(event.eventData.return).to eq("discover")
+    expect(event.eventData.data[:lastLocation]).to_not eq(nil)
+    loc = event.eventData.data[:lastLocation]
+    expect Platform::GeoCalc.equalCoordinates(loc, lastLocation)
+  end
+
+  it "should get a master for initial start" do
+    mainController.busmeConfigurator.setDefaultMaster(defaultMaster)
+    mainController.bgEvents.postEvent("Main:init", Platform::MainEventData.new(data:{}))
+    mainController.bgEvents.roll
+    event = mainController.uiEvents.peek
+    expect(event.eventName).to eq("Main:Init:return")
+    expect(event.eventData).to_not be nil
+    expect(event.eventData.return).to eq("defaultMaster")
+    expect(event.eventData.data[:master].apiUrl).to eq(defaultMaster.apiUrl)
+    expect(event.eventData.data[:master].slug).to eq(defaultMaster.slug)
+    expect(event.eventData.data[:master].title).to eq(defaultMaster.title)
   end
 end

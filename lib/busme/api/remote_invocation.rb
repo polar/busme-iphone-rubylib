@@ -75,11 +75,14 @@ module Api
 
     def makeRequestAndParseResponse(requestURL, parameters)
       resp = api.postURLResponse(requestURL, parameters)
-      status = resp.getStatusLine().statusCode
-      entity = resp.getEntity()
       tag = nil
-      if status == 200
-        tag = api.xmlParse(entity)
+      if resp
+        status = resp.getStatusLine().statusCode
+        entity = resp.getEntity()
+        tag = nil
+        if status == 200
+          tag = api.xmlParse(entity)
+        end
       end
       tag
     end

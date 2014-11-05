@@ -7,6 +7,7 @@ module Api
     attr_accessor :id
     attr_accessor :code
     attr_accessor :direction
+    attr_accessor :distance
     attr_accessor :vid
     attr_accessor :workingVid
     attr_accessor :timeless
@@ -23,6 +24,7 @@ module Api
     attr_accessor :endTime
     attr_accessor :schedStartTime
     attr_accessor :actualStartTime
+    attr_accessor :routeid
     attr_accessor :patternid
     attr_accessor :patternids
     attr_accessor :lastKnownLocation
@@ -44,6 +46,7 @@ module Api
     @id
     @code
     @direction
+    @distance
     @vid
     @workingVid
     @timeless
@@ -60,6 +63,7 @@ module Api
     @endTime
     @schedStartTime
     @actualStartTime
+    @routeid
     @patternid
     @patternids
     @lastKnownLocation
@@ -80,6 +84,7 @@ module Api
       self.id = decoder[:id]
       self.code = decoder[:code]
       self.direction = decoder[:direction]
+      self.distance = decoder[:distance]
       self.vid = decoder[:vid]
       self.workingVid = decoder[:workingVid]
       self.timeless = decoder[:timeless]
@@ -96,6 +101,7 @@ module Api
       self.endTime = decoder[:endTime]
       self.schedStartTime = decoder[:schedStartTime]
       self.actualStartTime = decoder[:actualStartTime]
+      self.routeid = decoder[:routeid]
       self.patternid = decoder[:patternid]
       self.patternids = decoder[:patternids]
       self.lastKnownLocation = decoder[:lastKnownLocation]
@@ -119,6 +125,7 @@ module Api
       encoder[:id] = id
       encoder[:code] = code
       encoder[:direction] = direction
+      encoder[:distance] = distance
       encoder[:vid] = vid
       encoder[:workingVid] = workingVid
       encoder[:timeless] = timeless
@@ -136,6 +143,7 @@ module Api
       encoder[:schedStartTime] = schedStartTime
       encoder[:actualStartTime] = actualStartTime
       encoder[:patternid] = patternid
+      encoder[:routeid] = routeid
       encoder[:patternids] = patternids
       encoder[:lastKnownLocation] = lastKnownLocation
       encoder[:lastKnownTime] = lastKnownTime
@@ -372,8 +380,10 @@ module Api
       self.id = tag.attributes["id"]
       self.name = tag.attributes["name"]
       self.direction = tag.attributes["dir"]
+      self.distance = tag.attributes["distance"].to_f if tag.attributes[:distance]
       self.code = tag.attributes["routeCode"]
       self.version = tag.attributes["version"].to_i
+      self.routeid = tag.attributes["routeid"]
       self.patternid = tag.attributes["patternid"]
       self.vid = tag.attributes["vid"]
       self.duration = tag.attributes["duration"].to_f
@@ -388,6 +398,19 @@ module Api
       self.timeless = tag.attributes["timeless"]
       self.startOffset = tag.attributes["startOffset"].to_f
       self.patternids = tag.attributes["patternids"].split(",") if tag.attributes["patternids"]
+      valid? && self
+    end
+
+    def valid?
+      val = (id && name && code && version && sort && nw_lon && nw_lat && se_lon && se_lat)
+      case type
+        when "journey"
+          val && routeid && distance && direction && patternid && duration && startOffset
+        when "route"
+          val && patternids && !patternids.empty?
+        when "pattern"
+          val
+      end
     end
 
     def to_s

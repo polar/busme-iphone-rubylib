@@ -405,8 +405,12 @@ module Api
             tag = xmlParse(entity)
             if tag
               route = Api::Route.new
-              route.loadParsedXML(tag)
-              return route
+              route = route.loadParsedXML(tag)
+              if route
+                return route
+              else
+                puts "getRouteDefinition(#{url}) definition was not valid."
+              end
             else
               puts "getRouteDefinition(#{url}) did not parse"
             end
