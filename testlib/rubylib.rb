@@ -112,6 +112,7 @@ require "busme/utils/path_utils"
 require "busme/utils/priority_queue"
 require "busme/utils/queue"
 require "busme/utils/stack"
+require "busme/utils/time"
 require "rexml/document"
 require "yaml"
 end

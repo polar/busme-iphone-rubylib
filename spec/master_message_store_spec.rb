@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Platform::MasterMessageStore do
-  let(:time_now) { Time.now }
+  let(:time_now) { Utils::Time.current }
   let(:store) { Platform::MasterMessageStore.new }
   let(:msg1) do
     m = Api::MasterMessage.new("1")

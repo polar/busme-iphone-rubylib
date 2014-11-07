@@ -22,7 +22,7 @@ module Platform
     end
 
     def onLocationUpdate(location, time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       point = location ? GeoCalc.toGeoPoint(location) : nil
       for marker in markerStore.markers.values do
         if marker.is_a? Api::MarkerInfo

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Api::MarkerInfo do
 
-  let(:time_now) { Time.now }
+  let(:time_now) { Utils::Time.current }
   let(:expiryTime) { time_now + 600 }
   let(:msg) {
     "<Marker expiryTime='#{expiryTime.to_i}'

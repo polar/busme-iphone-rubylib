@@ -58,34 +58,34 @@ module Platform
 
     def onBegin(isForced)
       self.eventData = JourneySyncProgressEventData.new
-      eventData.beginTime = Time.now
+      eventData.beginTime = Utils::Time.current
       eventData.isForced = isForced
       api.uiEvents.postEvent("JourneySyncProgress", eventData.dup)
     end
 
     def onSyncStart
       eventData.action = P_SYNC_START
-      eventData.syncStartTime = Time.now
+      eventData.syncStartTime = Utils::Time.current
       api.uiEvents.postEvent("JourneySyncProgress", eventData.dup)
     end
 
     def onSyncEnd(nRoutes)
       eventData.action = P_SYNC_END
-      eventData.syncEndTime = Time.now
+      eventData.syncEndTime = Utils::Time.current
       eventData.nRoutes = nRoutes
       api.uiEvents.postEvent("JourneySyncProgress", eventData.dup)
     end
 
     def onRouteStart(iRoute)
       eventData.action = P_ROUTE_START
-      eventData.routeTimes[iRoute] = {:start => Time.now}
+      eventData.routeTimes[iRoute] = {:start => Utils::Time.current}
       eventData.iRoute = iRoute
       api.uiEvents.postEvent("JourneySyncProgress", eventData.dup)
     end
 
     def onRouteEnd(iRoute)
       eventData.action = P_ROUTE_END
-      eventData.routeTimes[iRoute].merge(:end => Time.now)
+      eventData.routeTimes[iRoute].merge(:end => Utils::Time.current)
       eventData.iRoute = iRoute
       api.uiEvents.postEvent("JourneySyncProgress", eventData.dup)
     end
@@ -98,7 +98,7 @@ module Platform
 
     def onDone
       eventData.action = P_DONE
-      eventData.endTime = Time.now
+      eventData.endTime = Utils::Time.current
       api.uiEvents.postEvent("JourneySyncProgress", eventData.dup)
     end
   end

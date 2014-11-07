@@ -198,6 +198,8 @@ module Platform
     def setJourneys(js)
       self.journeys = js
       updateJourneyMap
+      puts "JourneyBasket:setJourneys:"
+      self.journeys.each {|x| puts "#{x.name} #{x.id}"}
     end
 
     def updateJourneyMap

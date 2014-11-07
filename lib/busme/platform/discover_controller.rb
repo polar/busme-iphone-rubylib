@@ -85,7 +85,7 @@ module Platform
     def onSearchSelectEvent(event)
       evd = event.eventData
       evd.controller = self
-      evd.return = mainController.switchMaster(evd.data[:master], evd.data[:masterApi])
+      evd.return = mainController.switchMaster(evd.data[:master], evd.data[:masterApi], evd.data[:saveAsDefault])
     rescue Exception => boom
       evd.error = boom
     ensure

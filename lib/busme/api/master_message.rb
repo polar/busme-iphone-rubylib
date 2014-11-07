@@ -90,7 +90,7 @@ module Api
       self.loaded = false
       self.seen = false
       self.remindPeriod = 1000*60*60*24*7
-      self.expiryTime = Time.now + 1000*60*60*24
+      self.expiryTime = Utils::Time.current + 1000*60*60*24
       self.content = "No Content"
       self.title = "No Title"
     end
@@ -122,7 +122,7 @@ module Api
     # disposed of by the controller. If it has a later remindTime that will be sorted
     # appropriately.
     def nextTime(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       if time < expiryTime
         if !seen
           time
@@ -139,7 +139,7 @@ module Api
     end
 
     def reset(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       self.seen = false
       self.lastSeen = nil
       self.displayed = false

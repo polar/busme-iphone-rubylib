@@ -25,8 +25,8 @@ describe Api::NameId do
   end
 
   it "should parse complex Journey name id with start times" do
-    time1 = Time.now
-    time2 = Time.now + 3
+    time1 = Utils::Time.current
+    time2 = Utils::Time.current + 3
 
     nameid = Api::NameId.new(["Name", "1", "V ", "340 ", "100 ", "#{time1.to_i}", "#{time2.to_i}"])
     expect(nameid.name).to eq("Name", )

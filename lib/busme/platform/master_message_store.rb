@@ -46,14 +46,14 @@ module Platform
     end
 
     def resetMessages(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       masterMessages.reject {|x| x.is_a?(Api::MessageSpec) && !x.is_a?(Api::MasterMessage)}
       masterMessages.each {|x| x.reset(time)}
       self.dirty = true
     end
 
     def clean(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       masterMessages.values.each do |msg|
         if msg.expiryTime < time
           masterMessages.delete(msg.id)

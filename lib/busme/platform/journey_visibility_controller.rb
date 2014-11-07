@@ -55,6 +55,10 @@ module Platform
       journeyDisplayController.getJourneyDisplays
     end
 
+    def getSortedJourneyDisplays
+      journeyDisplays.sort {|x, y| x.compareTo(y) }
+    end
+
     def getCurrentState
       stateStack.peek()
     end
@@ -235,6 +239,10 @@ module Platform
       return true
     end
 
+    def onRouteSelected(journeyDisplay)
+      onRouteCodeSelected(journeyDisplay.route.code)
+    end
+
     #
     # Called when User selects a route for filtering
     # Moves to the S_ROUTE state
@@ -355,15 +363,20 @@ module Platform
             setVisibilityJourneyDisplay(state, display)
           end
         when VisualState::S_VEHICLE
+          selectedRouteDef = nil
           for display in journeyDisplays
+            if selectedRouteDef && selectedRouteDef == display
+              # already set
+              next
+            end
             if state.selectedRoute == display
               if display.route.isJourney?
                 display.nameVisible = true
                 display.pathVisible = true
-                routeDisplay = display.getRouteDefinition
-                if routeDisplay
-                  routeDisplay.nameVisible = true
-                  routeDisplay.pathVisible = false
+                selectedRouteDef = display.getRouteDefinition
+                if selectedRouteDef
+                  selectedRouteDef.nameVisible = true
+                  selectedRouteDef.pathVisible = false
                 end
               end
             else

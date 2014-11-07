@@ -102,7 +102,7 @@ module Api
     # disposed of by the controller. If it has a later remindTime that will be sorted
     # appropriately.
     def nextTime(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       if time < expiryTime
         if remindable && remindTime
           remindTime
@@ -115,7 +115,7 @@ module Api
     end
 
     def reset(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       self.seen = false
       self.lastSeen = nil
       self.displayed = false

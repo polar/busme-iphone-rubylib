@@ -114,13 +114,13 @@ module Api
     end
 
     def onDisplay(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       self.beginSeen = time
       self.displayed = true
     end
 
     def onDismiss(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       self.lastSeen = time
       self.beginSeen = nil
       self.displayed = false
@@ -138,7 +138,7 @@ module Api
     end
 
     def setLastSeenNow
-      self.lastSeen = Time.now
+      self.lastSeen = Utils::Time.current
     end
 
     def isDisplayTimeExpired?(time)

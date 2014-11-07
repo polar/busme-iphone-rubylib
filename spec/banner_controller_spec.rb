@@ -3,7 +3,7 @@ require "test_banner_controller"
 
 describe Platform::BannerPresentationController do
 
-  let(:time_now)  { Time.now }
+  let(:time_now)  { Utils::Time.current }
   let(:controller) { TestBannerController.new(nil) }
   let(:banner1) do
     now = time_now

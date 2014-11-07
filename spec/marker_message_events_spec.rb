@@ -17,7 +17,7 @@ class TestFGMarkerMessageEventController < Platform::FG_MarkerMessageEventContro
 end
 
 describe Platform::MarkerMessageEventData do
-  let (:time_now) {Time.now}
+  let (:time_now) {Utils::Time.current}
   let (:suGet) {
     fileName = File.join("spec", "test_data", "SUGet.xml");
     TestHttpMessage.new(200, "OK", File.read(fileName))
@@ -134,7 +134,7 @@ describe Platform::MarkerMessageEventData do
 
   it "1 should interact with basket and be removed" do
     markerBasket.addMarker(markerInfo)
-    markerBasket.onLocationUpdate(location1, Time.now)
+    markerBasket.onLocationUpdate(location1, Utils::Time.current)
     # Foreground Thread
     markerController.roll()
     expect(markerInfo.displayed).to eq(true)
@@ -156,7 +156,7 @@ describe Platform::MarkerMessageEventData do
 
   it "2 should interact with basket and be removed, but reminded" do
     markerBasket.addMarker(markerInfo)
-    markerBasket.onLocationUpdate(location1, Time.now)
+    markerBasket.onLocationUpdate(location1, Utils::Time.current)
     # Foreground Thread
     markerController.roll()
     expect(markerInfo.displayed).to eq(true)
@@ -178,7 +178,7 @@ describe Platform::MarkerMessageEventData do
 
   it "should remain when canceled" do
     markerBasket.addMarker(markerInfo)
-    markerBasket.onLocationUpdate(location1, Time.now)
+    markerBasket.onLocationUpdate(location1, Utils::Time.current)
     # Foreground Thread
     markerController.roll()
     expect(markerInfo.displayed).to eq(true)

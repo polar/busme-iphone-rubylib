@@ -5,9 +5,11 @@ require 'test_foreground'
 class TestMainController < Platform::MainController
   attr_accessor :switched
   attr_accessor :switched_master
-  def switchMaster(master, api)
+  attr_accessor :saveAsDefault
+  def switchMaster(master, api, saveAdDefault)
     self.switched_master = master
     self.switched = api
+    self.saveAsDefault = saveAsDefault
   end
 end
 
@@ -30,7 +32,7 @@ describe Platform::MasterController do
     TestHttpMessage.new(200, "OK", File.read(fileName))
   }
   let (:testForeground) {
-    TestForeground.new(mainController, ["Master:Init:return"])
+    TestForeground.new(masterController.api, ["Master:Init:return"])
   }
   before {
     mainController
@@ -40,8 +42,8 @@ describe Platform::MasterController do
 
   it "should do a get" do
     httpClient.mock_answer = suGet
-    mainController.bgEvents.postEvent("Master:init", Platform::MasterEventData.new())
-    mainController.bgEvents.roll
+    masterController.api.bgEvents.postEvent("Master:init", Platform::MasterEventData.new())
+    masterController.api.bgEvents.roll
     expect(api.ready).to be(true)
     # Since the version is nothing, we should get an upgrade message
     expect(api.buspass.initialMessages).to_not be(nil)
@@ -51,11 +53,11 @@ describe Platform::MasterController do
 
   it "should return a UI event after a get" do
     httpClient.mock_answer = suGet
-    mainController.bgEvents.postEvent("Master:init", Platform::MasterEventData.new())
-    mainController.bgEvents.roll
-    event = mainController.uiEvents.peek
+    masterController.api.bgEvents.postEvent("Master:init", Platform::MasterEventData.new())
+    masterController.api.bgEvents.roll
+    event = masterController.api.uiEvents.peek
     expect(event.eventName).to eq("Master:Init:return")
-    mainController.uiEvents.roll
+    masterController.api.uiEvents.roll
     expect(testForeground.lastEvent.eventData.return).to eq(true)
   end
 end

@@ -226,12 +226,17 @@ module Api
 
     def isStartingJourney?(threshold = nil, time = nil)
       threshold = busAPI.activeStartDisplayThreshold if threshold.nil? && busAPI
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
+      if isJourney? && busAPI
+        startMeasure = getStartingMeasure(busAPI.activeStartDisplayThreshold, Utils::Time.current)
+        return 0.0 < startMeasure && startMeasure < 1.0
+      end
+      return false
     end
 
     def isNotYetStartingJourney?
       if isJourney? && busAPI
-        startMeasure = getStartingMeasure(busAPI.activeStartDisplayThreshold, Time.now)
+        startMeasure = getStartingMeasure(busAPI.activeStartDisplayThreshold, Utils::Time.current)
         return startMeasure < 0.0
       end
       false
@@ -246,7 +251,7 @@ module Api
       if schedStartTime
         Time.at(schedStartTime)
       else
-        Time.parse("0:00") + startOffset * 60
+        Utils::Time.parseTimeInZone("0:00", timeZone) + startOffset * 60
       end
 
     end
@@ -345,8 +350,9 @@ module Api
 
     def getStartingMeasure(threshold = nil, time = nil)
       threshold = busAPI.activeStartDisplayThreshold if threshold.nil?
-      time = Time.now if time.nil?
-      timediff = getStartTime - time;
+      time = Utils::Time.current if time.nil?
+      startTime = getStartTime
+      timediff = (time - startTime) * 1000 # time in seconds, threshold in millis
       ret = 1.0
       diff = 0
       distance = -1
@@ -380,7 +386,7 @@ module Api
       self.id = tag.attributes["id"]
       self.name = tag.attributes["name"]
       self.direction = tag.attributes["dir"]
-      self.distance = tag.attributes["distance"].to_f if tag.attributes[:distance]
+      self.distance = tag.attributes["distance"].to_f if tag.attributes["distance"]
       self.code = tag.attributes["routeCode"]
       self.version = tag.attributes["version"].to_i
       self.routeid = tag.attributes["routeid"]
@@ -389,7 +395,7 @@ module Api
       self.duration = tag.attributes["duration"].to_f
       self.sort = tag.attributes["sort"].to_f
       self.locationRefreshRate = tag.attributes["locationRefreshRate"]
-      self.timeZone = tag.attributes["timeZone"]
+      self.timeZone = tag.attributes["time_zone"]
       self.schedStartTime = tag.attributes["schedStartTime"]
       self.nw_lon = tag.attributes["nw_lon"]
       self.nw_lat = tag.attributes["nw_lat"]
@@ -398,18 +404,26 @@ module Api
       self.timeless = tag.attributes["timeless"]
       self.startOffset = tag.attributes["startOffset"].to_f
       self.patternids = tag.attributes["patternids"].split(",") if tag.attributes["patternids"]
-      valid? && self
+      valid?(tag.attributes) && self
     end
 
-    def valid?
-      val = (id && name && code && version && sort && nw_lon && nw_lat && se_lon && se_lat)
-      case type
+    def valid?(as)
+      val = (type && id && name && code && version && sort && nw_lon && nw_lat && se_lon && se_lat)
+      val = case type
         when "journey"
           val && routeid && distance && direction && patternid && duration && startOffset
         when "route"
           val && patternids && !patternids.empty?
         when "pattern"
           val
+            end
+      val.tap do |x|
+        if !val
+          puts "Invalid Definition #{as.inspect}"
+          eatme = {}
+          self.encodeWitHCoder1(eatme)
+          puts "Values #{eatme}"
+        end
       end
     end
 

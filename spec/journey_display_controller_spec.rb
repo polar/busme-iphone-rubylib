@@ -2,6 +2,15 @@ require "spec_helper"
 require "test_api"
 require "test_journey_display_controller"
 
+Utils::Time.class_eval do
+  @@time_now = nil
+  def self.current
+    @@time_now || self.now
+  end
+  def self.current=(n)
+    @@time_now = n
+  end
+end
 class TestListener
   attr_accessor :journeys_added
   attr_accessor :journeys_removed
@@ -109,6 +118,8 @@ describe Platform::JourneyDisplayController do
     basket.sync(journeyids, nil, nil)
     jd_route = controller.journeyDisplayMap[route_id.id]
     jd_journey = controller.journeyDisplayMap[journey_id.id]
+    startTime = jd_journey.route.getStartTime
+    Utils::Time.current = startTime + 2 * 60
     expect(jd_route.hasActiveJourneys?)
     expect(jd_route.activeJourneys).to include(jd_journey)
   end

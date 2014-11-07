@@ -7,7 +7,7 @@ rescue
 end
 
 describe Platform::JourneyStore do
-  let(:time_now) { Time.now }
+  let(:time_now) { Utils::Time.current }
   let(:api) { TestApi.new }
   let(:store) {
     Platform::JourneyStore.new

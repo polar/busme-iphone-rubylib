@@ -5,7 +5,7 @@ module Platform
 
     def initialize(location, time = nil)
       self.location = location
-      self.time = time || Time.now
+      self.time = time || Utils::Time.current
     end
   end
 end

@@ -9,7 +9,7 @@ end
 
 describe Platform::MarkerStore do
   let(:api) { TestApi.new }
-  let(:time_now) { Time.now }
+  let(:time_now) { Utils::Time.current }
   let(:store) { Platform::MarkerStore.new }
   let(:externalStorageController) { Platform::ExternalStorageController.new(api: api)}
   let(:storageSerializerController) {Platform::StorageSerializerController.new(api, externalStorageController)}

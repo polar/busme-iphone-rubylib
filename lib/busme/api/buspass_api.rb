@@ -23,7 +23,7 @@ module Api
 
       self.buspass = Buspass.new
       self.ready = false
-      self.activeStartDisplayThreshold = 10 * 60 # minutes
+      self.activeStartDisplayThreshold = 10 * 60 * 1000 # 10 minutes
       self.busmeAppVersionString = "#{self.platformName} #{self.appVersion}"
       self.uiEvents = BuspassEventDistributor.new(name: "UIEvents:#{master_slug}")
       self.bgEvents = BuspassEventDistributor.new(name: "BGEvents:#{master_slug}")

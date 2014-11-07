@@ -21,7 +21,7 @@ class TestDisplay
 end
 
 describe Platform::JourneySyncRemoteInvocation do
-  let (:time_now) {Time.now}
+  let (:time_now) {Utils::Time.current}
   let (:suGet) {
     fileName = File.join("spec", "test_data", "SUGet.xml");
     TestHttpMessage.new(200, "OK", File.read(fileName))

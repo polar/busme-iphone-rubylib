@@ -3,7 +3,7 @@ require "test_master_message_controller"
 
 describe Platform::MasterMessageController do
 
-  let(:time_now)  { Time.now }
+  let(:time_now)  { Utils::Time.current }
   let(:controller) { TestMasterMessageController.new(nil) }
   let(:msg1) do
     b = Api::MasterMessage.new("1")

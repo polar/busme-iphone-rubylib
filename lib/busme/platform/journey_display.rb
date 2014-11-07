@@ -131,6 +131,28 @@ module Platform
       jds
     end
 
+    def compareTo(jd)
+      if route.isJourney? && jd.route.isJourney? ||
+          !route.isJourney? && !jd.route.isJourney?
+        cmp = route.sort <=> jd.route.sort
+        if cmp == 0
+          if route.isJourney? && jd.route.isJourney?
+            return route.getStartTime <=> jd.route.getStartTime
+          end
+          return name <=> jd.name
+        else
+          return cmp
+        end
+
+      else
+        if !route.isJourney?
+          return -1
+        else
+          return 1
+        end
+      end
+    end
+
     # This is causing problems
     def inspect
       route.to_s

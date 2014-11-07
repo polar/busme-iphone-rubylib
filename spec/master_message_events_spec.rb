@@ -16,7 +16,7 @@ class TestFGMasterMessageController < Platform::FG_MasterMessageEventController
 end
 
 describe Platform::MasterMessageEventData do
-  let (:time_now) {Time.now}
+  let (:time_now) {Utils::Time.current}
   let (:suGet) {
     fileName = File.join("spec", "test_data", "SUGet.xml");
     TestHttpMessage.new(200, "OK", File.read(fileName))
@@ -60,7 +60,7 @@ describe Platform::MasterMessageEventData do
 
   it "should obey the protocol all the way through" do
     # MasterMessage Event has been set up with a masterMessage's message to be displayed.
-    masterMessage.onDisplay(Time.now)
+    masterMessage.onDisplay(Utils::Time.current)
     api.bgEvents.postEvent("MasterMessage", eventData)
 
     api.bgEvents.roll()
@@ -100,7 +100,7 @@ describe Platform::MasterMessageEventData do
 
   it "should obey the protocol all the way through, but with a bad response from the server, should just go to the goUrl" do
     # MasterMessage Event has been set up with a masterMessage's message to be displayed.
-    masterMessage.onDisplay(Time.now)
+    masterMessage.onDisplay(Utils::Time.current)
     api.bgEvents.postEvent("MasterMessage", eventData)
 
     api.bgEvents.roll()

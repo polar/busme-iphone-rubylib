@@ -70,7 +70,7 @@ module Platform
     # Called from UI Thread
     # Should Overridden to display message
     def onPresent(eventData)
-      eventData.banner_info.onDisplay(Time.now)
+      eventData.banner_info.onDisplay(Utils::Time.current)
     end
 
     # Called on Foreground Thread by way of UI invoking
@@ -106,7 +106,7 @@ module Platform
 
     # Should Overridden
     def onDone(eventData)
-      eventData.banner_info.onDismiss(Time.now)
+      eventData.banner_info.onDismiss(Utils::Time.current)
     end
   end
 

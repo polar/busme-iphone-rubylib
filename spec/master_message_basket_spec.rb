@@ -3,7 +3,7 @@ require "test_master_message_controller"
 
 describe Platform::MasterMessageBasket do
 
-  let(:time_now) { Time.now }
+  let(:time_now) { Utils::Time.current }
   let(:controller) { TestMasterMessageController.new(nil) }
   let(:store) { Platform::MasterMessageStore.new }
   let(:basket) { Platform::MasterMessageBasket.new(store, controller) }

@@ -9,7 +9,7 @@ class TestListener
   def onBuspassEvent(event)
     self.testEventName = event.eventName
     self.testEventData = event.eventData
-    self.testEventTime = Time.now
+    self.testEventTime = Utils::Time.current
   end
 end
 

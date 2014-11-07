@@ -7,7 +7,7 @@ class TestApi   < Api::BuspassAPI
   end
 
   def activeStartDisplayThreshold
-    10
+    10 * 60 * 1000
   end
 
   def mock_answer=(x)

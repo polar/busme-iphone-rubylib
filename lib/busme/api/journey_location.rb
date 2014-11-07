@@ -16,7 +16,7 @@ module Api
       self.id = tag.attributes["id"]
       self.lat = tag.attributes["lat"].to_f
       self.lon = tag.attributes["lon"].to_f
-      self.dir = tag.attributes["dir"].to_f
+      self.dir = tag.attributes["direction"].to_f
       self.reported = tag.attributes["reported"] == "true"
       self.reported_time = Time.at(tag.attributes["reported_time"].to_i)
       self.recorded_time = Time.at(tag.attributes["recorded_time"].to_i)

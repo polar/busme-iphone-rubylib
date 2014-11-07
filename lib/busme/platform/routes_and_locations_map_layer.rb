@@ -52,7 +52,7 @@ module Platform
     # is always on the top.
     #
     def placeJourneyLocation(journeyDisplay, disposition, context)
-      time_now = Time.now
+      time_now = Utils::Time.current
       if journeyDisplay.route.isReporting?
         isReported = true
         loc = getCurrentLocation()

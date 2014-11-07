@@ -11,7 +11,7 @@ module Platform
       self.name      = name
       self.latitude  = lat
       self.longitude = lon
-      self.time = Time.now
+      self.time = Utils::Time.current
       self.speed = 0
       self.bearing = 0
     end

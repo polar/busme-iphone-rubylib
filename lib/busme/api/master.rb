@@ -8,6 +8,7 @@ module Api
     attr_accessor :title
     attr_accessor :description
     attr_accessor :bbox
+    attr_accessor :time_format
     
     def propList
       %w(
@@ -19,7 +20,12 @@ module Api
     @title
     @description
     @bbox
+    @time_format
       )
+    end
+
+    def time_format
+      @time_format || "%l:%M %P"
     end
 
     def initWithCoder1(decoder)
@@ -31,6 +37,7 @@ module Api
       self.title = decoder[:title]
       self.description = decoder[:description]
       self.bbox = decoder[:bbox]
+      self.time_format = decoder[:time_format]
       self
     rescue Exception => boom
       puts "#{boom}"
@@ -45,6 +52,7 @@ module Api
       encoder[:title] = title
       encoder[:description] = description
       encoder[:bbox] = bbox
+      encoder[:time_format] = @time_format
     rescue Exception => boom
       puts "#{boom}"
       p boom.backtrace

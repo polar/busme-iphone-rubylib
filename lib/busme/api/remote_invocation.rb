@@ -29,7 +29,7 @@ module Api
     end
 
     def invoke(progress = nil, isForced = false)
-      progress.onUpdateStart(Time.now, isForced) if progress
+      progress.onUpdateStart(Utils::Time.current, isForced) if progress
       makeRequest = false
       if requestUrl
         progress.onArgumentsStart if progress
@@ -44,13 +44,13 @@ module Api
         progress.onArgumentsFinish(makeRequest) if progress
         response = nil
         if makeRequest
-          progress.onRequestStart(Time.now) if progress
+          progress.onRequestStart(Utils::Time.current) if progress
           begin
             response = makeRequestAndParseResponse(requestUrl, parameters)
           rescue IOError => boom
             progress.onRequestIOError(boom) if progress
           end
-          progress.onRequestFinish(Time.now) if progress
+          progress.onRequestFinish(Utils::Time.current) if progress
           progress.onResponseStart if progress
           if response
             if handleResponse(response)
@@ -62,7 +62,7 @@ module Api
           progress.onResponseFinish if progress
         end
       end
-      progress.onUpdateFinish(makeRequest, Time.now) if progress
+      progress.onUpdateFinish(makeRequest, Utils::Time.current) if progress
     end
 
     # Place to handle any response attributes, or make sure you've got the right

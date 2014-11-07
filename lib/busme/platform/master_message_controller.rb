@@ -21,7 +21,7 @@ module Platform
     end
 
     def roll(now = nil)
-      now = Time.now  if now.nil?
+      now = Utils::Time.current  if now.nil?
       if currentMasterMessage && currentMasterMessage.isDisplayed?
         # message must be dismissed first
         return
@@ -41,7 +41,7 @@ module Platform
     end
 
     def dismissCurrentMasterMessage(remind, time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       if currentMasterMessage
         currentMasterMessage.onDismiss(remind, time)
       end
@@ -51,7 +51,7 @@ module Platform
     protected
 
     def compare(b1,b2)
-      now = Time.now
+      now = Utils::Time.current
       time = b1.nextTime(now) <=> b2.nextTime(now)
       if time == 0
         b1.priority <=> b2.priority

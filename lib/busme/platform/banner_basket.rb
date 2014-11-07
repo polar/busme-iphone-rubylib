@@ -22,7 +22,7 @@ module Platform
 
     def onLocationUpdate(location, now = nil)
       point = GeoCalc.toGeoPoint(location)
-      now = Time.now if now.nil?
+      now = Utils::Time.current if now.nil?
       for banner in getBanners do
         dist = GeoCalc.getGeoDistance(point, banner.point)
         if dist < banner.radius

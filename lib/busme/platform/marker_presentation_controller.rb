@@ -20,7 +20,7 @@ module Platform
     end
 
     def roll(now = nil)
-      now = Time.now  if now.nil?
+      now = Utils::Time.current  if now.nil?
       # We sort because we have present time calculations.
       backOnQueue = []
       @markerQ.sort!
@@ -52,7 +52,7 @@ module Platform
     end
 
     def dismissMarker(marker, remind, time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       if marker
         marker.onDismiss(remind, time)
         abandonMarker(marker)
@@ -67,7 +67,7 @@ module Platform
 
     def removeDisplayedMarker(marker)
       if marker && marker.displayed
-        marker.onDismiss(false, Time.now)
+        marker.onDismiss(false, Utils::Time.current)
         abandonMarker(marker)
       end
     end
@@ -75,7 +75,7 @@ module Platform
     protected
 
     def compare(b1,b2)
-      now = Time.now
+      now = Utils::Time.current
       priority =  b1.priority <=> b2.priority
       if priority == 0
         b1.nextTime(now) <=> b2.nextTime(now)

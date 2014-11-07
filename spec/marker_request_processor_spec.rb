@@ -3,7 +3,7 @@ require "test_marker_controller"
 
 describe Platform::MarkerRequestProcessor do
 
-  let(:time_now) { Time.now }
+  let(:time_now) { Utils::Time.current }
   let(:controller) { TestMarkerController.new }
   let(:store) { Platform::MarkerStore.new }
   let(:basket) { Platform::MarkerBasket.new(store, controller) }

@@ -45,14 +45,14 @@ module Platform
     end
 
     def resetMarkers(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       markers.reject {|x| x.is_a?(Api::MessageSpec) && !x.is_a?(Api::MarkerInfo)}
       markers.each {|x| x.reset(time)}
       self.dirty = true
     end
 
     def clean(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       markers.values.each do |msg|
         if msg.expiryTime < time
           markers.delete(msg.id)

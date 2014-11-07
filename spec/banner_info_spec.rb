@@ -8,7 +8,7 @@ describe Api::BannerInfo, "Initialization" do
 end
 
 describe Api::BannerInfo, "Seen" do
-  let(:time_now) { Time.now }
+  let(:time_now) { Utils::Time.current }
   let(:banner_lit) {
     "
       <Banner id='1' version='121' lat='53.0' lon='-73.0' length='10'

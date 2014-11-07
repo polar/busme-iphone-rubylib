@@ -29,7 +29,10 @@ describe Platform::MainController do
   }
   let (:testForeground) {
     # We list only the events that we care about in this spec
-    TestForeground.new(mainController, ["Main:Init:return", "Main:Discover:Init:return", "Main:Master:Init:return", "Master:Init:return", "Search:Find:return"])
+    TestForeground.new(mainController, ["Main:Init:return", "Main:Discover:Init:return", "Main:Master:Init:return", "Search:Find:return"])
+  }
+  let (:testMasterForeground) {
+    TestForeground.new(mainController.masterController.api, ["Master:Init:return"])
   }
   let (:discoverGet) {
     fileName = File.join("spec", "test_data", "CNYDiscoverGet.xml")
@@ -117,19 +120,21 @@ describe Platform::MainController do
     expect(mainController.masterController.master).to_not eq(nil)
     expect(mainController.masterController.master).to be_a_kind_of(Api::Master)
     expect(mainController.masterController.master.slug).to eq("syracuse-university")
+    # Instantiated testMasterForground
+    testMasterForeground
     httpClient.mock_answer = suGet
-    mainController.bgEvents.postEvent("Master:init", Platform::MasterEventData.new())
-    mainController.bgEvents.roll
+    mainController.masterController.api.bgEvents.postEvent("Master:init", Platform::MasterEventData.new())
+    mainController.masterController.api.bgEvents.roll
     api = mainController.masterController.api
     expect(api.ready).to be(true)
     # Since the version is nothing, we should get an upgrade message
     expect(api.buspass.initialMessages).to_not be(nil)
     expect(api.buspass.initialMessages[0].title).to match(/Update/)
     expect(api.buspass.initialMessages[0].content).to match(/You have the 0.0.0/)
-    event = mainController.uiEvents.peek
+    event = mainController.masterController.api.uiEvents.peek
     expect(event.eventName).to eq("Master:Init:return")
-    mainController.uiEvents.roll
-    expect(testForeground.lastEvent.eventData.return).to eq(true)
+    mainController.masterController.api.uiEvents.roll
+    expect(testMasterForeground.lastEvent.eventData.return).to eq(true)
   end
 
   it "should get a discover for initial start" do

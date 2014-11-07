@@ -28,7 +28,7 @@ module Platform
     end
 
     def onLocationUpdate(location, time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       point = location ? GeoCalc.toGeoPoint(location) : nil
       for msg in masterMessageStore.masterMessages.values do
         if msg.is_a? Api::MasterMessage
@@ -47,7 +47,7 @@ module Platform
     end
 
     def resetMessages(time = nil)
-      time = Time.now if time.nil?
+      time = Utils::Time.current if time.nil?
       masterMessageStore.resetMessages(time)
     end
 

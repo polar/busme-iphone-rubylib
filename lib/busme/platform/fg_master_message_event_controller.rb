@@ -33,7 +33,7 @@ module Platform
 
     def resolveGo(requestState)
       requestState.resolve = R_GO
-      requestState.masterMessage.onDismiss(false, Time.now)
+      requestState.masterMessage.onDismiss(false, Utils::Time.current)
       requestState.state = S_ANSWER_FINISH
     ensure
       requestState.state = S_REQUEST_START
@@ -42,7 +42,7 @@ module Platform
 
     def resolveRemind(requestState)
       requestState.resolve = R_REMIND
-      requestState.masterMessage.onDismiss(true, Time.now)
+      requestState.masterMessage.onDismiss(true, Utils::Time.current)
       requestState.state = S_ANSWER_FINISH
       requestState.state = S_REQUEST_START
       api.bgEvents.postEvent("MasterMessage", requestState)
@@ -50,13 +50,13 @@ module Platform
 
     def resolveCancel(requestState)
       requestState.resolve = R_GO
-      requestState.masterMessage.onDismiss(false, Time.now)
+      requestState.masterMessage.onDismiss(false, Utils::Time.current)
       requestState.state = S_ANSWER_FINISH
     end
 
     def resolveOK(requestState)
       requestState.resolve = R_OK
-      requestState.masterMessage.onDismiss(false, Time.now)
+      requestState.masterMessage.onDismiss(false, Utils::Time.current)
       requestState.state = S_ANSWER_FINISH
     end
 
