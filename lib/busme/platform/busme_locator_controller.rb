@@ -49,7 +49,7 @@ module Platform
     end
 
     def doSelect(eventData)
-      puts "onSelect #{eventData.inspect} from #{masters.count} masters"
+     #puts "onSelect #{eventData.inspect} from #{masters.count} masters"
       loc = eventData
       selected = []
       masters.each do |master|
@@ -59,10 +59,10 @@ module Platform
         x = (loc.longitude * 1E6).to_i
         y = (loc.latitude * 1E6).to_i
         if r.containsXY(x,y)
-          puts "Hit #{master.slug} (#{x},#{y}) in #{r}"
+         #puts "Hit #{master.slug} (#{x},#{y}) in #{r}"
           selected << [r, master]
         else
-          puts "NoHit #{master.slug} (#{x},#{y}) in #{r}"
+         #puts "NoHit #{master.slug} (#{x},#{y}) in #{r}"
         end
       end
       _, master = selected.sort {|v1,v2| v1[0].area <=> v2[0].area}.first

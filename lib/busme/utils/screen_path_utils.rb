@@ -248,7 +248,7 @@ module Utils
     end
 
     def self.toClippedScreenPath(projectedPath, projection)
-      puts "toClippedScreenPath(#{projectedPath.length} points) on #{projection}"
+     #puts "toClippedScreenPath(#{projectedPath.length} points) on #{projection}"
       rect = projection.screenRect
       path = Integration::Path.new
       if projectedPath.length > 0
@@ -296,7 +296,7 @@ module Utils
         end
         last.set(coords.x, coords.y)
       end
-      puts "to Path #{path.to_s}"
+     #puts "to Path #{path.to_s}"
       path
     end
   end

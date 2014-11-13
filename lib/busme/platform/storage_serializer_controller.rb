@@ -10,7 +10,7 @@ module Platform
 
     def retrieveStorage(filename, api)
       if externalStorageController.isAvailable?
-        puts "Trying to read #{filename}....."
+       #puts "Trying to read #{filename}....."
         store = externalStorageController.deserializeObjectFromFile(filename)
         if store
           if store.is_a? Api::Storage
@@ -22,7 +22,7 @@ module Platform
         end
       end
     rescue Exception => boom
-      puts "retrieveStorage(#{filename}) => #{boom}"
+     #puts "retrieveStorage(#{filename}) => #{boom}"
       nil
     end
 

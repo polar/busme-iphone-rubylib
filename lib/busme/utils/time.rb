@@ -6,7 +6,7 @@ module Utils
     end
 
     def self.parseTimeInZone(str, zone = nil)
-      puts "For purposes of testing we ignore the zone" if zone
+     #puts "For purposes of testing we ignore the zone" if zone
       parse(str)
     end
   end

@@ -35,7 +35,7 @@ module Platform
     def serializeObjectToFile(store, filename)
       if isAvailable?
         data = YAML::dump(store)
-        puts data.inspect
+       #puts data.inspect
         writeFile(data, filename)
       end
     end
@@ -44,7 +44,7 @@ module Platform
       if isAvailable?
         data = readData(filename)
         if data
-          puts data
+         #puts data
           store = YAML::load(data)
           return store
         end
@@ -55,7 +55,7 @@ module Platform
       if isAvailable?
         FileUtils.mkdir_p(directory)
         fn = File.join(directory, legalize(fileName))
-        puts "ExternalStorageController: Writing to #{fn}"
+       #puts "ExternalStorageController: Writing to #{fn}"
         file = File.new(fn, "w+")
         file.write(data)
         file.close
@@ -64,14 +64,14 @@ module Platform
         false
       end
     rescue Exception => boom
-      puts "ExternalStorageController.writeData(#{fn} => #{boom}"
+     #puts "ExternalStorageController.writeData(#{fn} => #{boom}"
       false
     end
 
     def readData(fileName)
       if isAvailable?
         fn = File.join(directory, legalize(fileName))
-        puts "ExternalStorageController: reading from #{fn}"
+       #puts "ExternalStorageController: reading from #{fn}"
         file = File.open(fn, "r")
         file.read
       end

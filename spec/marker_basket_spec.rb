@@ -1,10 +1,12 @@
 require "spec_helper"
+require 'test_platform_api'
 require "test_marker_controller"
 
 describe Platform::MarkerBasket do
 
   let(:time_now) { Utils::Time.current }
-  let(:controller) { TestMarkerController.new }
+  let(:platform_api) { TestPlatformApi.new }
+  let(:controller) { TestMarkerController.new(platform_api) }
   let(:store) { Platform::MarkerStore.new }
   let(:basket) { Platform::MarkerBasket.new(store, controller) }
   let(:msg1) do

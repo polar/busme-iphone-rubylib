@@ -17,7 +17,7 @@ module Platform
     def onBuspassEvent(event)
       case event.eventName
         when "BusmeApi:set"
-          puts "Got Event #{event}"
+         #puts "Got Event #{event}"
           doSet(event.eventData)
         when "BusmeApi:get"
           doGet(event.eventData)
@@ -25,7 +25,7 @@ module Platform
     end
 
     def doSet(eventData)
-      puts "BusmeApiController.doSet #{eventData.class.name}##{eventData.__id__}"
+     #puts "BusmeApiController.doSet #{eventData.class.name}##{eventData.__id__}"
       api = eventData.api
       dir = eventData.directory
       guts.storeMasterApi
@@ -44,7 +44,7 @@ module Platform
     end
 
     def doGet(eventData)
-      puts "BusmeApiController.doGet"
+     #puts "BusmeApiController.doGet"
       eventData.get = guts.getMasterApi
       guts.api.uiEvents.postEvent("BusmeApi:onGet", eventData)
     end

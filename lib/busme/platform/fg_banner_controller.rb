@@ -29,7 +29,6 @@ module Platform
     end
 
     def presentBanner(eventData)
-      # Make the banner slide into view
     end
 
     def dismissBanner(eventData)

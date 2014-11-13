@@ -422,7 +422,7 @@ module Api
           puts "Invalid Definition #{as.inspect}"
           eatme = {}
           self.encodeWitHCoder1(eatme)
-          puts "Values #{eatme}"
+         #puts "Values #{eatme}"
         end
       end
     end

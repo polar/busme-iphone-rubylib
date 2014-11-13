@@ -25,7 +25,7 @@
     </Message>
   </Messages>
   <Markers>
-    <Marker id='1' version='121' lat='53.0' lon='-74.0' length='10'
+    <Marker id='1' version='121' lat='53.0' lon='-73.0' length='10'
             frequency='10' priority='1' expiryTime='7715568553'
             radius='200'
             goUrl='http://busme.us'

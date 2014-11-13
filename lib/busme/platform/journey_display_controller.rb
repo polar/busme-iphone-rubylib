@@ -61,7 +61,7 @@ module Platform
     def onJourneyAdded(basket, route)
       newRoute = JourneyDisplay.new(self, route)
       self.journeyDisplays << newRoute
-      puts "#{self}:onJourneyAdded #{route.id} #{route.name} #{route.direction} - #{journeyDisplays.length} JourneyDisplays"
+     #puts "#{self}:onJourneyAdded #{route.id} #{route.name} #{route.direction} - #{journeyDisplays.length} JourneyDisplays"
       journeyDisplayMap[newRoute.route.id] = newRoute
       onJourneyDisplayAddedListener.onJourneyDisplayAdded(newRoute) if onJourneyDisplayAddedListener
       presentJourneyDisplay(newRoute)

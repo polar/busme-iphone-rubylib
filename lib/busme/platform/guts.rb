@@ -68,7 +68,7 @@ module Platform
 
       self.journeyVisibilityController = JourneyVisibilityController.new(api, journeyDisplayController)
 
-      self.markerPresentationController = MarkerPresentationController.new
+      self.markerPresentationController = MarkerPresentationController.new(api)
       self.markerStore = MarkerStore.new # TODO: Serialization
       self.markerBasket = MarkerBasket.new(markerStore, markerPresentationController)
 
@@ -85,7 +85,7 @@ module Platform
       # Fires on a BG EVent "Update"
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
-      self.externalStorageController = ExternalStorageController.new(api: api) # TODO: Extend for platform
+      self.externalStorageController = XMLExternalStorageController.new(api: api) # TODO: Extend for platform
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
 
       self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)
@@ -131,7 +131,7 @@ module Platform
 
       self.journeyVisibilityController = JourneyVisibilityController.new(api, journeyDisplayController)
 
-      self.markerPresentationController = MarkerPresentationController.new
+      self.markerPresentationController = MarkerPresentationController.new(api)
       self.markerStore = MarkerStore.new
       self.markerBasket = MarkerBasket.new(markerStore, markerPresentationController)
 
@@ -147,7 +147,7 @@ module Platform
       # Fires on a BG EVent "Update"
       self.updateRemoteInvocation = UpdateRemoteInvocation.new(self)
 
-      self.externalStorageController = ExternalStorageController.new(api: api)
+      self.externalStorageController = XMLExternalStorageController.new(api: api)
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
 
       self.bgJourneySyncController = BG_JourneySyncController.new(api, journeyDisplayController)

@@ -40,7 +40,7 @@ module IPhone
         []
       end
     end
-    puts "past IPHone::Http"
+   #puts "past IPHone::Http"
     class HttpClient < Integration::Http::HttpClient
       def initialize
         super

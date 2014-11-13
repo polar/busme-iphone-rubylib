@@ -64,7 +64,7 @@ module Platform
     end
 
     def setNearByState(nearby)
-      puts( "setNearByState")
+     #puts( "setNearByState")
       newState = VisualState.new
       newState.nearBy = nearby
       newState.onlyActive = stateStack.peek().onlyActive
@@ -74,7 +74,7 @@ module Platform
     end
 
     def setOnlyActiveState(active)
-      puts( "setOnlyActive")
+     #puts( "setOnlyActive")
       newState = VisualState.new
       newState.onlyActive = active
       newState.nearBy = stateStack.peek().nearBy
@@ -153,6 +153,29 @@ module Platform
         stateStack.pop
       end
       setVisibility(stateStack.peek)
+    end
+
+    # TODO: Need Spec for this.
+    def highlight(journeyDisplay)
+      @journeysHighlighted ||= []
+      if journeyDisplay.route.isRouteDefinition?
+        journeyDisplay.activeJourneys.each do |jd|
+          jd.nameHighlighted = true
+          jd.pathHighlighted = true
+          @journeysHighlighted << jd
+        end
+      end
+      journeyDisplay.nameHighlighted = true
+      journeyDisplay.pathHighlighted = true
+      @journeysHighlighted << journeyDisplay
+    end
+
+    def unhighlightAll
+      @journeysHighlighted.each do |jd|
+        jd.nameHighlighted = false
+        jd.pathHighlighted = false
+      end
+      @journeysHighlighted = []
     end
 
     #

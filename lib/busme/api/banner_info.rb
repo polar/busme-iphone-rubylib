@@ -157,8 +157,8 @@ module Api
             self.description = m.text
         end
       end
-      self.length = tag.attributes["length"].to_f
-      self.frequency = tag.attributes["frequency"].to_f
+      self.length = tag.attributes["length"].to_f/1000.0
+      self.frequency = tag.attributes["frequency"].to_f/1000.0
       self.expiryTime = Time.at(tag.attributes["expiryTime"].to_i)
       self.priority = tag.attributes["priority"].to_f
       self.version = tag.attributes["version"].to_i

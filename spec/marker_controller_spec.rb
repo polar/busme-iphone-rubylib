@@ -1,10 +1,12 @@
 require "spec_helper"
+require 'test_platform_api'
 require "test_marker_controller"
 
 describe Platform::MarkerPresentationController do
 
   let(:time_now)  { Utils::Time.current }
-  let(:controller) { TestMarkerController.new }
+  let(:platform_api) { TestPlatformApi.new }
+  let(:controller) { TestMarkerController.new(platform_api) }
   let(:msg1) do
     b = Api::MarkerInfo.new
     b.id = "1"

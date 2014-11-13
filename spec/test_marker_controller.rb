@@ -1,6 +1,6 @@
 class TestMarkerController < Platform::MarkerPresentationController
   attr_accessor :test_current_markers
-  def initialize
+  def initialize(api)
     super
     @test_current_markers = []
   end

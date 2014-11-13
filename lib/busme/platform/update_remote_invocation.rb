@@ -23,7 +23,7 @@ module Platform
 
     def requestUrl
       if api.isReady?
-        api.buspass.updateUrl
+        api.buspass.updateUrl + api.getDefaultQuery.to_s
       end
     end
 

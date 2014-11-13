@@ -51,7 +51,7 @@ describe Platform::MarkerMessageEventData do
     api.forceGet
     api
   }
-  let(:markerController) {TestMarkerController.new }
+  let(:markerController) {TestMarkerController.new(api) }
   let(:markerMessageBackground) { Platform::BG_MarkerMessageEventController.new(api) }
   let(:markerMessageForeground) {TestFGMarkerMessageEventController.new(api, markerController) }
   let(:eventData) { Platform::MarkerMessageEventData.new(markerInfo)}

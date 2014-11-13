@@ -15,17 +15,17 @@ module Platform
       eventData = event.eventData
       case event.eventName
         when "MarkerPresent:Add"
-          addMarker(eventData)
-        when "MarkerPreset:Remove"
-          removeMarker(eventData)
+          presentMarker(eventData)
+        when "MarkerPresent:Remove"
+          abandonMarker(eventData)
       end
     end
 
-    def addMarker(eventData)
+    def presentMarker(eventData)
       raise "NotImplemented"
     end
 
-    def removeMarker(eventData)
+    def abandonMarker(eventData)
       raise "NotImplemented"
     end
   end

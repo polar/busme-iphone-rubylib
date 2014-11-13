@@ -30,15 +30,15 @@ module Api
     end
 
     def notifyEventListeners(event)
-      puts "BuspassEventNotifier: notify #{event.eventName}"
-      puts "BuspassEventNotifier: notify #{eventListeners.size} listeners"
-      puts "BuspassEventNotifier: notify make array #{[]}"
+     #puts "BuspassEventNotifier: notify #{event.eventName}"
+     #puts "BuspassEventNotifier: notify #{eventListeners.size} listeners"
+     #puts "BuspassEventNotifier: notify make array #{[]}"
       eventListeners.each do |lis|
-        puts "BuspassEventNotifier: notifying #{lis}"
-        puts "BuspassEventNotifer: array make #{[]}"
+       #puts "BuspassEventNotifier: notifying #{lis}"
+       #puts "BuspassEventNotifer: array make #{[]}"
         lis.onBuspassEvent(event)
-        puts "BuspassEventNotifier: notified #{lis}"
-        puts "BuspassEventNotifier: notified make array #{[]}"
+       #puts "BuspassEventNotifier: notified #{lis}"
+       #puts "BuspassEventNotifier: notified make array #{[]}"
       end
     end
   end
@@ -68,8 +68,8 @@ module Api
     end
 
     def postEvent(event, data = nil)
-      puts "#{self.to_s}.postEvent(event #{event}, data #{data})"
-      puts "#{self.to_s}.postEvent(event #{event}, data #{data}) #{[]}"
+     #puts "#{self.to_s}.postEvent(event #{event}, data #{data})"
+     #puts "#{self.to_s}.postEvent(event #{event}, data #{data}) #{[]}"
       event = event.is_a?(BuspassEvent) ? event : BuspassEvent.new(event, data)
       postBuspassEvent(event)
     end
@@ -86,20 +86,20 @@ module Api
     alias :top :peek
 
     def roll
-      puts "#{self}: roll1"
-      puts "#{self}: roll1 #{[]}"
+     #puts "#{self}: roll1"
+     #puts "#{self}: roll1 #{[]}"
       event = eventQ.pop
-      puts "#{self}: roll2 #{event}"
-      puts "#{self}: roll2 #{[]}"
+     #puts "#{self}: roll2 #{event}"
+     #puts "#{self}: roll2 #{[]}"
       if event
-        puts "#{self}: roll3 #{event} #{event.eventName}"
-        puts "#{self}: roll3 #{event} #{event.eventName} #{[]}"
+       #puts "#{self}: roll3 #{event} #{event.eventName}"
+       #puts "#{self}: roll3 #{event} #{event.eventName} #{[]}"
         triggerBuspassEvent(event)
-        puts "#{self}: roll4 #{event}"
-        puts "#{self}: roll4 #{event} #{[]}"
+       #puts "#{self}: roll4 #{event}"
+       #puts "#{self}: roll4 #{event} #{[]}"
       end
-      puts "#{self}: roll5 #{event}"
-      puts "#{self}: roll5 #{event} #{[]}"
+     #puts "#{self}: roll5 #{event}"
+     #puts "#{self}: roll5 #{event} #{[]}"
       event
     end
 
@@ -116,19 +116,19 @@ module Api
     end
 
     def triggerBuspassEvent(event)
-      puts "triggerBuspassEvent #{event.eventName}"
-      puts "triggerBuspassEvent #{[]}"
+     #puts "triggerBuspassEvent #{event.eventName}"
+     #puts "triggerBuspassEvent #{[]}"
       notifier = eventNotifiers[event.eventName]
-      puts "triggerBuspassEvent notifier #{notifier}"
+     #puts "triggerBuspassEvent notifier #{notifier}"
       if notifier
         notifier.notifyEventListeners(event)
       else
-        puts "No receptors for Event #{event.eventName} on #{self.to_s}"
+       #puts "No receptors for Event #{event.eventName} on #{self.to_s}"
       end
     end
 
     def registerForEvent(eventName, eventListener)
-      puts "#{self}: Register for #{eventName} lis = #{eventListener}"
+     #puts "#{self}: Register for #{eventName} lis = #{eventListener}"
       notifier = eventNotifiers[eventName] ||= BuspassEventNotifier.new(eventName)
       notifier.register(eventListener)
     end

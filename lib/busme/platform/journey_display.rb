@@ -32,6 +32,7 @@ module Platform
     GREEN_ARROW_ICON = 5
     BLUE_ARROW_ICON = 6
     BUS_ICON_ACTIVE = 7
+    RED_ARROW_ICON = 8
 
     def isStarting?
       route.isStarting?
@@ -74,7 +75,9 @@ module Platform
           ROUTE_ICON
         end
       else
-        if route.isStartingJourney?
+        if isNameHighlighted?
+          RED_ARROW_ICON
+        elsif route.isStartingJourney?
           PURPLE_DOT_ICON
         elsif route.isNotYetStartingJourney?
           BLUE_CIRCLE_ICON
@@ -86,6 +89,14 @@ module Platform
           BUS_ICON_ACTIVE
         end
       end
+    end
+
+    def isNameHighlighted?
+      nameHighlighted
+    end
+
+    def isPathHighlighted?
+      pathHighlighted
     end
 
     def getRouteDefinition

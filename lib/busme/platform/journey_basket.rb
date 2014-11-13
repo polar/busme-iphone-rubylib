@@ -134,7 +134,7 @@ module Platform
         notifyOnJourneyRemovedListener(route)
       end
       for route in addedJourneys
-        puts "JourneyBasket. onJourneyAdded #{route.name} #{route.direction}"
+       #puts "JourneyBasket. onJourneyAdded #{route.name} #{route.direction}"
         notifyOnJourneyAddedListener(route)
       end
       notifyOnBasketUpdateListener()
@@ -198,7 +198,7 @@ module Platform
     def setJourneys(js)
       self.journeys = js
       updateJourneyMap
-      puts "JourneyBasket:setJourneys:"
+     #puts "JourneyBasket:setJourneys:"
       self.journeys.each {|x| puts "#{x.name} #{x.id}"}
     end
 

@@ -2,8 +2,10 @@ module Platform
   class MarkerPresentationController
     attr_accessor :markerPresentLimit
     attr_accessor :currentMarkers
+    attr_accessor :api
 
-    def initialize
+    def initialize(api)
+      self.api = api
       @markerQ = Utils::PriorityQueue.new {|lhs,rhs| compare(lhs,rhs)}
       self.currentMarkers = []
       self.markerPresentLimit = 10
@@ -24,18 +26,18 @@ module Platform
       # We sort because we have present time calculations.
       backOnQueue = []
       @markerQ.sort!
-      currentMarkers.each {|x| @markerQ.push(x) }
-      currentMarkers = []
+      self.currentMarkers.each {|x| @markerQ.push(x) }
+      self.currentMarkers = []
       marker = @markerQ.poll
       while marker do
         if marker.shouldBeSeen?(now)
           if currentMarkers.size < markerPresentLimit
             if !marker.displayed
-              currentMarkers << marker
+              self.currentMarkers << marker
               presentMarker(marker)
               marker.onDisplay(now)
             else
-              currentMarkers << marker
+              self.currentMarkers << marker
             end
           else
             if marker.displayed
@@ -44,6 +46,11 @@ module Platform
             else
               backOnQueue << marker
             end
+          end
+        elsif marker.expiryTime <= now
+          if marker.displayed
+            marker.onDismiss(true, now)
+            abandonMarker(marker)
           end
         end
         marker = @markerQ.poll

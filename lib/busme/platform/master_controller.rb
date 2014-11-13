@@ -58,6 +58,8 @@ module Platform
 
     attr_accessor :busmeLocatorController
 
+    attr_accessor :locationController
+
     # Foreground Controllers
 
     attr_accessor :fgBannerPresentationEventController
@@ -104,7 +106,10 @@ module Platform
     end
 
     def assignStorageSerializerControllers
-      self.externalStorageController = ExternalStorageController.new(masterController: self, api: api) # TODO: Extend for platform
+      self.externalStorageController = XMLExternalStorageController.new(masterController: self, api: api) # TODO: Extend for platform
+      # YAML StorageSerializer is not used anymore because it must serialize objects that we don't
+      # want in the graph. Preserializing them by niling them out and reassigning them is causing reference
+      # problems.
       self.storageSerializerController = StorageSerializerController.new(api, externalStorageController)
     end
 
@@ -124,7 +129,7 @@ module Platform
       self.masterMessageController = MasterMessageController.new(api)
       self.masterMessageBasket = MasterMessageBasket.new(masterMessageStore, masterMessageController)
 
-      self.markerPresentationController = MarkerPresentationController.new
+      self.markerPresentationController = MarkerPresentationController.new(api)
       ks = storageSerializerController.retrieveStorage("#{api.master_slug}-Markers.xml", api)
       self.markerStore = ks || MarkerStore.new
       self.markerBasket = MarkerBasket.new(markerStore, markerPresentationController)
@@ -147,6 +152,7 @@ module Platform
       self.bgBannerMessageEventController = BG_BannerMessageEventController.new(api)
       self.bgMarkerMessageEventController = BG_MarkerMessageEventController.new(api)
       self.bgMasterMessageEventController = BG_MasterMessageEventController.new(api)
+      self.locationController = LocationController.new(api, self)
     end
 
     # These controllers listen for events on the uiEvents channel usually posted by
@@ -158,8 +164,8 @@ module Platform
     def assignForegroundControllers
       self.loginForeground = LoginForeground.new(api) # TODO: Extend with UI
 
-      self.fgBannerPresentationEventController = FG_BannerPresentationEventController.new(api)
-      self.fgMarkerPresentationEventController = FG_MarkerPresentationEventController.new(api)
+      #self.fgBannerPresentationEventController = FG_BannerPresentationEventController.new(api)
+      #self.fgMarkerPresentationEventController = FG_MarkerPresentationEventController.new(api)
 
       self.fgBannerMessageEventController = FG_BannerMessageEventController.new(api)
       self.fgMarkerMessageEventController = FG_MarkerMessageEventController.new(api, markerPresentationController)
@@ -173,7 +179,7 @@ module Platform
 
     # This method stores the our collected information on the external storage of the phone.
     def storeMaster
-      puts "MasterController.storeMaster: "
+     #puts "MasterController.storeMaster: "
       if api.isReady?
         # TODO: Do personal login information.
         journeyStore.preSerialize(api)
@@ -186,7 +192,7 @@ module Platform
         masterMessageStore.preSerialize(api)
         storageSerializerController.cacheStorage(masterMessageStore, "#{api.buspass.slug}-Messages.xml", api)
         masterMessageStore.postSerialize(api)
-        puts "MasterController.storeMaster: DONE"
+       #puts "MasterController.storeMaster: DONE"
       else
         puts "MasterController.storeMaster: API not ready"
       end
