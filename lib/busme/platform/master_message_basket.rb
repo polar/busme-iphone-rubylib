@@ -32,7 +32,7 @@ module Platform
       point = location ? GeoCalc.toGeoPoint(location) : nil
       for msg in masterMessageStore.masterMessages.values do
         if msg.is_a? Api::MasterMessage
-          if time <= msg.expiryTime && (!msg.seen || msg.remindTime && msg.remindTime <= time)
+          if (!msg.expiryTime || time <= msg.expiryTime) && (!msg.seen || msg.remindTime && msg.remindTime <= time)
             if msg.point && msg.radius && msg.radius > 0
               dist = GeoCalc.getGeoDistance(point, msg.point)
               if dist < msg.radius
