@@ -13,8 +13,16 @@ module Utils
       end
     end
 
+    def elements
+      @queue.dup
+    end
+
     def include?(v)
       @queue.include?(v)
+    end
+
+    def any?(&block)
+      @queue.any?(&block)
     end
 
     def push(v)

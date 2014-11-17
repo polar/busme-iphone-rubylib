@@ -2,6 +2,8 @@ module Platform
   class LocationController
     attr_accessor :api
     attr_accessor :masterController
+    attr_accessor :lastKnownLocation
+
     def initialize(api, controller)
       self.api = api
       self.masterController = controller
@@ -16,7 +18,9 @@ module Platform
     end
 
     def onLocationUpdate(eventData)
+      puts "LocationController::onLocationUpdate(#{eventData.location.inspect})"
       location = eventData.location
+      api.lastKnownLocation = self.lastKnownLocation = location
       masterController.bannerBasket.onLocationUpdate(location)
       masterController.markerBasket.onLocationUpdate(location)
     end

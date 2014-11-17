@@ -94,7 +94,11 @@ module Api
 
 
     def shouldBeSeen?(time)
-      time < expiryTime && (!seen || (remindable && (remindTime ? remindTime < time : false)))
+      # markers don't have expiry times.
+      #time < expiryTime && (!seen || (remindable && (remindTime ? remindTime < time : false)))
+      # We are not seen implies it goes up. If it's been seen and it's no longer displayed,
+      # then we should be displayed only if the remindTime has past.
+      (!expiryTime || time < expiryTime) && (!seen || (displayed || remindable && (remindTime ? remindTime < time : false)))
     end
 
     # This is used for sorting. Basically if it is not seen or expired the time is
@@ -103,7 +107,7 @@ module Api
     # appropriately.
     def nextTime(time = nil)
       time = Utils::Time.current if time.nil?
-      if time < expiryTime
+      if true # time < expiryTime
         if remindable && remindTime
           remindTime
         else
@@ -151,7 +155,7 @@ module Api
             self.goLabel = m.text
         end
       end
-      self.expiryTime = Time.at(tag.attributes["expiryTime"].to_i)
+      self.expiryTime = Time.at(tag.attributes["expiryTime"].to_i) if tag.attributes["expiryTime"]
       self.priority = tag.attributes["priority"].to_f
       self.remindPeriod = tag.attributes["remindPeriod"].to_i
       self.version = tag.attributes["version"].to_i

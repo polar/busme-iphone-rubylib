@@ -15,6 +15,10 @@ module Utils
       @queue.size
     end
 
+    def any?(&block)
+      @queue.any?(&block)
+    end
+
     alias_method :length, :size
 
     def include?(v)

@@ -132,8 +132,10 @@ module Api
     def nextTime(now)
       if !@seen
         now
-      else
+      elsif @lastSeen
         @lastSeen + frequency
+      else
+        now + frequency
       end
     end
 

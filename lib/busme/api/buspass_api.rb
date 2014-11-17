@@ -38,8 +38,14 @@ module Api
       "platform=#{platformName}&app_version=#{appVersion}"
     end
 
+    attr_accessor :lastKnownLocation
+
     def getTrackingArgs()
-      "lat=43.0&lon=-76.0"
+      if lastKnownLocation
+        "lat=#{lastKnownLocation.latitude}&lon=#{lastKnownLocation.longitude}"
+      else
+        ""
+      end
     end
 
     def get()

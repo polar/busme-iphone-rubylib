@@ -12,6 +12,7 @@ module Platform
     end
 
     def onBuspassEvent(event)
+      puts "FG Marker Presentation Event Controller. got event #{event.eventName}"
       eventData = event.eventData
       case event.eventName
         when "MarkerPresent:Add"

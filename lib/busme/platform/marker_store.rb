@@ -33,6 +33,10 @@ module Platform
       markers.values
     end
 
+    def getMarker(id)
+      markers[id]
+    end
+
     def addMarker(msg)
       markers[msg.id] = msg
       self.dirty = true

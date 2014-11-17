@@ -14,24 +14,41 @@ module Platform
     end
 
     def addMarker(marker_info)
+      puts "MarkerBasket addMarker #{marker_info.title}"
+      marker = markerStore.getMarker(marker_info.id)
+      if marker
+        if marker.version.to_i < marker_info.version.to_i
+          markerStore.removeMarker(marker_info.id)
+          markerController.removeMarker(marker) if markerController
+        end
+      end
       markerStore.addMarker(marker_info)
     end
 
     def removeMarker(key)
-      markerStore.removeMarker(key)
+      marker = markerStore.getMarker(key)
+      markerStore.removeMarker(key) if marker
+      markerController.removeMarker(marker) if marker && markerController
     end
 
     def onLocationUpdate(location, time = nil)
+      puts "MarkerBasket :onLocationUpdate #{location.inspect} #{markerStore.markers.values.inspect}"
       time = Utils::Time.current if time.nil?
       point = location ? GeoCalc.toGeoPoint(location) : nil
       for marker in markerStore.markers.values do
         if marker.is_a? Api::MarkerInfo
-          if time <= marker.expiryTime && (!marker.seen || marker.remindTime && marker.remindTime <= time)
+          # There is no expiry time on a marker
+          # The system will tell us to remove it.
+          #if time <= marker.expiryTime && (!marker.seen || marker.remindTime && marker.remindTime <= time)
+          if marker.shouldBeSeen?(time)
             if marker.point
               if marker.radius && marker.radius > 0
                 dist = GeoCalc.getGeoDistance(point, marker.point)
+                puts "MarkerBasket : distance #{dist} radius #{marker.radius}"
                 if dist < marker.radius
                   markerController.addMarker(marker)
+                else
+                  markerController.removeMarker(marker)
                 end
               else
                 markerController.addMarker(marker)

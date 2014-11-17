@@ -2,28 +2,63 @@ module Platform
   class MarkerPresentationController
     attr_accessor :markerPresentLimit
     attr_accessor :currentMarkers
+    attr_accessor :removeMarkers
     attr_accessor :api
 
     def initialize(api)
       self.api = api
       @markerQ = Utils::PriorityQueue.new {|lhs,rhs| compare(lhs,rhs)}
       self.currentMarkers = []
+      self.removeMarkers = []
       self.markerPresentLimit = 10
     end
 
     # Background Thread
 
     def addMarker(marker)
-      @markerQ.push(marker)
+      puts "MarkerPresentationController.addMarker #{marker.title}"
+      replace = false
+      found = false
+      ms = currentMarkers.select {|x| x.id == marker.id}
+      currentMarkers.dup.each do |m|
+        if m.id == marker.id
+          found = true
+          if m.version.to_i < marker.version.to_i
+            self.removeMarkers << m
+            self.currentMarkers.delete(m)
+            replace = true
+          end
+        end
+      end
+      @markerQ.elements.each do |m|
+        if m.id == marker.id
+          found = true
+          if m.version.to_i < marker.version.to_i
+            @markerQ.delete(m)
+            replace = true
+          end
+        end
+      end
+      if replace || !found
+        @markerQ.push(marker)
+      end
     end
 
     def removeMarker(marker)
-      @markerQ.delete(marker)
+      self.removeMarkers << marker
     end
 
     def roll(now = nil)
+      puts "MarkerPresentationController. roll remove #{removeMarkers.size} markers #{currentMarkers.size} limit #{markerPresentLimit}"
       now = Utils::Time.current  if now.nil?
       # We sort because we have present time calculations.
+      removeMarkers.dup.each do |marker|
+        if marker.displayed
+          marker.onDismiss(true, now)
+          abandonMarker(marker)
+        end
+        removeMarkers.delete(marker)
+      end
       backOnQueue = []
       @markerQ.sort!
       self.currentMarkers.each {|x| @markerQ.push(x) }
@@ -47,7 +82,13 @@ module Platform
               backOnQueue << marker
             end
           end
-        elsif marker.expiryTime <= now
+          # markers dont have expiryTimes
+        elsif marker.expiryTime && marker.expiryTime <= now
+          if marker.displayed
+            marker.onDismiss(true, now)
+            abandonMarker(marker)
+          end
+        else
           if marker.displayed
             marker.onDismiss(true, now)
             abandonMarker(marker)
@@ -92,6 +133,7 @@ module Platform
     end
 
     def presentMarker(marker)
+      puts "Marker Presentation Controller presentMarker"
       eventData = MarkerPresentEventData.new(marker)
       api.uiEvents.postEvent("MarkerPresent:Add", eventData)
     end
