@@ -23,6 +23,7 @@ module Platform
       api.lastKnownLocation = self.lastKnownLocation = location
       masterController.bannerBasket.onLocationUpdate(location)
       masterController.markerBasket.onLocationUpdate(location)
+      masterController.masterMessageBasket.onLocationUpdate(location)
     end
   end
 end

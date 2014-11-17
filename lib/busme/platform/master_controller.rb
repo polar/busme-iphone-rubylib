@@ -64,6 +64,7 @@ module Platform
 
     attr_accessor :fgBannerPresentationEventController
     attr_accessor :fgMarkerPresentationEventController
+    attr_accessor :fgMasterMessagePresentationEventController
 
     attr_accessor :fgBannerMessageEventController
     attr_accessor :fgMarkerMessageEventController
@@ -166,6 +167,7 @@ module Platform
 
       #self.fgBannerPresentationEventController = FG_BannerPresentationEventController.new(api)
       #self.fgMarkerPresentationEventController = FG_MarkerPresentationEventController.new(api)
+      #self.fgMasterMessagePresentationEventController = FG_MasterMessagePresentationEventController.new(api)
 
       self.fgBannerMessageEventController = FG_BannerMessageEventController.new(api)
       self.fgMarkerMessageEventController = FG_MarkerMessageEventController.new(api, markerPresentationController)

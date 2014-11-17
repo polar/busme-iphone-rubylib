@@ -1,4 +1,6 @@
 module Platform
+  # This controller handles messages given to it by the MasterMessageBasket
+  # for display. It handles a queue and only displays one at a time.
   class MasterMessageController
     attr_accessor :api
     attr_accessor :currentMasterMessage
@@ -9,11 +11,16 @@ module Platform
     end
 
     def addMasterMessage(msg)
+      puts "MasterMessageController.addMasterMessage #{msg.inspect}"
       @messageQ.push(msg)
     end
 
     def removeMasterMessage(msg)
+      puts "MasterMessageController.removeMasterMessage #{msg.inspect}"
       @messageQ.delete(msg)
+      if currentMasterMessage && (currentMasterMessage == msg || curentMasterMessage.id == msg.id)
+        dismissCurrentMasterMessage(false)
+      end
     end
 
     def contains?(msg)
@@ -21,9 +28,9 @@ module Platform
     end
 
     def roll(now = nil)
+      puts "MasterMessageController.roll #{currentMasterMessage}"
       now = Utils::Time.current  if now.nil?
       if currentMasterMessage && currentMasterMessage.isDisplayed?
-        # message must be dismissed first
         return
       end
       # We sort because we have present time calculations.
@@ -40,10 +47,15 @@ module Platform
       end
     end
 
+    def onDismiss
+      self.currentMasterMessage = nil
+    end
+
     def dismissCurrentMasterMessage(remind, time = nil)
       time = Utils::Time.current if time.nil?
       if currentMasterMessage
         currentMasterMessage.onDismiss(remind, time)
+        abandonMasterMessage(currentMasterMessage)
       end
       self.currentMasterMessage = nil
     end
@@ -61,8 +73,16 @@ module Platform
     end
 
     def presentMasterMessage(msg)
+      puts "MasterMessageController.presentMasterMessage #{msg.inspect}"
       eventData = MasterMessageEventData.new(msg)
-      api.uiEvents.postEvent("MasterMessage", eventData)
+      api.uiEvents.postEvent("MasterMessagePresent:display", eventData)
     end
+
+    def abandonMasterMessage(msg)
+      puts "MasterMessageController.abandonMasterMessage #{msg.inspect}"
+      eventData = MasterMessageEventData.new(msg)
+      api.uiEvents.postEvent("MasterMessagePresent:dismiss", eventData)
+    end
+
   end
 end

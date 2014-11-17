@@ -4,11 +4,14 @@ module Platform
   class FGMasterMessageController
     include Api::BuspassEventListener
     include MasterMessageConstants
+    include Platform::RequestConstants
     attr_accessor :api
 
     def initialize(api)
       self.api = api
-      api.uiEvents.registerForEvent("MasterMessageEvent", self)
+      api.uiEvents.registerForEvent("MasterMessage", self)
+      puts "S_PRESENT"
+      puts "#{S_PRESENT}"
     end
 
     def onBuspassEvent(event)

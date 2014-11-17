@@ -17,9 +17,11 @@ module Platform
     end
 
     def addMasterMessage(msg)
+      puts "MasterMessageBasket addMasterMessage #{msg.inspect}"
       stored_message = masterMessageStore.getMasterMessage(msg.id)
       if stored_message
         if stored_message.version < msg.version
+          masterMessageController.removeMasterMessage(stored_message)
           masterMessageStore.addMasterMessage(msg)
         end
       else
@@ -28,6 +30,7 @@ module Platform
     end
 
     def onLocationUpdate(location, time = nil)
+      puts "MasterMessageBasket onLocationUpdate #{location.inspect}"
       time = Utils::Time.current if time.nil?
       point = location ? GeoCalc.toGeoPoint(location) : nil
       for msg in masterMessageStore.masterMessages.values do
