@@ -10,7 +10,19 @@ describe Platform::MarkerPresentationController do
   let(:msg1) do
     b = Api::MarkerInfo.new
     b.id = "1"
+    b.title = "Title1"
     b.version = 100
+    b.expiryTime = time_now + 24 * 60 * 60
+    b.remindable = true
+    b.remindPeriod = 10
+    b.priority = 10
+    b
+  end
+  let(:msg1_2) do
+    b = Api::MarkerInfo.new
+    b.id = "1"
+    b.title = "Title2"
+    b.version = 101
     b.expiryTime = time_now + 24 * 60 * 60
     b.remindable = true
     b.remindPeriod = 10
@@ -31,10 +43,39 @@ describe Platform::MarkerPresentationController do
       now = time_now
       controller.addMarker(msg1)
       controller.roll(now)
+      expect(controller.currentMarkers).to include(msg1)
       expect(controller.test_current_markers).to include(msg1)
       expect(msg1.seen).to eq(true)
       expect(msg1.displayed).to eq(true)
       expect(msg1.lastSeen).to be_within(1).of(now)
+    end
+
+    it "should add marker 1 and marker 1_2, and replace marker1" do
+      now = time_now
+      controller.addMarker(msg1)
+      controller.roll(now)
+      expect(controller.currentMarkers).to include(msg1)
+      expect(controller.test_current_markers).to include(msg1)
+      expect(msg1.seen).to eq(true)
+      expect(msg1.displayed).to eq(true)
+      expect(msg1.lastSeen).to be_within(1).of(now)
+
+      controller.addMarker(msg1_2)
+
+      expect(controller.currentMarkers).to_not include(msg1)
+      expect(controller.removeMarkers).to include(msg1)
+      controller.roll(now + 2)
+      expect(controller.test_current_markers).to_not include(msg1)
+      expect(msg1.seen).to eq(true)
+      expect(msg1.displayed).to eq(false)
+      expect(msg1.lastSeen).to be_within(1).of(now + 2)
+
+      expect(controller.test_current_markers).to include(msg1_2)
+      expect(msg1_2.seen).to eq(true)
+      expect(msg1_2.displayed).to eq(true)
+      expect(msg1_2.lastSeen).to be_within(1).of(now + 2)
+
+
     end
 
     it "should add markers 1 and remove it and have the remindTime set" do

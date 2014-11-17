@@ -20,9 +20,11 @@ module Platform
         if marker.version.to_i < marker_info.version.to_i
           markerStore.removeMarker(marker_info.id)
           markerController.removeMarker(marker) if markerController
+          markerStore.addMarker(marker_info)
         end
+      else
+        markerStore.addMarker(marker_info)
       end
-      markerStore.addMarker(marker_info)
     end
 
     def removeMarker(key)

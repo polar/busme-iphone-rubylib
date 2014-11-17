@@ -19,11 +19,11 @@ module Platform
       puts "MarkerPresentationController.addMarker #{marker.title}"
       replace = false
       found = false
-      ms = currentMarkers.select {|x| x.id == marker.id}
       currentMarkers.dup.each do |m|
         if m.id == marker.id
           found = true
           if m.version.to_i < marker.version.to_i
+            puts "Replace CurrentMarker #{m.inspect}"
             self.removeMarkers << m
             self.currentMarkers.delete(m)
             replace = true
@@ -53,6 +53,7 @@ module Platform
       now = Utils::Time.current  if now.nil?
       # We sort because we have present time calculations.
       removeMarkers.dup.each do |marker|
+        puts "RemoveMarker: Looking at #{marker.inspect}"
         if marker.displayed
           marker.onDismiss(true, now)
           abandonMarker(marker)
@@ -133,12 +134,13 @@ module Platform
     end
 
     def presentMarker(marker)
-      puts "Marker Presentation Controller presentMarker"
+      puts "Marker Presentation Controller presentMarker #{marker}"
       eventData = MarkerPresentEventData.new(marker)
       api.uiEvents.postEvent("MarkerPresent:Add", eventData)
     end
 
     def abandonMarker(marker)
+      puts "Marker Presentation Controller abandonMarker #{marker}"
       eventData = MarkerPresentEventData.new(marker)
       api.uiEvents.postEvent("MarkerPresent:Remove", eventData)
     end

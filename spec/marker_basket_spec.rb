@@ -23,6 +23,20 @@ describe Platform::MarkerBasket do
     b.priority = 10
     b
   end
+  let(:msg1_2) do
+    b = Api::MarkerInfo.new
+    b.id = "1"
+    b.point = Integration::GeoPoint.new(53.0 * 1E6, -74.0 * 1E6)
+    b.version = 10001
+    b.title = "Title 1_2"
+    b.content = "Content 1_2"
+    b.radius = 2000
+    b.expiryTime = time_now + (24 * 60 * 60) * 1
+    b.remindable = true
+    b.remindPeriod = 10
+    b.priority = 10
+    b
+  end
   let(:msg1a) do
     b = Api::MarkerInfo.new
     b.id = "1a"
@@ -73,6 +87,14 @@ describe Platform::MarkerBasket do
       expect(store.markers.values).to include(msg1)
       basket.removeMarker(msg1.id)
       expect(store.markers.values).to_not include(msg1)
+    end
+
+    it "should replace markers by version" do
+      basket.addMarker(msg1)
+      expect(store.markers.values).to include(msg1)
+      basket.addMarker(msg1_2)
+      expect(store.markers.values).to_not include(msg1)
+      expect(store.markers.values).to include(msg1_2)
     end
 
     it "should display marker on location" do
