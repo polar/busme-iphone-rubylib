@@ -150,7 +150,7 @@ module Platform
           if route.isJourney? && jd.route.isJourney?
             return route.getStartTime <=> jd.route.getStartTime
           end
-          return name <=> jd.name
+          return route.name <=> jd.route.name
         else
           return cmp
         end

@@ -39,6 +39,7 @@ module Platform
     end
 
     def onBuspassEvent(event)
+      puts "MainController:onBuspassEvent(#{event.eventName})"
       case event.eventName
         when "Main:init"
           onInitEvent(event)
@@ -53,7 +54,7 @@ module Platform
       evd = event.eventData
       evd.controller = self
       defaultMaster = busmeConfigurator.getDefaultMaster()
-      if defaultMaster
+      if defaultMaster && defaultMaster.valid?
         evd.data = { :master => defaultMaster }
         evd.return = "defaultMaster"
       else

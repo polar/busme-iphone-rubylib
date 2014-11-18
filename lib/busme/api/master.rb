@@ -1,5 +1,6 @@
 module Api
   class Master
+    include Encoding
     attr_accessor :lon
     attr_accessor :lat
     attr_accessor :slug
@@ -57,5 +58,23 @@ module Api
       puts "#{boom}"
       p boom.backtrace
     end
+
+    def valid?
+      puts "Master:valid #{self.to_s}"
+      (!(propList - ["@time_format"]).any? {|x| instance_variable_get(x).nil?}).tap do |x|
+        puts "Master:.valid == #{x}"
+      end
+    end
+
+    def to_s
+      StringIO.new("<Api::Master:#{__id__}").tap do |s|
+        propList.each do |prop|
+          s.write(" #{prop}=#{instance_variable_get(prop).inspect}")
+        end
+        s.write(">")
+      end.string
+    end
   end
+
+
 end
