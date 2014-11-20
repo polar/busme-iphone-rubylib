@@ -14,23 +14,32 @@ module Api
     end
 
     def get
-      ent = openURL(initialUrl)
-      if ent
-        tag = xmlParse(ent)
-        if "api" == tag.name.downcase
-          version = tag.attributes["version"]
-          if "d1" == version || "td1" == version
-            self.discoverUrl = tag.attributes["discover"]
-            self.masterUrl = tag.attributes["master"]
-            return true
+      resp = getURLResponse(initialUrl)
+      if resp.getStatusLine.statusCode.to_i == 200
+        ent = resp.getEntity()
+        if ent
+          tag = xmlParse(ent)
+          if tag && "api" == tag.name.downcase
+            version = tag.attributes["version"]
+            if "d1" == version || "td1" == version
+              self.discoverUrl = tag.attributes["discover"]
+              self.masterUrl = tag.attributes["master"]
+              return self
+            else
+              Integration::Http::StatusLine.new(500, "Incorrect Version: Discover Api")
+            end
+          else
+            Integration::Http::StatusLine.new(500, "Bad Response from Server")
           end
+        else
+          puts "No Answer from #{initialUrl}"
+          Integration::Http::StatusLine.new(500, "Internal App Error")
         end
       else
-        puts "No Answer from #{initialUrl}"
+        resp.getStatusLine
       end
-      return false
-    rescue
-      return false
+    rescue Exception => boom
+      Integration::Http::StatusLine.new(500, "Internal App Error #{boom}")
     end
 
     # Zoomlevel here is Android specific.
