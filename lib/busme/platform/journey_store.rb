@@ -28,6 +28,15 @@ module Platform
       self.patterns = {}
     end
 
+    def empty
+      js = journeys
+      self.journeys = {}
+      self.patterns = {}
+      js.values.each do |route|
+        route.journeyStore = nil
+      end
+    end
+
     def getPattern(id)
       patterns[id]
     end

@@ -68,7 +68,7 @@ module Api
     end
 
     def postEvent(event, data = nil)
-     #puts "#{self.to_s}.postEvent(event #{event}, data #{data})"
+      puts "#{self.to_s}.postEvent(event #{event}, data #{data})"
      #puts "#{self.to_s}.postEvent(event #{event}, data #{data}) #{[]}"
       event = event.is_a?(BuspassEvent) ? event : BuspassEvent.new(event, data)
       postBuspassEvent(event)

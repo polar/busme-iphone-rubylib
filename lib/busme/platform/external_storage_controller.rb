@@ -80,5 +80,14 @@ module Platform
       nil
     end
 
+    def removeFile(filename)
+      if isAvailable?
+        fn = File.join(directory, legalize(filename))
+        File.delete(fn)
+      end
+    rescue Exception => boom
+      puts "ExternalStorageController.removeFile(#{fn} => #{boom}"
+    end
+
   end
 end

@@ -83,16 +83,20 @@ module Platform
       assignForegroundControllers
 
       api.bgEvents.registerForEvent("Master:init", self)
+      api.bgEvents.registerForEvent("Master:reload", self)
     end
 
     def unregisterForEvents
       api.bgEvents.unregisterForEvent("Master:init", self)
+      api.bgEvents.unregisterForEvent("Master:reload", self)
     end
 
     def onBuspassEvent(event)
       case event.eventName
         when "Master:init"
           doInitEvent(event)
+        when "Master:reload"
+          doReloadEvent(event)
       end
     end
 
@@ -104,6 +108,19 @@ module Platform
       evd.error = boom
     ensure
       api.uiEvents.postEvent("Master:Init:return", evd)
+    end
+
+    ##
+    # This event happens on the background thread so that it doesn't
+    # interfere with an ongoing Sync as the JourneyBasket/JourneyStore
+    # combo is not thread safe.
+    #
+    def doReloadEvent(event)
+      # We need to empty the basket first, because that notifies removals, which
+      # consequently need the getPattern from the store.
+      journeyBasket.empty
+      journeyStore.empty
+      clearMasterStore
     end
 
     def assignStorageSerializerControllers
@@ -198,6 +215,12 @@ module Platform
       else
         puts "MasterController.storeMaster: API not ready"
       end
+    end
+
+    def clearMasterStore
+      storageSerializerController.removeStorage("#{api.buspass.slug}-Journeys.xml")
+      storageSerializerController.removeStorage("#{api.buspass.slug}-Markers.xml")
+      storageSerializerController.removeStorage("#{api.buspass.slug}-Messages.xml")
     end
   end
 end

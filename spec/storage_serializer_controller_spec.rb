@@ -64,4 +64,14 @@ describe Platform::StorageSerializerController do
     expect(store.test_obj).to eq(api)
     expect(store.test_data).to eq(test_data)
   end
+
+  it "should remove file" do
+    expect(File.exist?(File.join("/", "tmp", "testFile"))).to eq(false)
+    result = controller.cacheStorage(store, "testFile", api)
+    expect(result).to eq(true)
+    store = controller.retrieveStorage("testFile", api)
+    expect(File.exist?(File.join("/", "tmp", "testFile"))).to eq(true)
+    controller.removeStorage("testFile")
+    expect(File.exist?(File.join("/", "tmp", "testFile"))).to eq(false)
+  end
 end

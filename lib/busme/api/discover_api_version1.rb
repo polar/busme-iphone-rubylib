@@ -26,20 +26,18 @@ module Api
               self.masterUrl = tag.attributes["master"]
               return self
             else
-              Integration::Http::StatusLine.new(500, "Incorrect Version: Discover Api")
+              raise Api::HTTPError.new(Integration::Http::StatusLine.new(500, "Incorrect Version: Discover Api"))
             end
           else
-            Integration::Http::StatusLine.new(500, "Bad Response from Server")
+            raise Api::HTTPError.new(Integration::Http::StatusLine.new(500, "Bad Response from Server"))
           end
         else
           puts "No Answer from #{initialUrl}"
-          Integration::Http::StatusLine.new(500, "Internal App Error")
+          raise Api::HTTPError.new(Integration::Http::StatusLine.new(500, "Internal App Error"))
         end
       else
-        resp.getStatusLine
+        raise Api::HTTPError.new(resp.getStatusLine)
       end
-    rescue Exception => boom
-      Integration::Http::StatusLine.new(500, "Internal App Error #{boom}")
     end
 
     # Zoomlevel here is Android specific.
@@ -61,7 +59,12 @@ module Api
     def discover(lon, lat, buffer)
       if discoverUrl
         url = "#{discoverUrl}?lon=#{lon}&lat=#{lat}&buf=#{buffer}"
-        ent = openURL(url)
+        resp = getURLResponse(url)
+        status = resp.getStatusLine
+        if status.statusCode.to_i != 200
+          raise Api::HTTPError.new(status)
+        end
+        ent = resp.getEntity()
         tag = xmlParse(ent)
         masters = []
         if "masters" == tag.name.downcase
@@ -74,13 +77,16 @@ module Api
         end
         return masters
       end
-    rescue
-      nil
     end
 
     def find_master(slug)
       url = "#{masterUrl}?slug=#{slug}"
-      ent = openURL(url)
+      resp = getURLResponse(url)
+      status = resp.getStatusLine
+      if status.statusCode.to_i != 200
+        raise Api::HTTPError.new(status)
+      end
+      ent = resp.getEntity()
       tag = xmlParse(ent)
       if tag && "master" == tag.name.downcase
         parse_master(tag)

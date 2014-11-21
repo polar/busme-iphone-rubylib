@@ -45,5 +45,15 @@ module Platform
       end
     end
 
+    def removeStorage(filename)
+      if externalStorageController.isAvailable?
+        if externalStorageController.isWriteable?
+          externalStorageController.removeFile(filename)
+        end
+      end
+    rescue Exception => boom
+      puts "cacheStorage(#{filename}) => #{boom}"
+    end
+
   end
 end

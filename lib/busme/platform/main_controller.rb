@@ -116,7 +116,7 @@ module Platform
           busmeConfigurator.saveAsDefaultMaster(master)
         end
       end
-      masterController
+      [masterController, oldMasterController]
     rescue Exception => boom
       self.masterController = oldMasterController
       raise boom

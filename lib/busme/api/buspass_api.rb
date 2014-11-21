@@ -126,16 +126,14 @@ module Api
             end
           else
             puts "Cannot get answer from #{url}"
-            Integration::Http::StatusLine.new(500, "Bad Response From Server")
+            raise Api::HTTPError.new(Integration::Http::StatusLine.new(500, "Bad Response From Server"))
           end
         else
-          Integration::Http::StatusLine.new(590, "App Internal Error")
+          raise Api::HTTPError.new(Integration::Http::StatusLine.new(590, "App Internal Error"))
         end
       else
-        status
+        raise Api::HTTPError.new(status)
       end
-    rescue Exception => boom
-      Integration::Http::StatusLine.new(500, "Internal App Error #{boom}")
     end
 
     def passwordRegistration(login)
