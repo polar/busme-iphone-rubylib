@@ -17,6 +17,7 @@ module Platform
       def deserializeObjectFromFile(filename)
         if isAvailable?
           fn = File.join(directory, legalize(filename))
+          puts "#{self.class.name}:#{__method__} Filename #{fn}"
           store = Api::Archiver.decode(File.open(fn))
         end
       end

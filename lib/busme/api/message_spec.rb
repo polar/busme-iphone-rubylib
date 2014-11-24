@@ -30,7 +30,7 @@ module Api
       p boom.backtrace
     end
 
-    def initialize(id, version, expiryTime)
+    def initialize(id = nil, version = nil, expiryTime = nil)
       self.id = id
       self.version = version
       self.expiryTime = expiryTime

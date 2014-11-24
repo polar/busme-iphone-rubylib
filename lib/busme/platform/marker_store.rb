@@ -58,9 +58,9 @@ module Platform
     def clean(time = nil)
       time = Utils::Time.current if time.nil?
       markers.values.each do |msg|
-        if msg.expiryTime < time
+        if msg.expiryTime && msg.expiryTime < time
           markers.delete(msg.id)
-        elsif msg.seen && (!msg.remindable || msg.remindTime.nil?)
+        elsif msg.is_a?(Api::MarkerInfo) && msg.seen && (!msg.remindable || msg.remindTime.nil?)
           markers[msg.id] = Api::MessageSpec.new(msg.id, msg.version, msg.expiryTime)
         end
         self.dirty = true

@@ -198,7 +198,11 @@ module Api
         when "Object"
           className = tag.attributes["class"]
           klass     = className.split("::").inject(Object) { |o, c| o.const_get c }
+          begin
           obj       = klass.new
+          rescue ArgumentError => boom
+            puts "ArgumentError on Object #{className}.new #{boom}"
+          end
           if obj.respond_to? :initWithCoderPrivate
             Archiver.decodeWithCoderKeys(obj, tag, coder)
           else

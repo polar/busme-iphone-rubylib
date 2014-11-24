@@ -55,9 +55,9 @@ module Platform
     def clean(time = nil)
       time = Utils::Time.current if time.nil?
       masterMessages.values.each do |msg|
-        if msg.expiryTime < time
+        if msg.expiryTime && msg.expiryTime < time
           masterMessages.delete(msg.id)
-        elsif msg.seen && (!msg.remindable || msg.remindTime.nil?)
+        elsif msg.is_a?(Api::MasterMessage) && msg.seen && (!msg.remindable || msg.remindTime.nil?)
           masterMessages[msg.id] = Api::MessageSpec.new(msg.id, msg.version, msg.expiryTime)
         end
         self.dirty = true

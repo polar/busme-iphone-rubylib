@@ -47,7 +47,7 @@ module Api
           progress.onRequestStart(Utils::Time.current) if progress
           begin
             response = makeRequestAndParseResponse(requestUrl, parameters)
-          rescue IOError => boom
+          rescue Api::HTTPError => boom
             progress.onRequestIOError(boom) if progress
           end
           progress.onRequestFinish(Utils::Time.current) if progress
@@ -82,7 +82,16 @@ module Api
         tag = nil
         if status == 200
           tag = api.xmlParse(entity)
+          if tag.nil?
+            status = Integration::Http::StatusLine.new(500, "Bad response from server")
+            raise Api::HTTPError.new(status)
+          end
+        else
+          raise Api::HTTPError.new(resp.getStatusLine)
         end
+      else
+        status = Integration::Http::StatusLine.new(500, "No response from server")
+        raise Api::HTTPError.new(status)
       end
       tag
     end

@@ -73,6 +73,7 @@ module Platform
       evd.controller = self
       oldDiscoverController = discoverController
       api = evd.data[:discoverApi]
+      loc = evd.data[:location]
       self.discoverController = DiscoverController.new(api: api, mainController: self)
       evd.return = discoverController
       if discoverController

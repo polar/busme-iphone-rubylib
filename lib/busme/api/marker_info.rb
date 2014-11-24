@@ -19,7 +19,7 @@ module Api
     attr_accessor :remindTime
     
     def propList
-      super.propList +
+      (super.propList) +
       %w(
     @point
     @radius
