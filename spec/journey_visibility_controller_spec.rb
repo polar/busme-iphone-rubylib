@@ -342,4 +342,56 @@ describe Platform::JourneyVisibilityController do
     end
   end
 
+  context "Using Current Selection Changed" do
+    it "should eliminate irrelevant routes when in NearBy state"do
+      journeyids = [route_id, journey_id, route340_id, journey340_id1]
+      basket.sync(journeyids, nil, nil)
+      jd_route = journeyDisplayController.journeyDisplayMap[route_id.id]
+      jd_journey = journeyDisplayController.journeyDisplayMap[journey_id.id]
+      jd_route340 = journeyDisplayController.journeyDisplayMap[route340_id.id]
+      jd_journey340 = journeyDisplayController.journeyDisplayMap[journey340_id1.id]
+
+      # This point shouldn't match any thing other than the 340
+      point1 = jd_journey340.route.paths[0][0]
+      controller.nearByDistance = 500
+      controller.setNearByState(true)
+      controller.onCurrentLocationChanged(point1)
+
+      expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_ALL)
+      expect(jd_route.pathVisible).to eq(false)
+      expect(jd_route.nameVisible).to eq(false)
+      expect(jd_journey.pathVisible).to eq(false)
+      expect(jd_journey.nameVisible).to eq(false)
+
+      expect(jd_route340.pathVisible).to eq(true)
+      expect(jd_route340.nameVisible).to eq(true)
+      expect(jd_journey340.pathVisible).to eq(true)
+      expect(jd_journey340.nameVisible).to eq(false)
+    end
+    it "should eliminate all routes when in NearBy state with far away point"do
+      journeyids = [route_id, journey_id, route340_id, journey340_id1]
+      basket.sync(journeyids, nil, nil)
+      jd_route = journeyDisplayController.journeyDisplayMap[route_id.id]
+      jd_journey = journeyDisplayController.journeyDisplayMap[journey_id.id]
+      jd_route340 = journeyDisplayController.journeyDisplayMap[route340_id.id]
+      jd_journey340 = journeyDisplayController.journeyDisplayMap[journey340_id1.id]
+
+      # This point shouldn't match any thing other than the 340
+      point1 = jd_journey340.route.paths[0][0]
+      controller.nearByDistance = 500
+      controller.setNearByState(true)
+      controller.onCurrentLocationChanged(Integration::GeoPoint.new(0,0))
+
+      expect(controller.stateStack.peek.state).to eq(Platform::VisualState::S_ALL)
+      expect(jd_route.pathVisible).to eq(false)
+      expect(jd_route.nameVisible).to eq(false)
+      expect(jd_journey.pathVisible).to eq(false)
+      expect(jd_journey.nameVisible).to eq(false)
+
+      expect(jd_route340.pathVisible).to eq(false)
+      expect(jd_route340.nameVisible).to eq(false)
+      expect(jd_journey340.pathVisible).to eq(false)
+      expect(jd_journey340.nameVisible).to eq(false)
+    end
+  end
 end

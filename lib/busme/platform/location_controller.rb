@@ -24,6 +24,10 @@ module Platform
       masterController.bannerBasket.onLocationUpdate(location)
       masterController.markerBasket.onLocationUpdate(location)
       masterController.masterMessageBasket.onLocationUpdate(location)
+      needsVisualUpdate = masterController.journeyVisibilityController.onCurrentLocationChanged(location)
+      if needsVisualUpdate
+        api.uiEvents.postEvent("VisibilityChanged")
+      end
     end
   end
 end

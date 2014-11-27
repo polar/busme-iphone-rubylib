@@ -39,6 +39,7 @@ module Platform
     attr_accessor :journeyDisplayController
 
     attr_accessor :nearByDistance
+    attr_accessor :currentLocation
 
     attr_accessor :stateStack
 
@@ -125,7 +126,7 @@ module Platform
       if state.nearBy
         case state.state
           when VisualState::S_ALL, VisualState::S_ROUTE
-            for display in getJourneyDisplays do
+            for display in journeyDisplays do
               isNearBy = false
               for path in display.route.paths do
                 if GeoPathUtils.isOnPath(path, point, nearByDistance)
