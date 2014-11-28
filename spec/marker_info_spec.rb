@@ -11,8 +11,8 @@ describe Api::MarkerInfo do
               remindable='true'
               lat='53.0'
               lon='-74.0'
-              goUrl='http://google.com'
-              iconUrl='http://imgur.com/2343'
+              go_url='http://google.com'
+              icon_url='http://imgur.com/2343'
               version='1394035274'>
         <Title>CAFE</Title>
         <GoLabel>GO!</GoLabel>

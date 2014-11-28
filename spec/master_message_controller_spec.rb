@@ -1,10 +1,12 @@
 require "spec_helper"
+require "test_platform_api"
 require "test_master_message_controller"
 
 describe Platform::MasterMessageController do
 
+  let(:api) { TestPlatformApi.new }
   let(:time_now)  { Utils::Time.current }
-  let(:controller) { TestMasterMessageController.new(nil) }
+  let(:controller) { TestMasterMessageController.new(api) }
   let(:msg1) do
     b = Api::MasterMessage.new("1")
     b.expiryTime = time_now + 24 * 60 * 60

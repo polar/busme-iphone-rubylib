@@ -61,7 +61,7 @@ describe Platform::DiscoverController do
     event = testForeground.lastEvent
     expect(event).to_not eq(nil)
     expect(event.eventData).to be_a_kind_of(Platform::DiscoverEventData)
-    expect(event.eventData.return).to eq(true)
+    expect(event.eventData.return).to be_a(Api::DiscoverAPI)
   end
 
   it "should get a response for discover" do

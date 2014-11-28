@@ -86,7 +86,7 @@ describe Platform::MainController do
     mainController.uiEvents.roll
     event = testForeground.lastEvent
     expect(event).to_not eq(nil)
-    expect(event.eventData.return).to be_a_kind_of(Platform::MasterController)
+    expect(event.eventData.return.first).to be_a_kind_of(Platform::MasterController)
   end
 
   it "should select master from discover" do
@@ -134,7 +134,7 @@ describe Platform::MainController do
     event = mainController.masterController.api.uiEvents.peek
     expect(event.eventName).to eq("Master:Init:return")
     mainController.masterController.api.uiEvents.roll
-    expect(testMasterForeground.lastEvent.eventData.return).to eq(true)
+    expect(testMasterForeground.lastEvent.eventData.return).to be_a(Api::BuspassAPI)
   end
 
   it "should get a discover for initial start" do

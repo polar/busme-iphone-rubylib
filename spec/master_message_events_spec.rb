@@ -1,17 +1,17 @@
 require "spec_helper"
 require "test_platform_api"
 
-class TestFGMasterMessageController < Platform::FG_MasterMessageEventController
+class TestFGMasterMessageEventController < Platform::FG_MasterMessageEventController
   attr_accessor :test_previous_state
 
   def onInquireStart(requestState)
     self.test_previous_state = requestState.state
-    super(requestState)
+    super
   end
 
   def onNotifyStart(requestState)
     self.test_previous_state = requestState.state
-    super(requestState)
+    super
   end
 end
 
@@ -51,7 +51,7 @@ describe Platform::MasterMessageEventData do
     api
   }
   let(:masterMessageBackground) { Platform::BG_MasterMessageEventController.new(api) }
-  let(:masterMessageForeground) {TestFGMasterMessageController.new(api) }
+  let(:masterMessageForeground) {TestFGMasterMessageEventController.new(api) }
   let(:eventData) { Platform::MasterMessageEventData.new(masterMessage)}
   before do
     masterMessageBackground

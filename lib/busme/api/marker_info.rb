@@ -142,8 +142,8 @@ module Api
 
     def loadParsedXML(tag)
       self.id = tag.attributes["id"]
-      self.goUrl = tag.attributes["goUrl"]
-      self.iconUrl = tag.attributes["iconUrl"]
+      self.goUrl = tag.attributes["go_url"]
+      self.iconUrl = tag.attributes["icon_url"]
       self.remindable = "true" == tag.attributes["remindable"]
       for m in tag.childNodes
         case m.name

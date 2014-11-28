@@ -22,13 +22,13 @@ describe Api::DiscoverAPIVersion1 do
   it "should get a response" do
     url = "https://busme-apis.herokuapp.com/apis/d1/get"
     d1 = Api::DiscoverAPIVersion1.new(Testlib::MyHttpClient.new, url)
-    expect(d1.get).to be(true)
+    expect(d1.get).to_not eq(nil)
   end
 
   it "should be able to find several" do
     url = "https://busme-apis.herokuapp.com/apis/d1/get"
     d1 = Api::DiscoverAPIVersion1.new(Testlib::MyHttpClient.new, url)
-    expect(d1.get).to be(true)
+    expect(d1.get).to_not eq(nil)
     masters = d1.discover(-76.13, 43.04, 1000)
     expect(masters).not_to be_empty
     expect(masters.map {|x| x.slug}).to include("syracuse-university")
@@ -37,14 +37,14 @@ describe Api::DiscoverAPIVersion1 do
   it "should be able to find one" do
     url = "https://busme-apis.herokuapp.com/apis/d1/get"
     d1 = Api::DiscoverAPIVersion1.new(Testlib::MyHttpClient.new, url)
-    expect(d1.get).to be(true)
+    expect(d1.get).to_not eq(nil)
     master = d1.find_master("syracuse-university")
     expect(master).not_to be(nil)
     expect(master.slug).to eq("syracuse-university")
   end
 
   it "should be able to parse a master" do
-    expect(api.get).to be(true)
+    expect(api.get).to be_a(Api::DiscoverAPI)
     httpClient.mock_answer = cnyDiscoverSU
     master = api.find_master("syracuse-university")
     expect(master).not_to be(nil)

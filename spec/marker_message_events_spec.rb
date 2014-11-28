@@ -28,8 +28,8 @@ describe Platform::MarkerMessageEventData do
       <Marker id='1' version='121' lat='53.0' lon='-74.0' length='10'
               frequency='10' priority='1' expiryTime='#{(time_now + 60 * 60).to_i}'
               radius='200'
-              goUrl='http://busme.us'
-              iconUrl='http://something.org/pic.png'
+              go_url='http://busme.us'
+              icon_url='http://something.org/pic.png'
               ><Title>Title1</Title><Description>Hello</Description>
       </Marker>
       "

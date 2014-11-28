@@ -58,6 +58,6 @@ describe Platform::MasterController do
     event = masterController.api.uiEvents.peek
     expect(event.eventName).to eq("Master:Init:return")
     masterController.api.uiEvents.roll
-    expect(testForeground.lastEvent.eventData.return).to eq(true)
+    expect(testForeground.lastEvent.eventData.return).to be_a(Api::BuspassAPI)
   end
 end
