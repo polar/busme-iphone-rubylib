@@ -180,7 +180,7 @@ module Platform
     # These are defaults for testing the back and forth protocol between cooresponding
     # background controllers, such with Interactions with messages and login.
     def assignForegroundControllers
-      self.loginForeground = LoginForeground.new(api) # TODO: Extend with UI
+      #self.loginForeground = LoginForeground.new(api) # TODO: Extend with UI
 
       #self.fgBannerPresentationEventController = FG_BannerPresentationEventController.new(api)
       #self.fgMarkerPresentationEventController = FG_MarkerPresentationEventController.new(api)

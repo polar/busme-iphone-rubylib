@@ -2,13 +2,11 @@ module Platform
 
   class LoginEventData
     attr_accessor :loginManager
-    attr_accessor :loginTries
     attr_accessor :loginForeground
     attr_accessor :loginBackground
 
     def initialize(manager)
       self.loginManager = manager
-      self.loginTries   = 0
     end
   end
 
@@ -27,58 +25,96 @@ module Platform
         eventData.loginForeground = self
         loginManager = eventData.loginManager
         login = loginManager.login
-        case login.loginState
-          when Api::Login::LS_LOGIN
-            passwordLogin(eventData)
-          when Api::Login::LS_REGISTER
-            registerLogin(eventData)
-          when Api::Login::LS_LOGGED_IN
-            dismiss(eventData)
-          when Api::Login::LS_LOGGED_OUT
-            dismiss(eventData)
-        end
+          case login.loginState
+            when Api::Login::LS_LOGIN
+              passwordLogin(eventData)
+            when Api::Login::LS_REGISTER
+              registerLogin(eventData)
+            when Api::Login::LS_LOGGED_IN
+              dismiss(eventData)
+            when Api::Login::LS_LOGGED_OUT
+              dismiss(eventData)
+            when Api::Login::LS_AUTHTOKEN_FAILURE,
+                Api::Login::LS_REGISTER_FAILURE,
+                Api::Login::LS_LOGIN_FAILURE
+              presentError(eventData)
+            when
+              Api::Login::LS_AUTHTOKEN_SUCCESS,
+              Api::Login::LS_REGISTER_SUCCESS,
+              Api::Login::LS_LOGIN_SUCCESS
+              presentConfirmation(eventData)
+          end
       end
     end
 
     def passwordLogin(eventData)
-      eventData.loginTries += 1
-      if eventData.loginTries < 3
+      login = eventData.loginManager.login
+      if !login.quiet
         presentPasswordLogin(eventData)
-      else
-        presentError(eventData)
       end
     end
 
     def registerLogin(eventData)
-      eventData.loginTries += 1
-      if eventData.loginTries < 3
+      login = eventData.loginManager.login
+      if !login.quiet
         presentRegisterLogin(eventData)
-      else
+      end
+    end
+
+    def processError(eventData)
+      login = eventData.loginManager.login
+      if !login.quiet
         presentError(eventData)
+      else
+        onContinue(eventData)
+      end
+    end
+
+    def processSuccess(eventData)
+      login = eventData.loginManager.login
+      if !login.quiet
+        presentConfirmation(eventData)
+      else
+        onContinue(eventData)
       end
     end
 
     def dismiss(eventData = nil)
-
     end
 
     def presentPasswordLogin(eventData)
       # Collect UserName and Password
       # Possible Driver Auth Code
+      onSubmit(eventData)
     end
 
     def presentRegisterLogin(eventData)
       # Get Username and Password
       # Possible Drive AuthCode
+      onSubmit(eventData)
     end
 
     def presentError(eventData)
+      onContinue(eventData)
+    end
 
+    def presentConfirmation(eventData)
+      onContinue(eventData)
     end
 
     def onSubmit(eventData)
       dismiss(eventData)
       api.bgEvents.postEvent("LoginEvent", eventData)
+    end
+
+    def onContinue(eventData)
+      dismiss(eventData)
+      eventData.loginManager.exitProtocol
+      case eventData.loginManager.login.loginState
+        when Api::Login::LS_LOGGED_IN, Api::Login::LS_LOGGED_OUT
+        else
+          api.uiEvents.postEvent("LoginEvent", eventData)
+      end
     end
 
     def onCancel(eventData)
@@ -101,23 +137,7 @@ module Platform
       loginManager = eventData.loginManager
       login = loginManager.login
       loginManager.enterProtocol(login)
-      loginManager.exitProtocol
-      case eventData.loginManager.login.loginState
-        when Api::Login::LS_LOGGED_IN, Api::Login::LS_LOGGED_OUT
-          api.uiEvents.postEvent("LoginEvent", eventData)
-        when Api::Login::LS_LOGIN, Api::Login::LS_REGISTER
-          if eventData.loginManager.login.status == "NetworkProblem"
-            data = Platform::NetworkEventData.new
-            data.reason = "login"
-            data.login = eventData
-            api.uiEvents.postEvent("NetworkProblem", data)
-          else
-            api.uiEvents.postEvent("LoginEvent", eventData)
-          end
-        else
-          api.uiEvents.postEvent("LoginEvent", eventData)
-      end
+      api.uiEvents.postEvent("LoginEvent", eventData)
     end
-
   end
 end

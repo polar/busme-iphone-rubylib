@@ -26,12 +26,11 @@ module Api
         when Login::LS_LOGGED_IN
         when Login::LS_LOGGED_OUT
         else
-          raise "Bad Option"
+          raise "Bad Option #{login.inspect}"
       end
     end
 
     def authTokenLogin
-      login.loginState = Login::LS_AUTHTOKEN
       login.authToken = authToken
       login.roleIntent = roleIntent
       api.authTokenLogin(login)
@@ -44,10 +43,16 @@ module Api
     end
 
     def registerLogin
-      login.loginState = Login::LS_REGISTER
-      login.email = email
-      login.roleIntent = roleIntent
-      api.passwordRegistration(login)
+      login.loginTries += 1
+      if login.loginTries < Login::LS_TRY_LIMIT
+        login.email ||= email
+        login.roleIntent ||= roleIntent
+        api.passwordRegistration(login)
+      else
+        login.loginState = Login::LS_REGISTER_FAILURE
+        login.status = "Too many tries"
+      end
+
     rescue IOError => boom
       login.status = "NetworkProblem"
       login.loginState = Login::LS_REGISTER_FAILURE
@@ -57,10 +62,15 @@ module Api
     end
 
     def passwordLogin
-      login.loginState = Login::LS_LOGIN
-      login.email = email
-      login.roleIntent = roleIntent
-      api.passwordLogin(login)
+      login.loginTries += 1
+      if login.loginTries < Login::LS_TRY_LIMIT
+        login.email = email
+        login.roleIntent = roleIntent
+        api.passwordLogin(login)
+      else
+        login.loginState = Login::LS_LOGIN_FAILURE
+        login.status = "Too many tries"
+      end
     rescue IOError => boom
       login.status = "NetworkProblem"
       login.loginState = Login::LS_LOGIN_FAILURE
@@ -78,7 +88,7 @@ module Api
         when Login::LS_AUTHTOKEN_SUCCESS, Login::LS_AUTHTOKEN_FAILURE
           confirmAuthTokenLogin
         else
-          raise "Bad Option"
+          raise "Bad Option #{login.inspect}"
       end
     end
 
@@ -87,17 +97,22 @@ module Api
         when Login::LS_LOGIN_SUCCESS
           login.loginState = Login::LS_LOGGED_IN
         when Login::LS_LOGIN_FAILURE
-          case login.status
-            when "NetworkProblem"
-              login.loginState = Login::LS_LOGIN
-            when "InvalidPassword"
-              login.loginState = Login::LS_LOGIN
-            when "NotAuthorized"
-              login.loginState = Login::LS_LOGIN
-            when "NotRegistered"
-              login.loginState = Login::LS_REGISTER
-            when "InvalidToken"
-              login.loginState = Login::LS_LOGIN
+          if login.quiet || login.loginTries >= Api::Login::LS_TRY_LIMIT
+            login.loginState = Login::LS_LOGGED_OUT
+          else
+            case login.status
+              when "NetworkProblem"
+                login.loginState = Login::LS_LOGIN
+              when "InvalidPassword"
+                login.loginState = Login::LS_LOGIN
+              when "NotAuthorized"
+                login.loginState = Login::LS_LOGIN
+              when "NotRegistered"
+                login.loginState = Login::LS_REGISTER
+                login.loginTries = 0
+              when "InvalidToken"
+                login.loginState = Login::LS_LOGIN
+            end
           end
       end
     end
@@ -107,17 +122,23 @@ module Api
         when Login::LS_REGISTER_SUCCESS
           login.loginState = Login::LS_LOGGED_IN
         when Login::LS_REGISTER_FAILURE
-          case login.status
-            when "NetworkProblem"
-              login.loginState = Login::LS_REGISTER
-            when "InvalidPassword"
-              login.loginState = Login::LS_REGISTER
-            when "NotAuthorized"
-              login.loginState = Login::LS_REGISTER
-            when "NotRegistered"
-              login.loginState = Login::LS_REGISTER
-            when "InvalidToken"
-              login.loginState = Login::LS_REGISTER
+          if login.quiet || login.loginTries >= Api::Login::LS_TRY_LIMIT
+            login.loginState = Login::LS_LOGGED_OUT
+          else
+            case login.status
+              when "NetworkProblem"
+                login.loginState = Login::LS_REGISTER
+              when "InvalidPassword"
+                login.loginState = Login::LS_REGISTER
+              when "InvalidPasswordConfirmation"
+                login.loginState = Login::LS_REGISTER
+              when "NotAuthorized"
+                login.loginState = Login::LS_REGISTER
+              when "NotRegistered"
+                login.loginState = Login::LS_REGISTER
+              when "InvalidToken"
+                login.loginState = Login::LS_REGISTER
+            end
           end
       end
     end

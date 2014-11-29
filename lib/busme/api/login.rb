@@ -12,20 +12,22 @@ module Api
     attr_accessor :roles
     attr_accessor :authToken
     attr_accessor :loginState
+    attr_accessor :loginTries
     attr_accessor :quiet
 
     LS_LOGIN = 1
-    LS_LOGIN_FAILURE = 2.5
-    LS_LOGIN_SUCCESS = 2.7
+    LS_LOGIN_FAILURE = 25
+    LS_LOGIN_SUCCESS = 27
     LS_REGISTER = 5
-    LS_REGISTER_SUCCESS = 5.5
-    LS_REGISTER_FAILURE = 5.6
+    LS_REGISTER_SUCCESS = 55
+    LS_REGISTER_FAILURE = 56
     LS_LOGGED_IN = 6
     LS_LOGGED_OUT = 7
     LS_AUTHTOKEN = 9
     LS_AUTHTOKEN_FAILURE = 10
     LS_AUTHTOKEN_SUCCESS =11
 
+    LS_TRY_LIMIT = 3
 
     def initialize
       self.roles = []
