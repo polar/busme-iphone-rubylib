@@ -64,8 +64,8 @@ module Api
     def passwordLogin
       login.loginTries += 1
       if login.loginTries < Login::LS_TRY_LIMIT
-        login.email = email
-        login.roleIntent = roleIntent
+        login.email ||= email
+        login.roleIntent ||= roleIntent
         api.passwordLogin(login)
       else
         login.loginState = Login::LS_LOGIN_FAILURE
