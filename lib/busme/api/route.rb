@@ -35,6 +35,7 @@ module Api
     attr_accessor :onRoute
     attr_accessor :timeZone
     attr_accessor :reported
+    attr_accessor :reporting
 
     attr_accessor :journeyStore
     

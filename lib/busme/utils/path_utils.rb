@@ -112,6 +112,21 @@ module Utils
       return false
     end
 
+    def self.offRoute(points, point)
+      max = 99999999999999
+      if points.length > 0
+        last = points[0]
+      end
+      for p in points
+        off =  offLine(last, p, point)
+        if off < max
+          max = off
+        end
+        last = p
+      end
+      return max
+    end
+
     def self.getRect(c1, c2)
       rect = Integration::Rect.new
       rect.left   = [c1.x, c2.x].min

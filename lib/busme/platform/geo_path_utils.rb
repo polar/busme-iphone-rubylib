@@ -29,6 +29,22 @@ module Platform
       GeoCalc.pathDistance(path)
     end
 
+    def self.offPath(path, point)
+      max = EARTH_RADIUS_FEET * EARTH_RADIUS_FEET * Math::PI
+      last = nil
+      if path.length > 0
+        last = path[0]
+      end
+      for p in path
+        off =  GeoCalc.offLine(last, p, point)
+        if off < max
+          max = off
+        end
+        last = p
+      end
+      return max
+    end
+
     def self.whereOnPath(path, point, buffer)
       results = []
       distance = 0.0

@@ -185,8 +185,9 @@ module Platform
       for display in journeyDisplayController.getJourneyDisplays do
         if display.pathVisible && display.route.isJourney?
           isSelected = false
+          # Journeys have one path, but whatever.
           for path in display.route.paths do
-            if GeoPathUtils.isOnPath(display.route.path, geoPoint, buffer)
+            if GeoPathUtils.isOnPath(path, geoPoint, buffer)
               isSelected = true
             end
           end

@@ -37,7 +37,7 @@ module Api
     end
 
     def loggedIn?
-      loginCredentials && loginCredentials.loginState == Login::LS_LOGGED_IN
+      loginCredentials && loginCredentials.loginState == Login::LS_LOGGED_IN ? loginCredentials : nil
     end
 
     def getPlatformArgs()

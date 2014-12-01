@@ -17,6 +17,11 @@ module Platform
       end
     end
 
+    def currentLocation
+      # TODO If it's not current don't return it.
+      lastKnownLocation
+    end
+
     def onLocationUpdate(eventData)
       puts "LocationController::onLocationUpdate(#{eventData.location.inspect})"
       location = eventData.location
