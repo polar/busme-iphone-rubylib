@@ -6,6 +6,7 @@ module Api
     attr_accessor :name
     attr_accessor :email
     attr_accessor :password
+    attr_accessor :passwordConfirmation
     attr_accessor :driverAuthCode
     attr_accessor :roleIntent
     attr_accessor :rolesLiteral
@@ -25,7 +26,7 @@ module Api
     LS_LOGGED_OUT = 7
     LS_AUTHTOKEN = 9
     LS_AUTHTOKEN_FAILURE = 10
-    LS_AUTHTOKEN_SUCCESS =11
+    LS_AUTHTOKEN_SUCCESS = 11
 
     LS_TRY_LIMIT = 3
 
@@ -33,6 +34,7 @@ module Api
       self.roles = []
       self.rolesLiteral = ""
       self.quiet = true
+      self.loginTries = 0
     end
 
     def hasRole?(name)

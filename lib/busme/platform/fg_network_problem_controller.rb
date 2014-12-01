@@ -1,8 +1,4 @@
 module Platform
-  class NetworkEventData
-    attr_accessor :reason
-    attr_accessor :login
-  end
 
   class FGNetworkProblemController
     include Api::BuspassEventListener
@@ -15,7 +11,7 @@ module Platform
 
     def onBuspassEvent(event)
       eventData = event.eventData
-      if eventData.is_a? NetworkEventData
+      if eventData.is_a? Api::NetworkProblemEventData
         present(eventData)
       end
 

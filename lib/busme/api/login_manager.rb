@@ -56,6 +56,7 @@ module Api
     rescue IOError => boom
       login.status = "NetworkProblem"
       login.loginState = Login::LS_REGISTER_FAILURE
+      api.uiEvents.postEvent("NetworkProblem", NetworkProblemEventData.new("#{boom}", login))
     rescue Exception => boom
       login.status = "BadResponse"
       login.loginState = Login::LS_REGISTER_FAILURE
@@ -74,6 +75,7 @@ module Api
     rescue IOError => boom
       login.status = "NetworkProblem"
       login.loginState = Login::LS_LOGIN_FAILURE
+      api.uiEvents.postEvent("NetworkProblem", NetworkProblemEventData.new("#{boom}", login))
     rescue Exception => boom
       login.status = "BadResponse"
       login.loginState = Login::LS_LOGIN_FAILURE
@@ -96,9 +98,11 @@ module Api
       case login.loginState
         when Login::LS_LOGIN_SUCCESS
           login.loginState = Login::LS_LOGGED_IN
+          api.loginCredentials = login
         when Login::LS_LOGIN_FAILURE
           if login.quiet || login.loginTries >= Api::Login::LS_TRY_LIMIT
             login.loginState = Login::LS_LOGGED_OUT
+            api.loginCredentials = nil
           else
             case login.status
               when "NetworkProblem"
@@ -106,7 +110,8 @@ module Api
               when "InvalidPassword"
                 login.loginState = Login::LS_LOGIN
               when "NotAuthorized"
-                login.loginState = Login::LS_LOGIN
+                login.loginState = Login::LS_REGISTER
+                login.loginTries = 0
               when "NotRegistered"
                 login.loginState = Login::LS_REGISTER
                 login.loginTries = 0
@@ -121,9 +126,11 @@ module Api
       case login.loginState
         when Login::LS_REGISTER_SUCCESS
           login.loginState = Login::LS_LOGGED_IN
+          api.loginCredentials = login
         when Login::LS_REGISTER_FAILURE
           if login.quiet || login.loginTries >= Api::Login::LS_TRY_LIMIT
             login.loginState = Login::LS_LOGGED_OUT
+            api.loginCredentials = nil
           else
             case login.status
               when "NetworkProblem"
@@ -147,9 +154,11 @@ module Api
       case login.loginState
         when Login::LS_AUTHTOKEN_SUCCESS
           login.loginState = Login::LS_LOGGED_IN
+          api.loginCredentials = login
         when Login::LS_AUTHTOKEN_FAILURE
           if login.quiet
             login.loginState = Login::LS_LOGGED_OUT
+            api.loginCredentials = nil
           else
             login.loginState = Login::LS_LOGIN
           end
@@ -160,10 +169,11 @@ module Api
       api.forgetLogin
     rescue IOError => boom
       login.status = "NetworkProblem"
-      login.loginState = Login::LS_LOGGED_OUT
+      api.uiEvents.postEvent("NetworkProblem", NetworkProblemEventData.new("#{boom}", login))
     rescue Exception => boom
     ensure
       login.loginState = Login::LS_LOGGED_OUT
+      api.loginCredentials = nil
     end
   end
 end

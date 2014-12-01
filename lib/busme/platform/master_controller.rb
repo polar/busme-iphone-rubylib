@@ -27,6 +27,7 @@ module Platform
     attr_accessor :journeyDisplayController
     attr_accessor :journeyStore
     attr_accessor :journeyVisibilityController
+    attr_accessor :journeySelectionPostingController
 
     attr_accessor :markerBasket
     attr_accessor :markerPresentationController
@@ -141,6 +142,7 @@ module Platform
       self.journeyBasket = JourneyBasket.new(api, journeyStore)
       self.journeyDisplayController = JourneyDisplayController.new(api, journeyBasket)
       self.journeyVisibilityController = JourneyVisibilityController.new(api, journeyDisplayController)
+      self.journeySelectionPostingController = JourneySelectionPostingController.new(api, journeyVisibilityController)
 
       ms = storageSerializerController.retrieveStorage("#{api.master_slug}-Messages.xml", api)
       self.masterMessageStore = ms || MasterMessageStore.new

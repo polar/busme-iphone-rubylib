@@ -13,6 +13,8 @@ module Api
     attr_accessor :loginManager
     attr_accessor :uiEvents
     attr_accessor :bgEvents
+    attr_accessor :loginCredentials
+    attr_accessor :startReporting
 
     def initialize(http_client, master_slug, initialURL, platform, appVersion)
       super(http_client)
@@ -32,6 +34,10 @@ module Api
 
     def isReady?
       ready
+    end
+
+    def loggedIn?
+      loginCredentials && loginCredentials.loginState == Login::LS_LOGGED_IN
     end
 
     def getPlatformArgs()

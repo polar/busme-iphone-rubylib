@@ -60,6 +60,7 @@ describe Api::LoginManager do
   end
 
   it "should handle bad response from login, auth, and register" do
+    login.quiet = false
     test_response(Api::Login::LS_LOGIN, badResponse)
     expect(login.loginState).to eq(Api::Login::LS_LOGIN_FAILURE)
     test_response(Api::Login::LS_AUTHTOKEN, badResponse)
@@ -69,6 +70,7 @@ describe Api::LoginManager do
   end
 
   it "should handle badly parsed data" do
+    login.quiet = false
     test_response(Api::Login::LS_LOGIN, invalidData)
     expect(login.loginState).to eq(Api::Login::LS_LOGIN_FAILURE)
     test_response(Api::Login::LS_AUTHTOKEN, invalidData)
@@ -78,6 +80,7 @@ describe Api::LoginManager do
   end
 
   it "should handle failed logins" do
+    login.quiet = false
     test_response(Api::Login::LS_LOGIN, invalidToken)
     expect(login.loginState).to eq(Api::Login::LS_LOGIN_FAILURE)
     test_response(Api::Login::LS_AUTHTOKEN, invalidToken)
@@ -87,6 +90,7 @@ describe Api::LoginManager do
   end
 
   it "should handle successful login" do
+    login.quiet = false
     test_response(Api::Login::LS_LOGIN, loginOK)
     expect(login.loginState).to eq(Api::Login::LS_LOGIN_SUCCESS)
     expect(login.email).to eq("polar@syr.edu")
@@ -96,6 +100,7 @@ describe Api::LoginManager do
   end
 
   it "should handle successful auth" do
+    login.quiet = false
     test_response(Api::Login::LS_AUTHTOKEN, loginOK)
     expect(login.loginState).to eq(Api::Login::LS_AUTHTOKEN_SUCCESS)
     expect(login.email).to eq("polar@syr.edu")
@@ -105,6 +110,7 @@ describe Api::LoginManager do
   end
 
   it "should handle successful register" do
+    login.quiet = false
     test_response(Api::Login::LS_REGISTER, loginOK)
     expect(login.loginState).to eq(Api::Login::LS_REGISTER_SUCCESS)
     expect(login.email).to eq("polar@syr.edu")
@@ -123,7 +129,18 @@ describe Api::LoginManager do
     api.loginManager.exitProtocol
   end
 
-  it "should roll to logged in" do
+  it "should roll to logged in when quiet" do
+    login.quiet = true
+    test_response_and_exit(Api::Login::LS_LOGIN, loginOK)
+    expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
+    test_response_and_exit(Api::Login::LS_AUTHTOKEN, loginOK)
+    expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
+    test_response_and_exit(Api::Login::LS_REGISTER, loginOK)
+    expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
+  end
+
+  it "should roll to logged in when quiet" do
+    login.quiet = false
     test_response_and_exit(Api::Login::LS_LOGIN, loginOK)
     expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
     test_response_and_exit(Api::Login::LS_AUTHTOKEN, loginOK)
@@ -133,8 +150,15 @@ describe Api::LoginManager do
   end
 
   it "should roll to register from login and being not registered" do
+    login.quiet = false
     test_response_and_exit(Api::Login::LS_LOGIN, notRegistered)
     expect(login.loginState).to eq(Api::Login::LS_REGISTER)
+  end
+
+  it "on quiet it should logged out for being not registered" do
+    login.quiet = true
+    test_response_and_exit(Api::Login::LS_LOGIN, notRegistered)
+    expect(login.loginState).to eq(Api::Login::LS_LOGGED_OUT)
   end
 
   it "should roll to password login on invalid token when not quiet" do

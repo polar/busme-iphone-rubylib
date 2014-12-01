@@ -179,6 +179,25 @@ module Platform
       @journeysHighlighted = []
     end
 
+
+    def selectJourneysFromPoint(geoPoint, buffer)
+      selected = []
+      for display in journeyDisplayController.getJourneyDisplays do
+        if display.pathVisible && display.route.isJourney?
+          isSelected = false
+          for path in display.route.paths do
+            if GeoPathUtils.isOnPath(display.route.path, geoPoint, buffer)
+              isSelected = true
+            end
+          end
+          if isSelected
+            selected << display
+          end
+        end
+      end
+      selected
+    end
+
     #
     # Called by User selecting a particular location for filtering.
     #

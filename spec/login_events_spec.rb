@@ -13,6 +13,7 @@ class TestLoginEventForeground < Platform::LoginForeground
       eventData.loginManager.login.driverAuthCode = "12123"
     end
     self.presented = true
+    super(eventData)
   end
 
   def presentRegistrationLogin(eventData)
@@ -23,6 +24,7 @@ class TestLoginEventForeground < Platform::LoginForeground
       eventData.loginManager.login.driverAuthCode = "12123"
     end
     self.presented = true
+    super(eventData)
   end
 
   def dismiss(eventData)
@@ -74,6 +76,8 @@ describe Platform::LoginForeground do
   it "should login and dismiss" do
     # Banner Event has been set up with a banner's message to be displayed.
     login.loginState = Api::Login::LS_LOGIN
+    login.loginTries = 0
+    login.quiet = false
     api.uiEvents.postEvent("LoginEvent", eventData)
     api.uiEvents.roll()
 
@@ -81,56 +85,59 @@ describe Platform::LoginForeground do
     expect(login.password).to eq("NE1410s")
     expect(loginForeground.presented)
 
-    # Foreground hit of submit button
-    loginForeground.onSubmit(eventData)
-
     api.mock_answer = loginOK
     api.bgEvents.roll()
-    expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
+    expect(login.loginState).to eq(Api::Login::LS_LOGIN_SUCCESS)
     api.uiEvents.roll()
+    expect(login.loginState).to eq(Api::Login::LS_LOGGED_IN)
     expect(loginForeground.dismissed)
+
+    expect(api.loginCredentials).to eq(login)
+    expect(api.loggedIn?)
   end
 
   it "should stop after 3 times" do
     login.loginState = Api::Login::LS_LOGIN
+    login.loginTries = 0
+    login.quiet = false
     api.uiEvents.postEvent("LoginEvent", eventData)
     api.uiEvents.roll()
-    # Foreground hit of submit button
-    loginForeground.onSubmit(eventData)
-    tries = 1
-    while (tries < 10 && loginForeground.presented) do
+    tries = 0
+    while (tries < Api::Login::LS_TRY_LIMIT) do
+      expect(login.loginState).to eq(Api::Login::LS_LOGIN)
 
       loginForeground.presented = false
 
       api.mock_answer = invalidToken
       api.bgEvents.roll()
-      expect(login.loginState).to eq(Api::Login::LS_LOGIN)
-      api.uiEvents.roll()
-      # Foreground hit of submit button
-      loginForeground.onSubmit(eventData)
+      expect(login.loginState).to eq(Api::Login::LS_LOGIN_FAILURE)
+      # This will spawn a couple UI Events to allow for notifications of failures
+      api.uiEvents.rollAll()
       tries += 1
     end
-    expect(tries).to eq(3)
+    expect(tries).to eq(Api::Login::LS_TRY_LIMIT)
+    api.uiEvents.roll()
+    expect(login.loginState).to eq(Api::Login::LS_LOGGED_OUT)
     expect(loginForeground.dismissed)
   end
 
   it "should handle a network problem" do
     # Banner Event has been set up with a banner's message to be displayed.
     login.loginState = Api::Login::LS_LOGIN
+    login.loginTries = 0
+    login.quiet = false
     api.uiEvents.postEvent("LoginEvent", eventData)
     api.uiEvents.roll()
     expect(loginForeground.presented)
 
-    # Foreground hit of submit button
-    loginForeground.onSubmit(eventData)
-
     api.mock_answer = IOError.new("Network unreachable")
 
     api.bgEvents.roll()
+    expect(login.loginState).to eq(Api::Login::LS_LOGIN_FAILURE)
+    api.uiEvents.rollAll()
     expect(login.loginState).to eq(Api::Login::LS_LOGIN)
-    api.uiEvents.roll()
 
-    expect(networkProblemForeground.eventData.login).to eq(eventData)
+    expect(networkProblemForeground.eventData.login).to eq(login)
   end
 
 end
