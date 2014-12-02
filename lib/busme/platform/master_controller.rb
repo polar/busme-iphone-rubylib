@@ -101,6 +101,14 @@ module Platform
       end
     end
 
+    def logout
+      if journeyLocationPoster
+        journeyLocationPoster.endPosting
+      end
+      api.clearLogin
+      # TODO: We should probably clear the cookie and end server session.
+    end
+
     def doInitEvent(event)
       evd = event.eventData
       evd.controller = self
@@ -195,7 +203,7 @@ module Platform
 
       # Extend to provide indications to user for various events that involves posting locations
       # for a particular journey.
-      self.journeyEventController = JourneyEventController.new(api)
+      #self.journeyEventController = JourneyEventController.new(api)
     end
 
     # This method stores the our collected information on the external storage of the phone.

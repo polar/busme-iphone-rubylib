@@ -110,11 +110,12 @@ module Platform
     def onContinue(eventData)
       dismiss(eventData)
       eventData.loginManager.exitProtocol
-      case eventData.loginManager.login.loginState
-        when Api::Login::LS_LOGGED_IN, Api::Login::LS_LOGGED_OUT
-        else
-          api.uiEvents.postEvent("LoginEvent", eventData)
-      end
+      api.uiEvents.postEvent("LoginEvent", eventData)
+      # case eventData.loginManager.login.loginState
+      #   when Api::Login::LS_LOGGED_IN, Api::Login::LS_LOGGED_OUT
+      #   else
+      #     api.uiEvents.postEvent("LoginEvent", eventData)
+      # end
     end
 
     def onCancel(eventData)

@@ -14,11 +14,12 @@ module Platform
     A_AT_ROUTE_END     = 6
     A_ON_ROUTE_DONE    = 7
 
-    R_NORMAL    = 1
-    R_FORCED    = 2
-    R_DISABLED  = 3
-    R_SERVICE   = 4
-    R_OFF_ROUTE = 5
+    R_NORMAL        = 1
+    R_FORCED        = 2
+    R_DISABLED      = 3
+    R_SERVICE       = 4
+    R_OFF_ROUTE     = 5
+    R_NOT_AVAILABLE = 6
   end
 
   class JourneyLocationPoster
@@ -34,11 +35,9 @@ module Platform
     attr_accessor :alreadyPosting
     attr_accessor :alreadyStarted
     attr_accessor :alreadyFinished
-    attr_accessor :enabled
 
     def initialize(api)
       self.api = api
-      self.enabled = false
 
       api.uiEvents.registerForEvent("LocationChanged", self)
       api.uiEvents.registerForEvent("LocationProviderDisabled", self)
@@ -86,10 +85,10 @@ module Platform
       self.endPoint = postingPathPoints.last
     end
 
-    def endPosting(reason = JourneyEventData::FORCED)
+    def endPosting(reason = JourneyEventData::R_FORCED)
       if postingRoute
         postingRoute.reporting = false
-        notifiyOnRouteDone(reason)
+        notifyOnRouteDone(reason)
         reset(nil, nil)
       end
     end
@@ -100,9 +99,6 @@ module Platform
     #
     # TODO: Determine Off Route stuff.
     def processLocation(location)
-      if !enabled
-        return
-      end
       if postingRoute
         if ! alreadyPosting
           notifyOnRoutePosting(location)
@@ -163,7 +159,7 @@ module Platform
     #
     def onJourneyStopPosting(eventData)
       if postingRoute
-        endPosting(JourneyEventData::R_FORCED)
+        endPosting(eventData.reason)
       end
     end
 
@@ -187,14 +183,12 @@ module Platform
     # Foreground Event for "LocationProviderEnabled"
     #
     def onProviderEnabled(eventData)
-      self.enabled = true
     end
 
     #
     # Foreground Event for "LocationProviderDisabled"
     #
     def onProviderDisabled(eventData)
-      self.enabled = false
       endPosting(JourneyEventData::R_DISABLED)
     end
 
@@ -259,7 +253,7 @@ module Platform
       eventData.reason = reason
       eventData.action = JourneyEventData::A_ON_ROUTE_DONE
       api.uiEvents.postEvent("JourneyEvent", eventData)
-      self.postingRoute = self.postingRole = nil
+      reset(nil, nil)
     end
 
   end

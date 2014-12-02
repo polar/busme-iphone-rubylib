@@ -29,10 +29,17 @@ module Platform
 
     def postLocation(eventData)
       result = api.postJourneyLocation(eventData.route, eventData.location, eventData.role)
-      case result
+      case result.downcase
         when "ok"
         when "notavailable"
           # Should probably stop posting
+          evd = JourneyEventData.new
+          evd.route = eventData.route
+          evd.role = eventData.role
+          evd.action = JourneyEventData::A_ON_ROUTE_DONE
+          evd.reason = JourneyEventData::R_NOT_AVAILABLE
+          evd.location = eventData.location
+          api.bgEvents.postEvent("JourneyStopPosting", evd)
         when "notloggedin"
           api.uiEvents.postEvent("ServerLogout")
       end

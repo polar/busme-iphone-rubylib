@@ -15,6 +15,9 @@ module Api
     attr_accessor :bgEvents
     attr_accessor :loginCredentials
     attr_accessor :startReporting
+    attr_accessor :offRouteDistanceThreshold
+    attr_accessor :offRouteCountThreshold
+    attr_accessor :offRouteTimeThreshold
 
     def initialize(http_client, master_slug, initialURL, platform, appVersion)
       super(http_client)
@@ -38,6 +41,10 @@ module Api
 
     def loggedIn?
       loginCredentials && loginCredentials.loginState == Login::LS_LOGGED_IN ? loginCredentials : nil
+    end
+
+    def clearLogin
+      self.loginCredentials = nil
     end
 
     def getPlatformArgs()
@@ -127,6 +134,10 @@ module Api
               end
               self.syncRate =  bp.syncRate ? bp.syncRate.to_i : 10000
               self.updateRate = bp.updateRate ? bp.updateRate.to_i : 40000
+              self.activeStartDisplayThreshold = bp.activeStartDisplayThreshold ? bp.activeStartDisplayThreshold.to_f : 10000
+              self.offRouteDistanceThreshold = bp.offRouteDistanceThreshold ? bp.offRouteDistanceThreshold.to_f : 200
+              self.offRouteCountThreshold = bp.offRouteCountThreshold ? bp.offRouteCountThreshold.to_i : 10
+              self.offRouteTimeThreshold = bp.offRouteTimeThreshold ? bp.offRouteTimeThreshold.to_f : 20000
               self.ready = true
               self
             end
