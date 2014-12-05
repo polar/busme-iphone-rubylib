@@ -33,7 +33,7 @@ module Platform
       self.bgEvents = Api::BuspassEventDistributor.new(:name => "BGEvents:Main")
       self.uiEvents = Api::BuspassEventDistributor.new(:name => "UIEvents:Main")
 
-      bgEvents.registerForEvent("Main:init", self)
+      uiEvents.registerForEvent("Main:init", self)
       bgEvents.registerForEvent("Main:Discover:init", self)
       bgEvents.registerForEvent("Main:Master:init", self)
     end

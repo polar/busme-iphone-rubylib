@@ -13,6 +13,12 @@ module Platform
       markerStore.markers.values
     end
 
+    def resetMarkers
+      markerStore.markers.values.each do |marker|
+        marker.reset
+      end
+    end
+
     def addMarker(marker_info)
       puts "MarkerBasket addMarker #{marker_info.title}"
       marker = markerStore.getMarker(marker_info.id)

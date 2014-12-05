@@ -47,8 +47,8 @@ module Platform
 
     def resetMessages(time = nil)
       time = Utils::Time.current if time.nil?
-      masterMessages.reject {|x| x.is_a?(Api::MessageSpec) && !x.is_a?(Api::MasterMessage)}
-      masterMessages.each {|x| x.reset(time)}
+      masterMessages.reject {|k,x| x.is_a?(Api::MessageSpec) && !x.is_a?(Api::MasterMessage)}
+      masterMessages.values.each {|x| x.reset(time)}
       self.dirty = true
     end
 

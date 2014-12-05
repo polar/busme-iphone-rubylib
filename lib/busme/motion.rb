@@ -16,6 +16,6 @@ Motion::Project::App.setup do |app|
   app.files_dependencies j("iphone/api.rb") => j("platform/platform_api.rb")
   app.files.delete j("motion.rb")
   app.files.each do |file|
-    p file
+    #p file
   end
 end

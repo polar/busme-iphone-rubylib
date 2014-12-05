@@ -85,11 +85,17 @@ module Platform
 
       api.bgEvents.registerForEvent("Master:init", self)
       api.bgEvents.registerForEvent("Master:reload", self)
+      api.bgEvents.registerForEvent("Master:store", self)
+      api.bgEvents.registerForEvent("Master:resetSeenMarkers", self)
+      api.bgEvents.registerForEvent("Master:resetSeenMessages", self)
     end
 
     def unregisterForEvents
       api.bgEvents.unregisterForEvent("Master:init", self)
       api.bgEvents.unregisterForEvent("Master:reload", self)
+      api.bgEvents.unregisterForEvent("Master:store", self)
+      api.bgEvents.unregisterForEvent("Master:resetSeenMarkers", self)
+      api.bgEvents.unregisterForEvent("Master:resetSeenMessages", self)
     end
 
     def onBuspassEvent(event)
@@ -98,6 +104,12 @@ module Platform
           doInitEvent(event)
         when "Master:reload"
           doReloadEvent(event)
+        when "Master:store"
+          doStoreEvent(event)
+        when "Master:resetSeenMarkers"
+          doResetSeenMarkers(event)
+        when "Master:resetSeenMessages"
+          doResetSeenMessages(event)
       end
     end
 
@@ -130,6 +142,24 @@ module Platform
       journeyBasket.empty
       journeyStore.empty
       clearMasterStore
+    end
+
+    def doResetSeenMarkers(event)
+      markerBasket.resetMarkers
+    end
+
+    def doResetSeenMessages(event)
+      masterMessageBasket.resetMessages
+    end
+
+    ##
+    # This event gets scheduled on the background thread.
+    #
+    def doStoreEvent(event)
+      evd = event.eventData
+      if evd.data[:masterController] == self
+        self.storeMaster
+      end
     end
 
     def assignStorageSerializerControllers

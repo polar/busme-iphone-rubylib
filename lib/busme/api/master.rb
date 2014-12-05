@@ -60,9 +60,9 @@ module Api
     end
 
     def valid?
-      puts "Master:valid #{self.to_s}"
+      #puts "Master:valid #{self.to_s}"
       (!(propList - ["@time_format"]).any? {|x| instance_variable_get(x).nil?}).tap do |x|
-        puts "Master:.valid == #{x}"
+        #puts "Master:.valid == #{x}"
       end
     end
 
