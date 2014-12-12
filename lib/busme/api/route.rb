@@ -247,6 +247,10 @@ module Api
       "route" == type
     end
 
+    def isReporting?
+      reporting
+    end
+
     # Day should have the correct timezone set
     def getStartTime
       if schedStartTime

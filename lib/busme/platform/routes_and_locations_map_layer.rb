@@ -11,14 +11,14 @@ module Platform
   class RoutesAndLocationsMapLayer
     attr_accessor :api
     attr_accessor :journeyDisplayController
-    attr_accessor :mustDrawPaths
+    attr_accessor :mustPlacePaths
     attr_accessor :doDraw
 
     PATTERN_PLACING_THRESHOLD = 10
 
     def initialize(api, journeyDisplayController)
       self.api = api
-      self.mustDrawPaths = true
+      self.mustPlacePaths = true
       self.doDraw = true
       self.journeyDisplayController = journeyDisplayController
     end
@@ -121,7 +121,7 @@ module Platform
           end
         end
       end
-      placeJourneyLocation(postingRoute, Disposition::NORMAL, context)
+      placeJourneyLocation(postingRoute, Disposition::NORMAL, context) if postingRoute
     end
 
     ##
@@ -137,7 +137,7 @@ module Platform
       lastNumberOfPathsVisible = 0
       placed = {}
       for pat in patterns
-        if p.isReady?
+        if pat.isReady?
           if mustPlacePaths || lastNumberOfPathsVisible < PATTERN_PLACING_THRESHOLD
             if placed[pat.id].nil?
               placePattern(pat, disposition, context)
@@ -152,22 +152,25 @@ module Platform
     end
 
     def placeRoutes(journeyDisplays, context)
-      patterns = journeyDisplays.reduce([]) {|t,v| t + v.journeyPatterns}
-      placePatterns(patterns, Disposition::NORMAL, context)
+      journeyDisplays.each do |route|
+        if route.isPathVisible?
+          disposition = route.isPathHighlighted? ? Disposition::HIGHLIGHT : Disposition::NORMAL
+          placeRoute(route, disposition, context)
+        end
+      end
     end
 
     def placeRoute(journeyDisplay, disposition, context)
-      placePatterns(journeyDisplay.journeyPatterns, disposition, context)
+      placePatterns(journeyDisplay.route.journeyPatterns, disposition, context)
     end
 
     def place(context)
       if ! doDraw
         return
       end
-      if journeyDisplayController.trackingJourneyDisplay
-        placeRoute(journeyDisplayController.trackingJourneyDisplay, Disposition::TRACK, context)
-      elsif journeyDisplayController.highlightJourneyDisplay
-        placeRoute(journeyDisplayController.highlightJourneyDisplay, Disposition::HIGHLIGHT, context)
+      state = journeyDisplayController.getCurrentState
+      if state.state == VisualState::S_VEHICLE
+        placeRoute(state.selectedRoute, Disposition::TRACK, context)
       else
         placeRoutes(journeyDisplayController.journeyDisplays, context)
         placeJourneyLocations(journeyDisplayController.journeyDisplays, context)
