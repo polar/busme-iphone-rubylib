@@ -251,6 +251,10 @@ module Api
       reporting
     end
 
+    def isReported?
+      reported
+    end
+
     # Day should have the correct timezone set
     def getStartTime
       if schedStartTime

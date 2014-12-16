@@ -3,9 +3,12 @@ module Platform
     TRACK = 1
     HIGHLIGHT = 2
     NORMAL = 3
-
-    TOO_EARLY = 5
-    START = 6
+  end
+  module IconType
+    NORMAL = 4
+    REPORTING = 5
+    TOO_EARLY = 6
+    START = 7
   end
 
   class RoutesAndLocationsMapLayer
@@ -42,7 +45,7 @@ module Platform
     # a visual for disposition and reported. It may also place text on the screen as well
     # in conjunction with the locator.
     #
-    def placeJourneyLocator(journeyDisplay, location, direction, reported, disposition, context)
+    def placeJourneyLocator(journeyDisplay, args, context)
 
     end
 
@@ -53,55 +56,86 @@ module Platform
     #
     def placeJourneyLocation(journeyDisplay, disposition, context)
       time_now = Utils::Time.current
+      onRoute = false
+      isReporting = false
+      currentLocation = nil
       if journeyDisplay.route.isReporting?
+        isReporting = true
         isReported = true
         loc = getCurrentLocation()
         if loc
-          currentLocation = GeoCalc.toGeoPoint(location)
-          currentDirection = currentLocation.bearing.
+          currentLocation = GeoCalc.toGeoPoint(loc)
+          currentDirection = loc.bearing
           points = GeoPathUtils.whereOnPath(journeyDisplay.paths[0], currentLocation, 60)
+          first = nil
           for gp in points
             if gp.distance > 0
-              currentDirection = gp.bearing
+              if route.lastKnownDistance && gp.distance >= route.lastKnownDistance
+                currentDirection = gp.bearing
+                currentDistance = gp.distance
+                onRoute = true
+                break
+              end
+              first ||= gp
             end
           end
-          currentTimeDiff = 0
-          onRoute = true
+          onRoute ||= !first.nil?
+          currentDirection ||= first.bearing if first
+          currentDistance ||= first.distance if first
+          currentTimediff = 0
         end
       end
-      startMeasure = journeyDisplay.route.getStartingMeasure(api.activeStartDisplayThreshold, time_now)
-      if currentLocation
+      if currentLocation.nil?
         journeyDisplay.route.tap do |route|
           isReported = route.isReported?
           currentLocation = route.lastKnownLocation
           currentDirection = route.lastKnownDirection
-          distance = route.lastKnownDistance
-          currentTimeDiff = route.lastKnownTimeDiff
+          currentDistance = route.lastKnownDistance
+          currentTimediff = route.lastKnownTimediff
           onRoute = route.onRoute
         end
       end
-      if currentLocation && startMeasure < 1.0
-        if startMeasure < 0
-          if disposition == Disposition::NORMAL
-            return
-          end
-          disposition = Disposition::TOO_EARLY
+      startMeasure = journeyDisplay.route.getStartingMeasure(api.activeStartDisplayThreshold, time_now)
+      if isReporting
+        if currentLocation
+          iconType = IconType::REPORTING
         else
-          disposition = Disposition::START
+          # We don't place a locator. May not have a valid location yet.
+          return
         end
-        currentLocation = journeyDisplay.route.getStartingPoint
-        currentDirection = 0.0 # doesn't matter.
-        currentTimeDiff = 0
+      elsif startMeasure < 1.0
+        if startMeasure < 0
+          iconType = IconType::TOO_EARLY
+        else
+          iconType = IconType::START
+        end
+        if currentLocation.nil?
+          currentLocation = journeyDisplay.route.getStartingPoint
+          currentDirection = 0
+          currentDistance = 0
+          currentTimediff = 0
+        end
+      else
+        iconType = IconType::NORMAL
       end
-      if currentLocation.nil?
-        return
+      if currentLocation
+        # < 0 means early
+        # > 0 means late
+        args = {
+            :currentLocation => currentLocation,
+            :currentDirection => currentDirection,
+            :currentDistance => currentDistance,
+            :currentTimediff => currentTimediff,
+            :onRoute => onRoute,
+            :isReporting => isReporting,
+            :isReported => isReported,
+            :startMeasure => startMeasure,
+            :disposition => disposition,
+            :iconType => iconType
+        }
+        PM.logger.info "#{self.class.name}#{self.__method__} #{args.inspect}"
+        placeJourneyLocator(journeyDisplay, args, context)
       end
-      text = ""
-      diff = currentTimeDiff/60
-      time = "%sm" % diff.abs
-      # < 0 means early
-      # > 0 means late
-      placeJourneyLocator(journeyDisplay, currentLocation, currentDirection, isReported, disposition, context)
     end
 
     def placeJourneyLocations(journeyDisplays, context)
@@ -114,7 +148,11 @@ module Platform
           else
             if ! jd.route.isFinished?
               if (self.mustPlacePaths || placed <= PATTERN_PLACING_THRESHOLD)
-                placeJourneyLocation(jd, Disposition::NORMAL, context)
+                if jd.isPathHighlighted?
+                  placeJourneyLocation(jd, Disposition::HIGHLIGHT, context)
+                else
+                  placeJourneyLocation(jd, Disposition::NORMAL, context)
+                end
                 placed += 1
               end
             end
@@ -171,6 +209,7 @@ module Platform
       state = journeyDisplayController.getCurrentState
       if state.state == VisualState::S_VEHICLE
         placeRoute(state.selectedRoute, Disposition::TRACK, context)
+        placeJourneyLocation(state.selectedRoute, Disposition::TRACK, context)
       else
         placeRoutes(journeyDisplayController.journeyDisplays, context)
         placeJourneyLocations(journeyDisplayController.journeyDisplays, context)
