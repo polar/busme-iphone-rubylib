@@ -133,7 +133,6 @@ module Platform
             :disposition => disposition,
             :iconType => iconType
         }
-        PM.logger.info "#{self.class.name}#{self.__method__} #{args.inspect}"
         placeJourneyLocator(journeyDisplay, args, context)
       end
     end
@@ -216,5 +215,16 @@ module Platform
       end
     end
 
+    def placeLocators(context)
+      if ! doDraw
+        return
+      end
+      state = journeyDisplayController.getCurrentState
+      if state.state == VisualState::S_VEHICLE
+        placeJourneyLocation(state.selectedRoute, Disposition::TRACK, context)
+      else
+        placeJourneyLocations(journeyDisplayController.journeyDisplays, context)
+      end
+    end
   end
 end

@@ -25,6 +25,10 @@ module Integration
       self.paths = []
     end
 
+    def pathsCount
+      self.paths.size
+    end
+
     def moveTo(x, y = nil)
       if x.is_a? Point
         self.paths << [x]

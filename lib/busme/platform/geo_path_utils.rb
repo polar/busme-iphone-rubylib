@@ -64,5 +64,18 @@ module Platform
       end
       results
     end
+
+    def self.rectForPath(path)
+      right = left = path[0].longitude
+      top = bottom = path[0].latitude
+      for i in 1..path.size-1
+        # TODO This is wrong if we span the date line
+        left = [left, path[i].longitude].min
+        right = [right, path[i].longitude].max
+        top = [top, path[i].latitude].max
+        bottom = [bottom, path[i].latitude].min
+      end
+      Integration::Rect.new(left, top, right, bottom)
+    end
   end
 end

@@ -5,6 +5,7 @@ module Api
     attr_accessor :path
     attr_writer   :projectedPath
     attr_writer   :distance
+    attr_accessor :rect
 
     def propList
       %w(
@@ -67,6 +68,7 @@ module Api
         for jps in tag.childNodes do
           if "jps" == jps.name.downcase
             self.path = parsePath(jps)
+            self.rect = Platform::GeoPathUtils.rectForPath(path)
             return path
           end
         end

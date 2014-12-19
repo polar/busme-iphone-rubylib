@@ -247,16 +247,18 @@ module Utils
       end
     end
 
-    def self.toClippedScreenPath(projectedPath, projection)
-     #puts "toClippedScreenPath(#{projectedPath.length} points) on #{projection}"
+    def self.toClippedScreenPath(projectedPath, projection, path = nil)
+      #PM.logger.info "toClippedScreenPath(#{projectedPath.length} points) on #{projection.inspect}"
       rect = projection.screenRect
-      path = Integration::Path.new
+      #PM.logger.info "toClippedScreenPath rect=#{rect.inspect}"
+      path ||= Integration::Path.new
       if projectedPath.length > 0
         last = projection.translatePoint(projectedPath[0])
         onscreen = rect.containsXY(last.x, last.y)
       end
-      coords = Integration::Point.new
+      #coords = Integration::Point.new
       for point in projectedPath
+        coords = projection.translatePoint(point)
         if last.x != coords.x || last.y != coords.y
           if rect.containsXY(coords.x, coords.y)
             #puts "Point #{point} translated to #{coords} is in #{rect}"
@@ -265,7 +267,7 @@ module Utils
             # If we aren't initialized yet, we have to start somewhere.
             # This might be the first point in the projected path that is actually onscreen, which could
             # be considerably far down the line.
-            if ! onscreen || path.paths.size == 0
+            if ! onscreen || path.pathsCount == 0
               path.moveTo(last.x, last.y)
             end
             # Duplicates will be noticed and not added, but we never add dups anyway
@@ -276,7 +278,7 @@ module Utils
             # If we were onscreen then we draw to off screen, which will be clipped.
             if onscreen
               # We may have not started yet!
-              if path.paths.size == 0
+              if path.pathsCount == 0
                 path.moveTo(last.x, last.y)
               end
               path.lineTo(coords.x, coords.y)
@@ -285,7 +287,7 @@ module Utils
               # We draw a line if the line intersects the rect
               lineRect = Integration::Rect.initWithLineCoords(last.x,last.y,coords.x,coords.y)
               if lineRect.intersectRect(rect)
-                if path.paths.size == 0
+                if path.pathsCount == 0
                   path.moveTo(last.x, last.y)
                 end
                 path.lineTo(coords.x,coords.y)
@@ -296,7 +298,7 @@ module Utils
         end
         last.set(coords.x, coords.y)
       end
-     #puts "to Path #{path.to_s}"
+      #PM.logger.info "to Path #{path.to_s}"
       path
     end
   end
