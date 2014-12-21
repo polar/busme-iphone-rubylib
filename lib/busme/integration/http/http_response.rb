@@ -1,18 +1,19 @@
 module Integration
   module Http
     class HttpResponse
-      attr_accessor :httpResponse
       def initialize(httpResponse)
-        self.httpResponse = httpResponse
+        @headers = httpResponse.header.items.map {|k,v| Header.new(k,v)}
+        @entity = HttpEntity.new(httpResponse)
+        @statusLine = StatusLine.new(httpResponse.header.status_code, httpResponse.header.reason_phrase)
       end
       def getAllHeaders()
-        @headers ||= httpResponse.header.items.map {|k,v| Header.new(k,v)}
+        @headers
       end
       def getEntity()
-        @entity ||= HttpEntity.new(httpResponse)
+        @entity
       end
       def getStatusLine()
-        @status_line ||= StatusLine.new(httpResponse.header.status_code, httpResponse.header.reason_phrase)
+        @statusLine
       end
     end
 end

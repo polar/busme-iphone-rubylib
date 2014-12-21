@@ -189,11 +189,18 @@ module Platform
     end
 
     def placeRoutes(journeyDisplays, context)
+      highlights = []
       journeyDisplays.each do |route|
         if route.isPathVisible?
-          disposition = route.isPathHighlighted? ? Disposition::HIGHLIGHT : Disposition::NORMAL
-          placeRoute(route, disposition, context)
+          if route.isPathHighlighted?
+            highlights << route
+          else
+            placeRoute(route, Disposition::NORMAL, context)
+          end
         end
+      end
+      highlights.each do |route|
+        placeRoute(route, Disposition::HIGHLIGHT, context)
       end
     end
 

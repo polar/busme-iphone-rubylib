@@ -1,22 +1,22 @@
 module Integration
   module Http
     class HttpEntity
-      attr_accessor :response
 
       def initialize(response)
-        self.response = response
+        @contentLength = response.body.length
+        @content = response.body.to_s
       end
 
       def getContentLength
-        response.body.length
+        @contentLength
       end
 
       def consumeContent
-
+        @content = nil
       end
 
       def getContent
-        response.body.to_s
+        @content
       end
     end
 end

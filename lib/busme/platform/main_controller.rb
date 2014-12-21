@@ -39,7 +39,7 @@ module Platform
     end
 
     def onBuspassEvent(event)
-      puts "MainController:onBuspassEvent(#{event.eventName})"
+      PM.logger.info "#{self.class.name}:#{__method__}(#{event.eventName})"
       case event.eventName
         when "Main:init"
           onInitEvent(event)
@@ -53,12 +53,16 @@ module Platform
     def onInitEvent(event)
       evd = event.eventData
       evd.controller = self
+      PM.logger.info "#{self.class.name}:#{__method__}(#{event.eventName}) #{evd.controller}"
       defaultMaster = busmeConfigurator.getDefaultMaster()
+      PM.logger.info "#{self.class.name}:#{__method__}(#{event.eventName}) defaultMaster #{defaultMaster}"
       if defaultMaster && defaultMaster.valid?
         evd.data = { :master => defaultMaster }
         evd.return = "defaultMaster"
       else
+        PM.logger.info "#{self.class.name}:#{__method__}(#{event.eventName}) getting last location"
         location = busmeConfigurator.getLastLocation()
+        PM.logger.info "#{self.class.name}:#{__method__}(#{event.eventName}) location #{location}"
         evd.data = { lastLocation: location }
         evd.return = "discover"
       end
@@ -66,6 +70,7 @@ module Platform
       evd.error = boom
     ensure
       uiEvents.postEvent("Main:Init:return", evd)
+      PM.logger.info "#{self.class.name}:#{__method__}(#{event.eventName}) #{evd.return}"
     end
 
     def onDiscoverInitEvent(event)

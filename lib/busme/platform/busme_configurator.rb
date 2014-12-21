@@ -14,6 +14,7 @@ module Platform
     end
 
     def getLastLocation
+      PM.logger.info "#{self.class.name}:#{__method__} #{@location}"
       @lastLocation
     end
 

@@ -13,6 +13,7 @@ module Api
     @path
     @projectedPath
     @distance
+    @rect
       )
     end
     def initWithCoder1(decoder)
@@ -56,8 +57,12 @@ module Api
       @projectedPath ||= Utils::ScreenPathUtils.toProjectedPath(path)
     end
 
+    def rect
+      @rect ||= Platform::GeoPathUtils.rectForPath(@path) if @path
+    end
+
     def endPoint
-      path && path.last
+      @endPoint ||= path && path.last
     end
 
     def loadParsedXML(tag)
@@ -68,7 +73,6 @@ module Api
         for jps in tag.childNodes do
           if "jps" == jps.name.downcase
             self.path = parsePath(jps)
-            self.rect = Platform::GeoPathUtils.rectForPath(path)
             return path
           end
         end

@@ -30,15 +30,15 @@ module Api
     end
 
     def notifyEventListeners(event)
-     #puts "BuspassEventNotifier: notify #{event.eventName}"
-     #puts "BuspassEventNotifier: notify #{eventListeners.size} listeners"
-     #puts "BuspassEventNotifier: notify make array #{[]}"
+      PM.logger.info "BuspassEventNotifier: notify #{event.eventName}"
+      PM.logger.info "BuspassEventNotifier: notify #{eventListeners.size} listeners"
+      PM.logger.info "BuspassEventNotifier: notify make array #{[]}"
       eventListeners.each do |lis|
-       #puts "BuspassEventNotifier: notifying #{lis}"
-       #puts "BuspassEventNotifer: array make #{[]}"
+        PM.logger.info "BuspassEventNotifier: notifying #{lis}"
+        PM.logger.info "BuspassEventNotifer: array make #{[]}"
         lis.onBuspassEvent(event)
-       #puts "BuspassEventNotifier: notified #{lis}"
-       #puts "BuspassEventNotifier: notified make array #{[]}"
+        PM.logger.info "BuspassEventNotifier: notified #{lis}"
+        PM.logger.info "BuspassEventNotifier: notified make array #{[]}"
       end
     end
   end
@@ -67,9 +67,9 @@ module Api
       self.name = args[:name]
     end
 
-    def postEvent(event, data = nil)
-      puts "#{self.to_s}.postEvent(event #{event}, data #{data})"
-     #puts "#{self.to_s}.postEvent(event #{event}, data #{data}) #{[]}"
+    def postEvent(event, data = nil) 
+      PM.logger.info "#{self.to_s}.postEvent(event #{event}, data #{data})"
+      PM.logger.info "#{self.to_s}.postEvent(event #{event}, data #{data}) #{[]}"
       event = event.is_a?(BuspassEvent) ? event : BuspassEvent.new(event, data)
       postBuspassEvent(event)
     end
@@ -86,27 +86,31 @@ module Api
     alias :top :peek
 
     def roll
-     #puts "#{self}: roll1"
-     #puts "#{self}: roll1 #{[]}"
+      PM.logger.info "#{self}: roll1"
+      PM.logger.info "#{self}: roll1 #{[]}"
       event = eventQ.pop
-     #puts "#{self}: roll2 #{event}"
-     #puts "#{self}: roll2 #{[]}"
+      PM.logger.info "#{self}: roll2 #{event}"
+      PM.logger.info "#{self}: roll2 #{[]}"
       if event
-       #puts "#{self}: roll3 #{event} #{event.eventName}"
-       #puts "#{self}: roll3 #{event} #{event.eventName} #{[]}"
+        PM.logger.info "#{self}: roll3 #{event} #{event.eventName}"
+        PM.logger.info "#{self}: roll3 #{event} #{event.eventName} #{[]}"
         triggerBuspassEvent(event)
-       #puts "#{self}: roll4 #{event}"
-       #puts "#{self}: roll4 #{event} #{[]}"
+        PM.logger.info "#{self}: roll4 #{event}"
+        PM.logger.info "#{self}: roll4 #{event} #{[]}"
       end
-     #puts "#{self}: roll5 #{event}"
-     #puts "#{self}: roll5 #{event} #{[]}"
+      PM.logger.info "#{self}: roll5 #{event}"
+      PM.logger.info "#{self}: roll5 #{event} #{[]}"
       event
     end
 
     def rollAll
       event = roll
+      PM.logger.info "#{self}: rollAll #{event}"
+      PM.logger.info "#{self}: rollAll #{event} #{[]}"
       while event do
         event = roll
+        PM.logger.info "#{self}: rollAll #{event}"
+        PM.logger.info "#{self}: rollAll #{event} #{[]}"
       end
     end
 
@@ -116,14 +120,14 @@ module Api
     end
 
     def triggerBuspassEvent(event)
-     #puts "triggerBuspassEvent #{event.eventName}"
-     #puts "triggerBuspassEvent #{[]}"
+      PM.logger.info "triggerBuspassEvent #{event.eventName}"
+      PM.logger.info "triggerBuspassEvent #{[]}"
       notifier = eventNotifiers[event.eventName]
-     #puts "triggerBuspassEvent notifier #{notifier}"
+      PM.logger.info "triggerBuspassEvent notifier #{notifier}"
       if notifier
         notifier.notifyEventListeners(event)
       else
-       #puts "No receptors for Event #{event.eventName} on #{self.to_s}"
+        PM.logger.info "No receptors for Event #{event.eventName} on #{self.to_s}"
       end
     end
 
